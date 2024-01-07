@@ -13,9 +13,11 @@
   },
   "devDependencies": {
     "@types/bunyan": "^1.8.11",
+    "@types/graphql": "^14.5.0",
     "@types/koa": "^2.13.12",
     "@types/koa-bunyan-logger": "^2.1.7",
     "@types/koa-cors": "^0.0.6",
+    "@types/koa-router": "^7.4.8",
     "@types/mongoose": "^5.11.97",
     "ts-loader": "^9.5.1",
     "tsx": "^4.7.0",
@@ -24,10 +26,13 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@types/koa-router": "^7.4.8",
     "bunyan": "^1.8.15",
+    "graphql": "^16.8.1",
     "koa": "^2.15.0",
     "koa-bunyan-logger": "^2.1.0",
     "koa-cors": "^0.0.16",
+    "koa-router": "^12.0.1",
     "mongoose": "^8.0.3"
   }
 }
