@@ -1,0 +1,12 @@
+{
+  "name": "server",
+  "version": "0.0.0",
+  "description": "A (soft) real-time chat server",
+  "main": "./src/index.ts",
+  "author": "henri <henri@henr.in>",
+  "license": "MIT",
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}
