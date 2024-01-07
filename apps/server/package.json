@@ -5,8 +5,17 @@
   "main": "./src/index.ts",
   "author": "henri <henri@henr.in>",
   "license": "MIT",
+  "scripts": {
+    "build": "webpack --progress",
+    "build:watch": "webpack --watch --progress",
+    "start": "node ./dist/bundle.js",
+    "dev": "tsx --watch ./src/index.ts"
+  },
   "devDependencies": {
+    "ts-loader": "^9.5.1",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "webpack": "^5.89.0",
+    "webpack-cli": "^5.1.4"
   }
 }
