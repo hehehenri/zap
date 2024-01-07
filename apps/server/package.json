@@ -8,14 +8,26 @@
   "scripts": {
     "build": "webpack --progress",
     "build:watch": "webpack --watch --progress",
-    "start": "node ./dist/bundle.js",
-    "dev": "tsx --watch ./src/index.ts"
+    "start": "node ./dist/bundle.js | bunyan",
+    "dev": "tsx --watch ./src/index.ts | bunyan"
   },
   "devDependencies": {
+    "@types/bunyan": "^1.8.11",
+    "@types/koa": "^2.13.12",
+    "@types/koa-bunyan-logger": "^2.1.7",
+    "@types/koa-cors": "^0.0.6",
+    "@types/mongoose": "^5.11.97",
     "ts-loader": "^9.5.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "bunyan": "^1.8.15",
+    "koa": "^2.15.0",
+    "koa-bunyan-logger": "^2.1.0",
+    "koa-cors": "^0.0.16",
+    "mongoose": "^8.0.3"
   }
 }
