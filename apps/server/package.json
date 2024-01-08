@@ -12,6 +12,7 @@
     "dev": "tsx --watch ./src/index.ts | bunyan"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/bunyan": "^1.8.11",
     "@types/graphql": "^14.5.0",
     "@types/graphql-relay": "^0.7.0",
@@ -30,6 +31,7 @@
   "dependencies": {
     "@types/koa-graphql": "^0.8.11",
     "@types/koa-router": "^7.4.8",
+    "bcrypt": "^5.1.1",
     "bunyan": "^1.8.15",
     "graphql": "^16.8.1",
     "graphql-relay": "^0.10.0",
