@@ -2,21 +2,14 @@ import Koa from "koa";
 import cors from "koa-cors";
 import bunyan from "bunyan";
 import koaBunyan from "koa-bunyan-logger";
-import Router from "koa-router";
-import router from "./router";
-
-type LogLevel = "trace" | "debug" | "info";
+import routes from "./routes";
 
 type Config = {
   port: number,
-  logger: {
-    level: LogLevel
-  }
 }
 
-const logger = ({ level }: { level: LogLevel }) => {
+const logger = () => {  
   const options = {
-    level,
     name: 'zap',
     serializers: bunyan.stdSerializers
   };
@@ -29,11 +22,11 @@ const start = (config: Config) => {
   const app = new Koa();
 
   app.use(cors());
-  app.use(logger(config.logger));
+  app.use(logger());
   app.use(koaBunyan.requestLogger());
 
-  const r = router();  
-  app.use(r.routes());
+  const router = routes();  
+  app.use(router.routes());
   
   app.listen(config.port);
 };

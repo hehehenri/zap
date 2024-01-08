@@ -3,9 +3,6 @@ export default {
     uri: 'mongodb://localhost:27017/'
   },
   app: {
-    port: 8000,
-    logger: {
-      level: "debug",
-    }
+    port: 8000
   }
 }
