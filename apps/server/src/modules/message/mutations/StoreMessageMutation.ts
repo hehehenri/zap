@@ -1,4 +1,4 @@
-import {mutationWithClientMutationId} from "graphql-relay";
+import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLString, GraphQLNonNull, GraphQLID } from "graphql/type";
 
 import { MessageType } from "../MessageType";
