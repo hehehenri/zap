@@ -4,5 +4,8 @@ export default {
   },
   app: {
     port: 8000
+  },
+  jwt: {
+    secret: "zap.secret"
   }
 }
