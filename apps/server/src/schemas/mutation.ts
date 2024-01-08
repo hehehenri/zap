@@ -1,12 +1,16 @@
 import { GraphQLObjectType } from "graphql";
 
-import loginMutation from "../modules/user/mutation/login";
+import LoginMutation from "../modules/user/mutations/LoginMutation";
+import RegisterMutation from "../modules/user/mutations/RegisterMutation";
+import StoreMessageMutation from "../modules/message/mutations/StoreMessageMutation";
 
 const mutation = new GraphQLObjectType({
   name: "Mutation",
-  description: "Mutation Root",
   fields: () => ({
-    login: loginMutation
+    login: LoginMutation,
+    register: RegisterMutation,
+
+    storeMessage: StoreMessageMutation
   })
 });
 

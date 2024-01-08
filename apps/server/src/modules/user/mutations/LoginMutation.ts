@@ -7,8 +7,8 @@ import { getToken }  from "../../../authentication";
 import config from "../../../config";
 import UserModel from "../UserModel";
 
-const loginMutation = mutationWithClientMutationId({
-  name: "Login",
+const LoginMutation = mutationWithClientMutationId({
+  name: "LoginMutation",
   description: "Validate password and return user's token",
   inputFields: {
     username: {
@@ -16,6 +16,16 @@ const loginMutation = mutationWithClientMutationId({
     },
     password: {
       type: new GraphQLNonNull(GraphQLString),
+    }
+  },
+  outputFields: {
+    token: {
+      type: GraphQLString,
+      resolve: ({ token }) => token
+    },
+    user: {
+      type: UserType,
+      resolve: ({ user }) => user
     }
   },
   mutateAndGetPayload: async ({ username, password }) => {
@@ -33,17 +43,7 @@ const loginMutation = mutationWithClientMutationId({
       token,
       user
     };
-  },
-  outputFields: {
-    token: {
-      type: GraphQLString,
-      resolve: ({ token }) => token
-    },
-    user: {
-      type: UserType,
-      resolve: ({ user }) => user
-    }
   }
 });
 
-export default loginMutation;
+export default LoginMutation;

@@ -1,13 +1,13 @@
 import { GraphQLObjectType } from "graphql";
 
-import me from '../modules/user/query/me';
+import Me from '../modules/user/queries/Me';
 
 const query = new GraphQLObjectType({
   name: 'Query',
   description: 'Query Root',
   fields: () => ({
-    me,
+    me: Me,
   })
 })
 
-export default query
+export default query;

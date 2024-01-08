@@ -1,4 +1,5 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 const env = () => {
   return process.env.ENV === 'production'
@@ -26,4 +27,5 @@ module.exports = {
       },
     ],
   },
+  externals: [nodeExternals()]
 };

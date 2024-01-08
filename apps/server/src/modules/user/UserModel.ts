@@ -6,10 +6,10 @@ export type UserDefinition = {
   readonly password: string
 }
 
-export const schema = new mongoose.Schema<UserDefinition>({
+export const userSchema = new mongoose.Schema<UserDefinition>({
   username: { type: String, required: true },
 })
 
-const UserModel = mongoose.model<UserDefinition>('User', schema);
+const UserModel = mongoose.model<UserDefinition>('User', userSchema);
 
 export default UserModel;

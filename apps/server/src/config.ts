@@ -6,6 +6,7 @@ export default {
     port: 8000
   },
   jwt: {
-    secret: "zap.secret"
-  }
+    secret: "zap.secret",
+    saltRounds: 10,
+  },
 }
