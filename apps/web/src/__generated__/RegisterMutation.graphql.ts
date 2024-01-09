@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<2185cfa7668f930e2a578e9b27f6c238>>
+ * @generated SignedSource<<ffe46d873a503e617d456896f26d9785>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,18 +9,18 @@
 // @ts-nocheck
 
 import { ConcreteRequest, Mutation } from 'relay-runtime';
-export type LoginMutation$variables = {
+export type RegisterMutation$variables = {
   password: string;
   username: string;
 };
-export type LoginMutation$data = {
-  readonly login: {
+export type RegisterMutation$data = {
+  readonly register: {
     readonly token: string | null | undefined;
   } | null | undefined;
 };
-export type LoginMutation = {
-  response: LoginMutation$data;
-  variables: LoginMutation$variables;
+export type RegisterMutation = {
+  response: RegisterMutation$data;
+  variables: RegisterMutation$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -55,9 +55,9 @@ v2 = [
         "name": "input"
       }
     ],
-    "concreteType": "LoginMutationPayload",
+    "concreteType": "RegisterMutationPayload",
     "kind": "LinkedField",
-    "name": "login",
+    "name": "register",
     "plural": false,
     "selections": [
       {
@@ -79,7 +79,7 @@ return {
     ],
     "kind": "Fragment",
     "metadata": null,
-    "name": "LoginMutation",
+    "name": "RegisterMutation",
     "selections": (v2/*: any*/),
     "type": "Mutation",
     "abstractKey": null
@@ -91,20 +91,20 @@ return {
       (v0/*: any*/)
     ],
     "kind": "Operation",
-    "name": "LoginMutation",
+    "name": "RegisterMutation",
     "selections": (v2/*: any*/)
   },
   "params": {
-    "cacheID": "3625501019e97bcafc93ed9c4f7bf7ae",
+    "cacheID": "f12575002f1518e9da5f11cc0139e466",
     "id": null,
     "metadata": {},
-    "name": "LoginMutation",
+    "name": "RegisterMutation",
     "operationKind": "mutation",
-    "text": "mutation LoginMutation(\n  $username: String!\n  $password: String!\n) {\n  login(input: {username: $username, password: $password}) {\n    token\n  }\n}\n"
+    "text": "mutation RegisterMutation(\n  $username: String!\n  $password: String!\n) {\n  register(input: {username: $username, password: $password}) {\n    token\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5456dc24581abde2f2c15fe796ad8eec";
+(node as any).hash = "79cf3d1b151887ee1f8863d641502873";
 
 export default node;

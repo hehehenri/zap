@@ -1,21 +1,22 @@
 "use client";
 
 import { Button, Input } from "@/components";
-import { Login } from "@/components/mutations";
 import { Logo } from "@/components/Logo";
+import { Register } from "@/components/mutations/RegisterMutation";
 import { useMutation } from "react-relay";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import Cookie from "js-cookie";
 import {
-  LoginMutation,
-  LoginMutation$variables as Variables,
-  LoginMutation$data as Response,
-} from "@/__generated__/LoginMutation.graphql";
+  RegisterMutation,
+  RegisterMutation$variables as Variables,
+  RegisterMutation$data as Response,
+} from "@/__generated__/RegisterMutation.graphql";
 
-const LoginPage = () => {
-  const [commitMutation, inFlight] = useMutation<LoginMutation>(Login);
+import { useRouter } from "next/navigation";
+
+const RegisterPage = () => {
+  const [commitMutation, inFlight] = useMutation<RegisterMutation>(Register);
   const { register, handleSubmit } = useForm<Variables>();
   const router = useRouter();
 
@@ -23,12 +24,16 @@ const LoginPage = () => {
   const onSubmit = (variables: Variables) => {
     commitMutation({
       variables,
-      onCompleted: ({ login }: Response) => {
-        if (!login?.token) {
-          throw new Error("failed to login user: " + JSON.stringify(register));
+      onCompleted: ({ register }: Response) => {
+        // TODO: move this somewhere else
+        // TODO: properly handle error
+        if (!register?.token) {
+          throw new Error(
+            "failed to register user: " + JSON.stringify(register),
+          );
         }
 
-        Cookie.set("auth.token", login.token);
+        Cookie.set("auth.token", register.token);
         router.push("/messages");
       },
     });
@@ -38,7 +43,7 @@ const LoginPage = () => {
     <main className="w-full h-full flex flex-col gap-y-6 items-center justify-center">
       <div className="flex flex-col items-center gap-y-2">
         <Logo />
-        <span className="text-zinc-700">Login to your account.</span>
+        <span className="text-zinc-700">Register to your account.</span>
       </div>
 
       <section className="bg-white rounded-2xl shadow px-8 py-6 flex flex-col">
@@ -77,20 +82,20 @@ const LoginPage = () => {
             </div>
           </div>
           <Button className="flex items-center gap-1 w-full justify-center">
-            <span>Login</span>
+            Register
             <LogIn strokeWidth={1} />
           </Button>
         </form>
       </section>
 
       <div className="flex gap-1.5">
-        Doesn't have an account?
-        <a href="/register" className="font-semibold text-primary-500">
-          Sign up here
+        Already have an account?
+        <a href="/login" className="font-semibold text-primary-500">
+          Sign in here.
         </a>
       </div>
     </main>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

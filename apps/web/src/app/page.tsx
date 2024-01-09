@@ -1,4 +1,4 @@
-import Logo from "@/components/Logo";
+import { Logo } from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
@@ -9,7 +9,7 @@ const Home = () => {
         <nav className="flex items-center justify-between">
           <Logo />
           <a
-            href="#"
+            href="/login"
             className="
               flex items-center gap-2
               bg-primary-500 rounded-full py-3 px-7 border border-black
@@ -33,7 +33,7 @@ const Home = () => {
             </p>
 
             <a
-              href="#"
+              href="/login"
               className="
                 flex items-center justify-center gap-2 w-40 text-black
                 bg-primary-500 py-3 px-7 mt-24 rounded-full border border-black
