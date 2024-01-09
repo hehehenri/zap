@@ -1,6 +1,8 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { ReactRelayContext } from "react-relay";
+import Providers from "./providers";
 
 const bevellier = localFont({
   src: "../../public/bevellier.ttf",
@@ -23,9 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }): JSX.Element {
   return (
-    <html lang="en" className="bg-secondary-50/70">
-      <body className={`${bevellier.variable} ${satoshi.variable} font-sans`}>
-        {children}
+    <html lang="en" className="bg-secondary-50/40">
+      <body
+        className={`${bevellier.variable} ${satoshi.variable} font-sans h-full`}
+      >
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
