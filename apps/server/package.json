@@ -6,10 +6,10 @@
   "author": "henri <henri@henr.in>",
   "license": "MIT",
   "scripts": {
-    "build": "webpack --config ./webpack.config.js --progress",
-    "build:watch": "webpack --config ./webpack.config.js --watch --progress",
-    "start": "node ./dist/bundle.js | bunyan",
-    "dev": "tsx --watch ./src/index.ts | bunyan"
+    "build": "yarn gen:schema && webpack --config ./webpack.config.js --progress",
+    "start": "yarn gen:schema && node ./dist/bundle.js | bunyan",
+    "dev": "yarn gen:schema && tsx --watch ./src/index.ts | bunyan",
+    "gen:schema": "tsx ./scripts/generateSchema.ts && cp ./schema/schema.graphql ../web/data"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

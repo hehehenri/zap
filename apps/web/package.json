@@ -3,17 +3,25 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "yarn relay && next dev",
+    "build": "yarn relay && next build",
     "start": "next start",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "relay": "relay-compiler"
   },
   "dependencies": {
     "@repo/ui": "*",
+    "clsx": "^2.1.0",
+    "graphql-ws": "^5.14.3",
     "lucide-react": "^0.307.0",
     "next": "^14.0.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.49.3",
+    "react-relay": "^16.1.0",
+    "relay-runtime": "^16.1.0",
+    "tailwind-merge": "^2.2.0",
+    "watchman": "^1.0.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",
@@ -23,9 +31,13 @@
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
     "@types/react-dom": "^18.2.18",
+    "@types/react-relay": "^16.0.5",
+    "@types/relay-runtime": "^14.1.21",
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
+    "fb-watchman": "^2.0.2",
     "postcss": "^8.4.33",
+    "relay-compiler": "^16.1.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5.3.3"
   }

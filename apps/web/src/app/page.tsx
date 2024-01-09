@@ -1,3 +1,4 @@
+import Logo from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 
@@ -6,9 +7,7 @@ const Home = () => {
     <div className="px-12 py-4 flex flex-col gap-8">
       <header className="inset-x-0 top-0 z-10">
         <nav className="flex items-center justify-between">
-          <span className="font-mono text-4xl font-bold text-primary-500">
-            Zap
-          </span>
+          <Logo />
           <a
             href="#"
             className="

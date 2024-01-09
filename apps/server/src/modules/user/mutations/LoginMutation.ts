@@ -33,6 +33,7 @@ const LoginMutation = mutationWithClientMutationId({
 
     if (!user) throw new Error('invalid password or user not found');
 
+    
     const isValidPassword = await bcrypt.compare(password, user.password);
 
     if (!isValidPassword) throw new Error('invalid password or user not found');
