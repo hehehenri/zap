@@ -28,13 +28,12 @@ const LoginMutation = mutationWithClientMutationId({
       resolve: ({ user }) => user
     }
   },
-  mutateAndGetPayload: async ({ username, password }) => {
-    const user = await UserModel.findOne({ username });
+  mutateAndGetPayload: async ({ username, password: plainTextPassword }) => {
+    const user = await UserModel.findOne({ username }).select('+password').exec();
 
     if (!user) throw new Error('invalid password or user not found');
-
     
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    const isValidPassword = await bcrypt.compare(plainTextPassword, user.password);
 
     if (!isValidPassword) throw new Error('invalid password or user not found');
 

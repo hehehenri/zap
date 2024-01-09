@@ -8,6 +8,7 @@ export type UserDefinition = {
 
 export const userSchema = new mongoose.Schema<UserDefinition>({
   username: { type: String, required: true },
+  password: { type: String, required: true, select: false }
 })
 
 const UserModel = mongoose.model<UserDefinition>('User', userSchema);
