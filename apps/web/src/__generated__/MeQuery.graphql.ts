@@ -1,5 +1,5 @@
 /**
- * @generated SignedSource<<0b9fcc5e1e7d6a2dd85a3b7f53de818a>>
+ * @generated SignedSource<<e007b8fa64abb0ea0e1f6d205b887ac8>>
  * @lightSyntaxTransform
  * @nogrep
  */
@@ -9,16 +9,16 @@
 // @ts-nocheck
 
 import { ConcreteRequest, Query } from 'relay-runtime';
-export type useUserQuery$variables = Record<PropertyKey, never>;
-export type useUserQuery$data = {
+export type MeQuery$variables = Record<PropertyKey, never>;
+export type MeQuery$data = {
   readonly me: {
     readonly id: string;
     readonly username: string;
   } | null | undefined;
 };
-export type useUserQuery = {
-  response: useUserQuery$data;
-  variables: useUserQuery$variables;
+export type MeQuery = {
+  response: MeQuery$data;
+  variables: MeQuery$variables;
 };
 
 const node: ConcreteRequest = (function(){
@@ -54,7 +54,7 @@ return {
     "argumentDefinitions": [],
     "kind": "Fragment",
     "metadata": null,
-    "name": "useUserQuery",
+    "name": "MeQuery",
     "selections": (v0/*: any*/),
     "type": "Query",
     "abstractKey": null
@@ -63,20 +63,20 @@ return {
   "operation": {
     "argumentDefinitions": [],
     "kind": "Operation",
-    "name": "useUserQuery",
+    "name": "MeQuery",
     "selections": (v0/*: any*/)
   },
   "params": {
-    "cacheID": "64ad23ec3228481d1bc9bfadf2bae02b",
+    "cacheID": "77b2876b0f48f176957e4830bded0bed",
     "id": null,
     "metadata": {},
-    "name": "useUserQuery",
+    "name": "MeQuery",
     "operationKind": "query",
-    "text": "query useUserQuery {\n  me {\n    id\n    username\n  }\n}\n"
+    "text": "query MeQuery {\n  me {\n    id\n    username\n  }\n}\n"
   }
 };
 })();
 
-(node as any).hash = "5df03988b136585e7d3aaf9b68b3cf5c";
+(node as any).hash = "fb84b57a52f18c62e4ce3844b911d042";
 
 export default node;

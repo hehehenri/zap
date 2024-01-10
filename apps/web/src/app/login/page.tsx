@@ -15,12 +15,14 @@ import {
 } from "@/__generated__/LoginMutation.graphql";
 
 const LoginPage = () => {
-  const [commitMutation, inFlight] = useMutation<LoginMutation>(Login);
+  const [commitMutation] = useMutation<LoginMutation>(Login);
   const { register, handleSubmit } = useForm<Variables>();
   const router = useRouter();
 
   // TODO: validate with zod before commiting
+  // TODO: display errors
   const onSubmit = (variables: Variables) => {
+    console.log(variables);
     commitMutation({
       variables,
       onCompleted: ({ login }: Response) => {

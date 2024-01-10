@@ -1,23 +1,33 @@
 import { Logo } from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Cookies from "js-cookie";
+
+const JoinAnchor = ({ href, content }: { href: string; content: string }) => {
+  return (
+    <a
+      href="/login"
+      className="
+        flex items-center gap-2 w-fit
+        bg-primary-500 rounded-full py-3 px-7 border border-black
+      "
+    >
+      {content}
+      <ArrowRight strokeWidth={1} />
+    </a>
+  );
+};
 
 const Home = () => {
+  const token = Cookies.get("auth.token");
+  const joinHref = token ? "/messages" : "/login";
+
   return (
     <div className="px-12 py-4 flex flex-col gap-8">
       <header className="inset-x-0 top-0 z-10">
         <nav className="flex items-center justify-between">
           <Logo />
-          <a
-            href="/login"
-            className="
-              flex items-center gap-2
-              bg-primary-500 rounded-full py-3 px-7 border border-black
-            "
-          >
-            Sign Up
-            <ArrowRight strokeWidth={1} />
-          </a>
+          <JoinAnchor href={joinHref} content={token ? "Open" : "Sign Up"} />
         </nav>
       </header>
 
@@ -27,21 +37,12 @@ const Home = () => {
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans font-semibold tracking-tight text-zinc-50 leading-tight">
               Send messages (not) privately
             </h1>
-            <p className="mt-6 text-lg sm:text-xl leading-8 tracking-tighter">
+            <p className="mt-6 text-lg sm:text-xl leading-8 tracking-tighter mb-20">
               Simple, reliable, private messaging and calling for free*,
               available all over the world.
             </p>
 
-            <a
-              href="/login"
-              className="
-                flex items-center justify-center gap-2 w-40 text-black
-                bg-primary-500 py-3 px-7 mt-24 rounded-full border border-black
-              "
-            >
-              Sign Up
-              <ArrowRight strokeWidth={1} />
-            </a>
+            <JoinAnchor href={joinHref} content={token ? "Open" : "Sign Up"} />
           </div>
         </div>
 

@@ -1,7 +1,6 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ReactRelayContext } from "react-relay";
 import Providers from "./providers";
 
 const bevellier = localFont({

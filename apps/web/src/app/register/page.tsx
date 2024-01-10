@@ -33,7 +33,10 @@ const RegisterPage = () => {
           );
         }
 
-        Cookie.set("auth.token", register.token);
+        Cookie.set("auth.token", register.token, {
+          sameSite: "None",
+          secure: true,
+        });
         router.push("/messages");
       },
     });

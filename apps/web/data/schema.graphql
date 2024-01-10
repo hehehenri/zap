@@ -2,11 +2,62 @@
 type Query {
   """Get the authenticated user"""
   me: User
+
+  """Get user's rooms"""
+  rooms: RoomConnection!
 }
 
 type User {
   id: String!
   username: String!
+}
+
+"""A connection to a list of items."""
+type RoomConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [RoomEdge]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type RoomEdge {
+  """The item at the end of the edge"""
+  node: Room
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Room {
+  id: String!
+  participants: [User!]!
+  messages: [Message!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Message {
+  id: String!
+  content: String!
+  sender: User!
+  sentAt: String!
 }
 
 type Mutation {
@@ -52,13 +103,6 @@ type StoreMessagePayload {
   clientMutationId: String
 }
 
-type Message {
-  id: String!
-  content: String!
-  sender: User!
-  sentAt: String!
-}
-
 input StoreMessageInput {
   content: String!
   room_id: ID!
@@ -68,14 +112,6 @@ input StoreMessageInput {
 type CreateRoomPayload {
   room: Room
   clientMutationId: String
-}
-
-type Room {
-  id: String!
-  participants: [User!]!
-  messages: [Message!]!
-  createdAt: String!
-  updatedAt: String!
 }
 
 input CreateRoomInput {

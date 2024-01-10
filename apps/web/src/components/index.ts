@@ -4,3 +4,4 @@ export * from './Messages';
 export * from './Logo';
 export * from './Input';
 export * from './Button';
+export * from './Avatar';
