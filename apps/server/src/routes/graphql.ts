@@ -16,12 +16,14 @@ const graphqlRoute = () => {
     _req: Request,
     _res: Response,
     ctx: KoaContext,
-  ): Promise<OptionsData> => {
+  ): Promise<OptionsData> => {    
     const { user } = await getAuth(ctx.cookies.get('auth.token') ?? null, config.jwt.secret);
   
     return ({
       schema,
-      graphiql: true,
+      graphiql: {
+        headerEditorEnabled: true
+      },
       pretty: true,
       context: { user },
       customFormatErrorFn: (error) => {

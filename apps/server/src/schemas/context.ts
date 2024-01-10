@@ -1,8 +1,9 @@
 import { Context } from "koa";
 import WebSocket, { WebSocketServer } from "ws";
+import { UserDefinition } from "../modules/user/UserModel";
 
 export type GraphQLContext = {
-  user: any | null,
+  user: UserDefinition | null,
 }
 
 export type KoaContext = {
