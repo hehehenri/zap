@@ -1,4 +1,5 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNullableType } from "graphql/type";
+import { connectionDefinitions } from "graphql-relay";
 
 import { RoomDefinition } from "./RoomModel";
 import UserType from "../user/UserType";
@@ -13,7 +14,7 @@ const RoomType = new GraphQLObjectType<RoomDefinition>({
   fields: () => ({
     id: {
       type: new GraphQLNonNull(GraphQLString),
-      resolve: (room) => room._id.toString()
+      resolve: (room) => room._id
     },
     participants: {
       type: list(UserType),
@@ -33,5 +34,10 @@ const RoomType = new GraphQLObjectType<RoomDefinition>({
     }
   })
 })
+
+export const RoomConnection = connectionDefinitions({
+  name: 'Room',
+  nodeType: RoomType
+});
 
 export default RoomType;
