@@ -1,5 +1,13 @@
-type GraphQLContext = {
-  user: any | null
+import { Context } from "koa";
+import WebSocket, { WebSocketServer } from "ws";
+
+export type GraphQLContext = {
+  user: any | null,
 }
 
-export default GraphQLContext;
+export type KoaContext = {
+  websocket?: {
+    server: WebSocketServer;
+    ws: () => Promise<WebSocket>;
+  }  
+} & Context;

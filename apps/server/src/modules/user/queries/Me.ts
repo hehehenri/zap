@@ -1,5 +1,5 @@
 import { GraphQLFieldConfig } from "graphql/type";
-import GraphQLContext from "../../../schemas/context";
+import { GraphQLContext } from "../../../schemas/context";
 import UserType from "../UserType";
 
 const me: GraphQLFieldConfig<any, GraphQLContext> = {

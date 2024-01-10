@@ -1,8 +1,12 @@
 import Koa from "koa";
+import http from "http";
 import cors from "koa-cors";
 import bunyan from "bunyan";
 import koaBunyan from "koa-bunyan-logger";
 import routes from "./routes";
+import { KoaContext } from "./schemas/context";
+import WebSocket from "./routes/websocket";
+import schema from "./schemas";
 
 type Config = {
   port: number,
@@ -19,7 +23,7 @@ const logger = () => {
 }
 
 const start = (config: Config) => {
-  const app = new Koa();
+  const app = new Koa<Koa.DefaultState, KoaContext>();
 
   app.use(cors());
   app.use(logger());
@@ -27,8 +31,12 @@ const start = (config: Config) => {
 
   const router = routes();  
   app.use(router.routes());
+
+  const server = http.createServer(app.callback());
+
+  WebSocket.handleUpgrade(server, schema);
   
-  app.listen(config.port);
+  server.listen(config.port);
 };
 
 export { start }
