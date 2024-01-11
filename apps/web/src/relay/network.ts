@@ -1,38 +1,41 @@
 import { createClient } from "graphql-ws";
-import { CacheConfig, Network, Observable, RequestParameters, Variables } from "relay-runtime"
-import { cache } from "./cache";
+import {  ConcreteRequest, Observable, RequestParameters, Variables } from "relay-runtime"
 
-export const fetchFunction = async (request: RequestParameters, variables: Variables, cacheConfig: CacheConfig) => {
-  const forceFetch = cacheConfig?.force;
-  const isQuery = request.operationKind === 'query';
-
-  if (isQuery && !forceFetch && request.text) {
-    const cachedValue = cache.get(request.text, variables);
-
-    if (cachedValue) return cachedValue;
-  }
-
+export const getPreloadedQuery = async (
+  { params }: ConcreteRequest,
+  variables: Variables,
+) => {
+  const response = await fetchFunction(params, variables);
   
+  return { params, variables, response }
+};
+
+export const fetchFunction = async (request: RequestParameters, variables: Variables) => {
   // TODO: get from .env
   const resp = await fetch('http://localhost:8000/graphql', {
     method: 'POST',
+    credentials: "include",
+
     headers: {
-      'content-type': 'application/json'
+      'content-type': 'application/json',
     },
     body: JSON.stringify({
       query: request.text,
       variables,
-    })
+    }),
   })
 
   const json = await resp.json();
+
+  console.log(json);
 
   if (Array.isArray(json.errors)) {
     const error = {
       query: request,
       errors: json.errors
     };
-    
+
+    console.error(error);
     throw new Error("failed to fetch graphql query", { cause: error });
   }
 

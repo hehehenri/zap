@@ -25,7 +25,7 @@ const logger = () => {
 const start = (config: Config) => {
   const app = new Koa<Koa.DefaultState, KoaContext>();
 
-  app.use(cors());
+  app.use(cors({ credentials: true }));
   app.use(logger());
   app.use(koaBunyan.requestLogger());
 
