@@ -10,8 +10,8 @@
     "relay": "relay-compiler"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
     "@repo/ui": "*",
-    "@types/js-cookie": "^3.0.6",
     "clsx": "^2.1.0",
     "graphql-ws": "^5.14.3",
     "js-cookie": "^3.0.5",
@@ -22,13 +22,13 @@
     "react-hook-form": "^7.49.3",
     "react-relay": "^16.1.0",
     "relay-runtime": "^16.1.0",
-    "tailwind-merge": "^2.2.0",
-    "watchman": "^1.0.0"
+    "tailwind-merge": "^2.2.0"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "@types/js-cookie": "^3.0.6",
     "@types/eslint": "^8.56.1",
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
