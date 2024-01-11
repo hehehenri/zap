@@ -36,3 +36,8 @@ yarn-error.log*
 # Misc
 .DS_Store
 *.pem
+
+# GraphQL
+./apps/web/src/__generated__/*
+./apps/web/data/schema.graphql
+./apps/server/schema/schema.graphql
