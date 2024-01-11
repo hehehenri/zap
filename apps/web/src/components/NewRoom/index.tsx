@@ -41,7 +41,7 @@ export const NewRoom = ({
 }: {
   fragmentKey: NewRoomUserConnectionFragment$key;
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const data = useFragment(userConnectionFragment, fragmentKey);
   console.log(data);
   if (!data) return;
