@@ -1,4 +1,13 @@
+"use client";
+
+import { SendHorizonal } from "lucide-react";
 import { Avatar } from "..";
+import { useForm } from "react-hook-form";
+import { commitMutation, graphql, useMutation } from "react-relay";
+import {
+  MessagesStoreMutation,
+  MessagesStoreMutation$data,
+} from "@/__generated__/MessagesStoreMutation.graphql";
 
 const Message = ({ content }: { content: string }) => {
   return (
@@ -23,37 +32,69 @@ export const MessagesHeader = () => {
   );
 };
 
-export const Messages = () => {
-  return (
-    <section className="h-full max-h-full overflow-y-auto mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 container flex flex-col gap-y-1.5">
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />{" "}
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />{" "}
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />{" "}
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />{" "}
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-      <Message content={"pogchamp kekw omegalul"} />
-    </section>
-  );
+const storeMessageMutation = graphql`
+  mutation MessagesStoreMutation($input: StoreMessageInput!) {
+    storeMessage(input: $input) {
+      message {
+        id
+        content
+      }
+    }
+  }
+`;
+
+type FormType = {
+  roomId: string;
+  content: string;
 };
 
-export const MessageInput = () => {
-  return <input></input>;
+export const Messages = () => {
+  const [commitMutation] =
+    useMutation<MessagesStoreMutation>(storeMessageMutation);
+  const { register, handleSubmit } = useForm<FormType>({
+    defaultValues: {
+      roomId: "",
+      content: "",
+    },
+  });
+
+  const onSubmit = (variables: FormType) => {
+    commitMutation({
+      variables,
+      onCompleted: (response: MessagesStoreMutation$data) => {
+        console.log(response);
+      },
+    });
+  };
+
+  return (
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="h-full max-h-full overflow-y-auto mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 container flex justify-end flex-col gap-y-1.5"
+    >
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+      <Message content={"pogchamp kekw omegalul"} />
+
+      <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
+        <input
+          placeholder="Message"
+          className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
+          {...register("content")}
+        />
+        <button className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white">
+          <SendHorizonal />
+        </button>
+      </div>
+    </form>
+  );
 };

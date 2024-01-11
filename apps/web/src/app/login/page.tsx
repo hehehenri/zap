@@ -22,7 +22,6 @@ const LoginPage = () => {
   // TODO: validate with zod before commiting
   // TODO: display errors
   const onSubmit = (variables: Variables) => {
-    console.log(variables);
     commitMutation({
       variables,
       onCompleted: ({ login }: Response) => {

@@ -1,12 +1,33 @@
 "use client";
 
-import { useState } from "react";
-
 import Dialog from "../Dialog";
-import { useFragment } from "react-relay";
+import { useFragment, useMutation } from "react-relay";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { graphql } from "react-relay";
 import { NewRoomUserFragment$key } from "@/__generated__/NewRoomUserFragment.graphql";
 import { NewRoomUserConnectionFragment$key } from "@/__generated__/NewRoomUserConnectionFragment.graphql";
+import { Avatar } from "..";
+import { SearchIcon } from "lucide-react";
+import { NewRoomMutation } from "@/__generated__/NewRoomMutation.graphql";
+
+const Header = () => {
+  return (
+    <div className="px-10">
+      <p>New Message</p>
+    </div>
+  );
+};
+
+const newRoomMutation = graphql`
+  mutation NewRoomMutation($participants: CreateRoomInput!) {
+    createRoom(input: $participants) {
+      room {
+        id
+      }
+    }
+  }
+`;
 
 const userFragment = graphql`
   fragment NewRoomUserFragment on User {
@@ -21,8 +42,35 @@ const UserPreview = ({
   fragmentKey: NewRoomUserFragment$key;
 }) => {
   const user = useFragment(userFragment, fragmentKey);
+  const router = useRouter();
+  const [commitMutation] = useMutation<NewRoomMutation>(newRoomMutation);
 
-  return <div>{user.username}</div>;
+  const onClick = () => {
+    const variables = { participants: { userId: user.id } };
+
+    commitMutation({
+      variables,
+      onCompleted: ({ createRoom }) => {
+        console.log(createRoom);
+        const room = createRoom?.room;
+        if (!room) {
+          throw new Error("failed to create room");
+        }
+
+        router.push(`/messages/${room?.id}`);
+      },
+    });
+  };
+
+  return (
+    <button
+      onClick={() => onClick()}
+      className="px-10 py-4 flex items-center gap-2 hover:bg-zinc-50 w-full"
+    >
+      <Avatar />
+      <span>{user.username}</span>
+    </button>
+  );
 };
 
 const userConnectionFragment = graphql`
@@ -30,6 +78,7 @@ const userConnectionFragment = graphql`
     edges {
       node {
         id
+        username
         ...NewRoomUserFragment
       }
     }
@@ -41,9 +90,11 @@ export const NewRoom = ({
 }: {
   fragmentKey: NewRoomUserConnectionFragment$key;
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [search, setSearch] = useState("");
+
   const data = useFragment(userConnectionFragment, fragmentKey);
-  console.log(data);
+
   if (!data) return;
 
   return (
@@ -54,15 +105,34 @@ export const NewRoom = ({
       >
         New Message
       </button>
-      <Dialog title={"New Message"} open={isOpen} onOpenChange={setIsOpen}>
-        {data.edges?.map((edge) => {
-          const user = edge?.node;
+      <Dialog
+        title={<Header />}
+        open={isOpen}
+        onOpenChange={setIsOpen}
+        className="pt-6 pb-0 px-0"
+      >
+        <div className="relative flex items-center mb-2">
+          <SearchIcon className="absolute ml-10" strokeWidth={1} />
+          <input
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search people"
+            className="w-full pl-[4.5rem] py-2 border-b border-b-secondary-200 outline-none placeholder-zinc-500 tracking-wide"
+          />
+        </div>
+        <div className="h-[25rem] w-full">
+          {data.edges
+            ?.filter((edge) =>
+              search.length > 0
+                ? edge?.node?.username.startsWith(search)
+                : true,
+            )
+            .map((edge) => {
+              const user = edge?.node;
+              if (!user) return;
 
-          if (!user) return;
-
-          return <UserPreview key={user.id} fragmentKey={user} />;
-        })}
-        <div>ayoo</div>
+              return <UserPreview key={user.id} fragmentKey={user} />;
+            })}
+        </div>
       </Dialog>
     </div>
   );

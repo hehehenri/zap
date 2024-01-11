@@ -1,20 +1,15 @@
 import { mutationWithClientMutationId } from "graphql-relay";
-import { GraphQLNonNull, GraphQLID, GraphQLList } from "graphql/type";
+import { GraphQLNonNull, GraphQLID, GraphQLList, GraphQLString } from "graphql/type";
 import RoomType from "../RoomType";
 import RoomModel from "../RoomModel";
 import UserModel from "../../user/UserModel";
-
-type Args = {
-  participants: string[]
-}
+import { Context } from "../../../routes/graphql";
 
 const CreateRoomMutation = mutationWithClientMutationId({
   name: "CreateRoom",
   description: "Create Room",
   inputFields: {
-    participants: { 
-      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLID))),
-    }
+    userId: { type: new GraphQLNonNull(GraphQLString) }
   },
   outputFields: {
     room: {
@@ -22,17 +17,23 @@ const CreateRoomMutation = mutationWithClientMutationId({
       resolve: ({ room }) => room
     }
   },
-  mutateAndGetPayload: async ({participants}: Args) => {
-    if (participants.length < 2) {
-      throw new Error("room must have at least two participants");
-    }
+  mutateAndGetPayload: async ({ userId }: { userId: string }, ctx: Context) => {
+    const authUser = ctx.user;
     
-    const userParticipants = participants.map(id => UserModel.findById(id));
+    if (!authUser) return new Error("new authenticated");
+
+    const firstParticipant = await UserModel.findById(authUser._id).select("+password").exec();
+    const secondParticipant = await UserModel.findById(userId).select("+password");
     
-    const room = await new RoomModel({
-      participants: userParticipants,
+    const room = new RoomModel({
+      participants: [
+        firstParticipant,
+        secondParticipant
+      ],
       messages: [],
-    }).save();
+    });
+
+    await room.save();
 
     return { room };
   }

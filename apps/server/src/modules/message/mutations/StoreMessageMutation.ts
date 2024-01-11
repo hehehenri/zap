@@ -1,5 +1,5 @@
 import { mutationWithClientMutationId } from "graphql-relay";
-import { GraphQLString, GraphQLNonNull, GraphQLID } from "graphql/type";
+import { GraphQLString } from "graphql/type";
 
 import { MessageType } from "../MessageType";
 import { Context } from "../../../routes/graphql";
@@ -10,8 +10,8 @@ const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
   description: "Store user's message",
   inputFields: {
-    content: { type: new GraphQLNonNull(GraphQLString) },
-    room_id: { type: new GraphQLNonNull(GraphQLID) }
+    content: { type: GraphQLString },
+    roomId: { type: GraphQLString }
   },
   outputFields: {
     message: {
@@ -20,14 +20,9 @@ const StoreMessageMutation = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ content, room_id }, ctx: Context) => {
-    if (!ctx.user) {
-      return new Error("not authenticated")
-    }
+    if (!ctx.user) return new Error("not authenticated");
     
-    const message = new MessageModel({
-      content,
-
-    });
+    const message = new MessageModel({ content });
 
     // TODO: add to the room and save inside a transaction
 

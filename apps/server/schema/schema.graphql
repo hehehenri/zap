@@ -1,0 +1,141 @@
+"""Query Root"""
+type Query {
+  """Get the authenticated user"""
+  me: User
+
+  """List user's rooms"""
+  rooms: RoomConnection!
+
+  """List users"""
+  users: UserConnection!
+}
+
+type User {
+  id: String!
+  username: String!
+}
+
+"""A connection to a list of items."""
+type RoomConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [RoomEdge]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type RoomEdge {
+  """The item at the end of the edge"""
+  node: Room
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Room {
+  id: String!
+  participants: [User!]!
+  messages: [Message!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type Message {
+  id: String!
+  content: String!
+  sender: User!
+  sentAt: String!
+}
+
+"""A connection to a list of items."""
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """The item at the end of the edge"""
+  node: User
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Mutation {
+  """Validate password and return user's token"""
+  login(input: LoginMutationInput!): LoginMutationPayload
+
+  """Register user"""
+  register(input: RegisterMutationInput!): RegisterMutationPayload
+
+  """Store user's message"""
+  storeMessage(input: StoreMessageInput!): StoreMessagePayload
+
+  """Create Room"""
+  createRoom(input: CreateRoomInput!): CreateRoomPayload
+}
+
+type LoginMutationPayload {
+  token: String
+  user: User
+  clientMutationId: String
+}
+
+input LoginMutationInput {
+  username: String!
+  password: String!
+  clientMutationId: String
+}
+
+type RegisterMutationPayload {
+  token: String
+  user: User
+  clientMutationId: String
+}
+
+input RegisterMutationInput {
+  username: String!
+  password: String!
+  clientMutationId: String
+}
+
+type StoreMessagePayload {
+  message: Message
+  clientMutationId: String
+}
+
+input StoreMessageInput {
+  content: String
+  room_id: String
+  clientMutationId: String
+}
+
+type CreateRoomPayload {
+  room: Room
+  clientMutationId: String
+}
+
+input CreateRoomInput {
+  userId: String!
+  clientMutationId: String
+}
