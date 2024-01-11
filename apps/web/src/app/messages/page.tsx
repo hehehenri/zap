@@ -1,6 +1,28 @@
-import { RoomList } from "@/components";
+"use client";
 
-const ChatEmptyState = () => {
+import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
+import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
+import { env } from "@/relay/env";
+import { NewRoom } from "@/components";
+import {
+  pageMessagesQuery,
+  pageMessagesQuery$data,
+} from "@/__generated__/pageMessagesQuery.graphql";
+
+const messagesPageQuery = graphql`
+  query pageMessagesQuery {
+    rooms {
+      ...RoomPreviewListFragment
+    }
+    users {
+      ...NewRoomUserConnectionFragment
+    }
+  }
+`;
+
+const queryRef = loadQuery<pageMessagesQuery>(env, messagesPageQuery, {});
+
+const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div className="space-y-5">
@@ -13,20 +35,22 @@ const ChatEmptyState = () => {
             keep swimming.
           </p>
         </div>
-
-        <button className="bg-secondary-400 rounded-full px-8 py-3 text-xl font-bold text-white font-mono">
-          New Message
-        </button>
+        <NewRoom fragmentKey={queryRef.users} />
       </div>
     </div>
   );
 };
 
 const Messages = () => {
+  const data = usePreloadedQuery<pageMessagesQuery>(
+    messagesPageQuery,
+    queryRef,
+  );
+
   return (
     <main className="grid grid-cols-[auto_1fr] h-full">
-      <RoomList />
-      <ChatEmptyState />
+      <RoomPreviewList fragmentRef={data.rooms} />
+      <ChatEmptyState queryRef={data} />
     </main>
   );
 };

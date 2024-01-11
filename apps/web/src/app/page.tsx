@@ -1,12 +1,12 @@
 import { Logo } from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import Cookies from "js-cookie";
+import { cookies } from "next/headers";
 
 const JoinAnchor = ({ href, content }: { href: string; content: string }) => {
   return (
     <a
-      href="/login"
+      href={href}
       className="
         flex items-center gap-2 w-fit
         bg-primary-500 rounded-full py-3 px-7 border border-black
@@ -19,15 +19,23 @@ const JoinAnchor = ({ href, content }: { href: string; content: string }) => {
 };
 
 const Home = () => {
-  const token = Cookies.get("auth.token");
-  const joinHref = token ? "/messages" : "/login";
+  const token = cookies().get("auth.token");
+  const anchor = token
+    ? {
+        content: "Open",
+        href: "/messages",
+      }
+    : {
+        content: "Sign Up",
+        href: "/login",
+      };
 
   return (
     <div className="px-12 py-4 flex flex-col gap-8">
       <header className="inset-x-0 top-0 z-10">
         <nav className="flex items-center justify-between">
           <Logo />
-          <JoinAnchor href={joinHref} content={token ? "Open" : "Sign Up"} />
+          <JoinAnchor href={anchor.href} content={anchor.content} />
         </nav>
       </header>
 
@@ -42,7 +50,7 @@ const Home = () => {
               available all over the world.
             </p>
 
-            <JoinAnchor href={joinHref} content={token ? "Open" : "Sign Up"} />
+            <JoinAnchor href={anchor.href} content={anchor.content} />
           </div>
         </div>
 
