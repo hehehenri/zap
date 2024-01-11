@@ -36,7 +36,7 @@ const RoomType = new GraphQLObjectType<RoomDefinition>({
 })
 
 export const RoomConnection = connectionDefinitions({
-  name: 'Room',
+  name: "Room",
   nodeType: RoomType
 });
 

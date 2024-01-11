@@ -7,22 +7,22 @@ import DataLoader from "dataloader";
 
 const rooms: GraphQLFieldConfig<any, GraphQLContext> = {
   type: new GraphQLNonNull(RoomConnection.connectionType),
-  description: "Get user's rooms",
+  description: "List user's rooms",
   resolve: async (_source, args, context) => {
     const user = context.user;
     // TODO: write a middleware to check this
     if (!user) throw new Error("not logged in");
 
-    const loader = new DataLoader(ids => {
-      return mongooseLoader(RoomModel, ids as any);
-    })
+    const loader = new DataLoader<string, Promise<any[]>>(ids => {
+      return mongooseLoader(RoomModel, ids);
+    });
 
     return connectionFromMongoCursor({
       cursor: RoomModel.find({ participants: user }),
       context,
       args,
-      loader: (_, id) => loader.load(id),
-    })
+      loader: (_, id) => loader.load(id.toString()),
+    });
   }
 }
 
