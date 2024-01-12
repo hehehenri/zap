@@ -1,9 +1,9 @@
 "use client";
 
+import env from "@/relay/environment";
 import { pageQuery } from "@/__generated__/pageQuery.graphql";
 import { Messages, MessagesHeader } from "@/components";
 import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
-import { env } from "@/relay/env";
 import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
 
 const pageQuery = graphql`

@@ -1,15 +1,20 @@
 "use client";
 
 import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
-import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
-import { env } from "@/relay/env";
+import {
+  QueryRenderer,
+  graphql,
+  loadQuery,
+  usePreloadedQuery,
+} from "react-relay";
+import env from "@/relay/environment";
 import { NewRoom } from "@/components";
 import {
   pageMessagesQuery,
   pageMessagesQuery$data,
 } from "@/__generated__/pageMessagesQuery.graphql";
 
-const messagesPageQuery = graphql`
+const query = graphql`
   query pageMessagesQuery {
     rooms {
       ...RoomPreviewListFragment
@@ -20,7 +25,7 @@ const messagesPageQuery = graphql`
   }
 `;
 
-const queryRef = loadQuery<pageMessagesQuery>(env, messagesPageQuery, {});
+const queryRef = loadQuery<pageMessagesQuery>(env, query, {});
 
 const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
@@ -42,10 +47,7 @@ const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
 };
 
 const Messages = () => {
-  const data = usePreloadedQuery<pageMessagesQuery>(
-    messagesPageQuery,
-    queryRef,
-  );
+  const data = usePreloadedQuery<pageMessagesQuery>(query, queryRef);
 
   return (
     <main className="grid grid-cols-[auto_1fr] h-full">

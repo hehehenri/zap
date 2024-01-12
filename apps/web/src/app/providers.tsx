@@ -1,6 +1,6 @@
 "use client";
 
-import { env } from "@/relay/env";
+import env from "@/relay/environment";
 import { useMemo } from "react";
 import { ReactRelayContext } from "react-relay";
 

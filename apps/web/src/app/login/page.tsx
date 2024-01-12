@@ -7,15 +7,25 @@ import { useMutation } from "react-relay";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
-import Cookie from "js-cookie";
 import {
   LoginMutation,
   LoginMutation$variables as Variables,
   LoginMutation$data as Response,
 } from "@/__generated__/LoginMutation.graphql";
+import { login } from "@/auth";
+import { useState } from "react";
+
+const Error = ({ error }: { error: string | null }) => {
+  return (
+    <div className="w-full flex justify-center pt-2.5">
+      <span className="text-sm text-rose-500 font-semibold">{error}</span>
+    </div>
+  );
+};
 
 const LoginPage = () => {
   const [commitMutation] = useMutation<LoginMutation>(Login);
+  const [error, setError] = useState<string | null>(null);
   const { register, handleSubmit } = useForm<Variables>();
   const router = useRouter();
 
@@ -24,13 +34,16 @@ const LoginPage = () => {
   const onSubmit = (variables: Variables) => {
     commitMutation({
       variables,
-      onCompleted: ({ login }: Response) => {
-        if (!login?.token) {
-          throw new Error("failed to login user: " + JSON.stringify(register));
+      onCompleted: ({ login: response }: Response) => {
+        if (!response?.token) {
+          return;
         }
 
-        Cookie.set("auth.token", login.token);
+        login(response.token);
         router.push("/messages");
+      },
+      onError: (error) => {
+        setError(error.message);
       },
     });
   };
@@ -82,6 +95,7 @@ const LoginPage = () => {
             <LogIn strokeWidth={1} />
           </Button>
         </form>
+        <Error error={error} />
       </section>
 
       <div className="flex gap-1.5">

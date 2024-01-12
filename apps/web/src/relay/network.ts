@@ -1,5 +1,5 @@
 import { createClient } from "graphql-ws";
-import {  ConcreteRequest, Observable, RequestParameters, Variables } from "relay-runtime"
+import {  ConcreteRequest, Network, Observable, RequestParameters, Variables } from "relay-runtime"
 
 export const getPreloadedQuery = async (
   { params }: ConcreteRequest,
@@ -12,7 +12,7 @@ export const getPreloadedQuery = async (
 
 export const fetchFunction = async (request: RequestParameters, variables: Variables) => {
   // TODO: get from .env
-  const resp = await fetch('http://localhost:8000/graphql', {
+  const response = await fetch('http://localhost:8000/graphql', {
     method: 'POST',
     credentials: "include",
 
@@ -23,23 +23,17 @@ export const fetchFunction = async (request: RequestParameters, variables: Varia
       query: request.text,
       variables,
     }),
-  })
+  });
+  
+  const result = await response.json();
 
-  const json = await resp.json();
-
-  console.log(json);
-
-  if (Array.isArray(json.errors)) {
-    const error = {
-      query: request,
-      errors: json.errors
-    };
-
-    console.error(error);
-    throw new Error("failed to fetch graphql query", { cause: error });
+  if (Array.isArray(result.errors) && result.errors.length > 0) {
+    const message = result.errors[0].message as string;
+    
+    throw new Error(message, { cause: response })
   }
 
-  return json;
+  return result;
 }
 
 export const subscribeFunction = (request: RequestParameters, variables: Variables): Observable<any> => {
@@ -60,3 +54,6 @@ export const subscribeFunction = (request: RequestParameters, variables: Variabl
     return client.subscribe({operationName, query, variables}, sink);
   })
 }
+
+const network = Network.create(fetchFunction, subscribeFunction);
+export default network;
