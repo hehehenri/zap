@@ -6,6 +6,7 @@ import schema from "../schemas";
 import { getAuth } from "../authentication";
 import config from "../config";
 import { UserDefinition } from "../modules/user/UserModel";
+import { RouteError } from "./error";
 
 export type Context = {
   user: UserDefinition | null
@@ -27,7 +28,14 @@ const graphqlRoute = () => {
       pretty: true,
       context: { user },
       customFormatErrorFn: (error) => {
+        // TODO: this workaround doesn't seems right.
+        // find a way to do the same using 
         ctx.log.error(error);
+
+        const err = error.originalError;
+        if (err && err instanceof RouteError) {
+          ctx.status = err.status
+        }
 
         return error;
       }
