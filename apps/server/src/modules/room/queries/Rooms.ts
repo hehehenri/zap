@@ -1,17 +1,18 @@
 import { GraphQLFieldConfig, GraphQLNonNull } from "graphql";
 import { GraphQLContext } from "../../../schemas/context";
 import { RoomConnection } from "../RoomType";
-import RoomModel from "../RoomModel";
+import { RoomModel } from "../RoomModel";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import DataLoader from "dataloader";
+import { UnauthorizedError } from "../../../routes/error";
 
-const rooms: GraphQLFieldConfig<any, GraphQLContext> = {
+export const Rooms: GraphQLFieldConfig<any, GraphQLContext> = {
   type: new GraphQLNonNull(RoomConnection.connectionType),
   description: "List user's rooms",
   resolve: async (_source, args, context) => {
     const user = context.user;
-    // TODO: write a middleware to check this
-    if (!user) throw new Error("not logged in");
+
+    if (!user) throw new UnauthorizedError;
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {
       return mongooseLoader(RoomModel, ids);
@@ -25,5 +26,3 @@ const rooms: GraphQLFieldConfig<any, GraphQLContext> = {
     });
   }
 }
-
-export default rooms;

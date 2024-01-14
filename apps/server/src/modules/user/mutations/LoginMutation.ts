@@ -2,12 +2,13 @@ import {mutationWithClientMutationId} from "graphql-relay";
 import { GraphQLString, GraphQLNonNull } from "graphql/type";
 import bcrypt from "bcrypt";
 
-import UserType from "../UserType";
+import { UserType } from "../UserType";
 import { getToken }  from "../../../authentication";
 import config from "../../../config";
-import UserModel from "../UserModel";
+import { UserModel } from "../UserModel";
+import { InvalidPayloadError } from "../../../routes/error";
 
-const LoginMutation = mutationWithClientMutationId({
+export const LoginMutation = mutationWithClientMutationId({
   name: "LoginMutation",
   description: "Validate password and return user's token",
   inputFields: {
@@ -31,11 +32,15 @@ const LoginMutation = mutationWithClientMutationId({
   mutateAndGetPayload: async ({ username, password: plainTextPassword }) => {
     const user = await UserModel.findOne({ username }).select('+password').exec();
 
-    if (!user) throw new Error('invalid password or user not found');
+    if (!user) throw new InvalidPayloadError(
+      "Invalid password or user not found"
+    );
     
     const isValidPassword = await bcrypt.compare(plainTextPassword, user.password);
 
-    if (!isValidPassword) throw new Error('invalid password or user not found');
+    if (!isValidPassword) throw new InvalidPayloadError(
+      "Invalid password or user not found"
+    );
 
     const token = getToken(user, config.jwt.secret);
 
@@ -45,5 +50,3 @@ const LoginMutation = mutationWithClientMutationId({
     };
   }
 });
-
-export default LoginMutation;

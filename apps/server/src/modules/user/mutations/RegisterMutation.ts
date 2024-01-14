@@ -1,13 +1,13 @@
 import {mutationWithClientMutationId} from "graphql-relay";
 import { GraphQLString, GraphQLNonNull } from "graphql/type";
-import UserType from "../UserType";
+import { UserType } from "../UserType";
 import bcrypt from "bcrypt";
 import config from "../../../config";
-import UserModel from "../UserModel";
+import { UserModel } from "../UserModel";
 import { getToken } from "../../../authentication";
 
 
-const RegisterMutation = mutationWithClientMutationId({
+export const RegisterMutation = mutationWithClientMutationId({
   name: "RegisterMutation",
   description: "Register user",
   inputFields: {
@@ -43,5 +43,3 @@ const RegisterMutation = mutationWithClientMutationId({
     return { user, token };
   }
 });
-
-export default RegisterMutation;

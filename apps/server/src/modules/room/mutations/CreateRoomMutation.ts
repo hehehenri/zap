@@ -1,11 +1,11 @@
 import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLNonNull, GraphQLID, GraphQLList, GraphQLString } from "graphql/type";
-import RoomType from "../RoomType";
-import RoomModel from "../RoomModel";
-import UserModel from "../../user/UserModel";
+import { RoomType } from "../RoomType";
+import { RoomModel } from "../RoomModel";
+import { UserModel } from "../../user/UserModel";
 import { Context } from "../../../routes/graphql";
 
-const CreateRoomMutation = mutationWithClientMutationId({
+export const CreateRoomMutation = mutationWithClientMutationId({
   name: "CreateRoom",
   description: "Create Room",
   inputFields: {
@@ -29,8 +29,7 @@ const CreateRoomMutation = mutationWithClientMutationId({
       participants: [
         firstParticipant,
         secondParticipant
-      ],
-      messages: [],
+      ]
     });
 
     await room.save();
@@ -38,5 +37,3 @@ const CreateRoomMutation = mutationWithClientMutationId({
     return { room };
   }
 })
-
-export default CreateRoomMutation;

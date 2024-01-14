@@ -3,16 +3,16 @@ import { GraphQLContext } from "../../../schemas/context";
 import { UserConnection } from "../UserType";
 import DataLoader from "dataloader";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
-import UserModel from "../UserModel";
+import { UserModel } from "../UserModel";
+import { UnauthorizedError } from "../../../routes/error";
 
-const users: GraphQLFieldConfig<any, GraphQLContext> = {
+export const Users: GraphQLFieldConfig<any, GraphQLContext> = {
   type: new GraphQLNonNull(UserConnection.connectionType),
   description: "List users",
   resolve: async (_source, args, context) => {
     const user = context.user;
 
-    // TODO: properly handle errors
-    if (!user) throw new Error("not logged in");
+    if (!user) new UnauthorizedError();
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {
       return mongooseLoader(UserModel, ids); 
@@ -26,5 +26,3 @@ const users: GraphQLFieldConfig<any, GraphQLContext> = {
     });
   }
 }
-
-export default users;

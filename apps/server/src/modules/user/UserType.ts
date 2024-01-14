@@ -2,7 +2,7 @@ import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import { UserDefinition } from "./UserModel";
 import { connectionDefinitions } from "graphql-relay";
 
-const UserType = new GraphQLObjectType<UserDefinition>({
+export const UserType = new GraphQLObjectType<UserDefinition>({
   name: "User",
   fields: () => ({
     id: {
@@ -20,5 +20,3 @@ export const UserConnection = connectionDefinitions({
   name: "User",
   nodeType: UserType,
 });
-
-export default UserType;
