@@ -1,7 +1,7 @@
 import Router from "koa-router";
 import KoaRouter from "koa-router"
 import graphqlRoute from "./graphql";
-import { websocketMiddleware } from "./middlewares/websocket";
+import { websocketMiddleware } from "./middlewares";
 
 const merge = (router: Router, route: Router) => {
   router.use(route.routes());

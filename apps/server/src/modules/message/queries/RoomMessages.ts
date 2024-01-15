@@ -5,6 +5,7 @@ import { ConnectionArguments, connectionArgs } from "graphql-relay";
 import DataLoader from "dataloader";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import MessageModel from "../MessageModel";
+import { UnauthorizedError } from "../../../routes/error";
 
 export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments & {
   roomId: string
@@ -19,6 +20,10 @@ export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArg
     }
   },
   resolve: async (_src, args, context) => {
+    const user = context.user;
+
+    if (!user) throw new UnauthorizedError();
+    
     const loader = new DataLoader<string, Promise<any>>(ids => {
       return mongooseLoader(MessageModel, ids);
     });

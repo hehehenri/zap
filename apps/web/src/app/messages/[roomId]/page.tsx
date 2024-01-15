@@ -1,33 +1,40 @@
 "use client";
 
-import env from "@/relay/environment";
-import { pageQuery } from "@/__generated__/pageQuery.graphql";
-import { Messages, MessagesHeader } from "@/components";
+import { MessagesHeader, RoomMessages } from "@/components";
 import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
-import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
+import { graphql, useLazyLoadQuery } from "react-relay";
+import { useParams } from "next/navigation";
+import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.graphql";
 
-const pageQuery = graphql`
-  query pageQuery {
+const RoomMessagesQuery = graphql`
+  query pageRoomMessagesQuery($roomId: ID!) {
     rooms {
       ...RoomPreviewListFragment
+    }
+    roomMessages(roomId: $roomId) {
+      ...RoomMessagesListFragment
     }
   }
 `;
 
-const queryRef = loadQuery<pageQuery>(env, pageQuery, {});
+const RoomMessagesPage = () => {
+  const { roomId } = useParams<{ roomId: string }>();
 
-const RoomMessages = () => {
-  const { rooms } = usePreloadedQuery<pageQuery>(pageQuery, queryRef);
+  // TODO: discover how to use usePreloadedQuery hook instead
+  const { rooms, roomMessages } = useLazyLoadQuery<pageRoomMessagesQuery>(
+    RoomMessagesQuery,
+    { roomId },
+  );
 
   return (
     <main className="grid grid-cols-[auto_1fr]">
       <RoomPreviewList fragmentRef={rooms} />
       <div className="flex flex-col h-screen">
         <MessagesHeader />
-        <Messages />
+        <RoomMessages messagesFragment={roomMessages} roomId={roomId} />
       </div>
     </main>
   );
 };
 
-export default RoomMessages;
+export default RoomMessagesPage;

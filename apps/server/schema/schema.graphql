@@ -8,6 +8,24 @@ type Query {
 
   """List users"""
   users: UserConnection!
+
+  """List room messages"""
+  roomMessages(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+
+    """The messages' room id"""
+    roomId: ID!
+  ): MessageConnection!
 }
 
 type User {
@@ -48,19 +66,12 @@ type RoomEdge {
   cursor: String!
 }
 
+"""Room Type"""
 type Room {
   id: String!
   participants: [User!]!
-  messages: [Message!]!
   createdAt: String!
   updatedAt: String!
-}
-
-type Message {
-  id: String!
-  content: String!
-  sender: User!
-  sentAt: String!
 }
 
 """A connection to a list of items."""
@@ -79,6 +90,32 @@ type UserEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
+}
+
+"""A connection to a list of items."""
+type MessageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MessageEdge]
+}
+
+"""An edge in a connection."""
+type MessageEdge {
+  """The item at the end of the edge"""
+  node: Message
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Message {
+  id: String!
+  content: String!
+  sender: User!
+  room: Room!
+  sentAt: String!
 }
 
 type Mutation {
@@ -126,7 +163,7 @@ type StoreMessagePayload {
 
 input StoreMessageInput {
   content: String
-  room_id: String
+  roomId: String
   clientMutationId: String
 }
 
@@ -138,4 +175,19 @@ type CreateRoomPayload {
 input CreateRoomInput {
   userId: String!
   clientMutationId: String
+}
+
+"""Subscription Root"""
+type Subscription {
+  messageAdded(input: MessageAddedInput!): MessageAddedPayload
+}
+
+type MessageAddedPayload {
+  message: Message
+  clientSubscriptionId: String
+}
+
+input MessageAddedInput {
+  content: String!
+  clientSubscriptionId: String
 }

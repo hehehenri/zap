@@ -7,6 +7,7 @@ import routes from "./routes";
 import { KoaContext } from "./schemas/context";
 import WebSocket from "./routes/websocket";
 import schema from "./schemas";
+import { errorHandlerMiddleware } from "./routes/middlewares";
 
 type Config = {
   port: number,
@@ -31,6 +32,7 @@ const start = (config: Config) => {
 
   const router = routes();  
   app.use(router.routes());
+  app.use(errorHandlerMiddleware());
 
   const server = http.createServer(app.callback());
 

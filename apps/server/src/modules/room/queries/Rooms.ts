@@ -12,14 +12,16 @@ export const Rooms: GraphQLFieldConfig<any, GraphQLContext> = {
   resolve: async (_source, args, context) => {
     const user = context.user;
 
-    if (!user) throw new UnauthorizedError;
+    if (!user) {
+      throw new UnauthorizedError
+    };
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {
       return mongooseLoader(RoomModel, ids);
     });
 
     return connectionFromMongoCursor({
-      cursor: RoomModel.find({ participants: user }),
+      cursor: RoomModel.find({ "participants._id": user._id }),
       context,
       args,
       loader: (_, id) => loader.load(id.toString()),

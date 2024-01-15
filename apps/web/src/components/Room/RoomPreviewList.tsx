@@ -2,6 +2,7 @@ import { Search } from "@/components";
 import { graphql, useFragment } from "react-relay";
 import { RoomPreview } from "./RoomPreview";
 import { RoomPreviewListFragment$key } from "@/__generated__/RoomPreviewListFragment.graphql";
+import NoMessages from "../EmptyState/NoMessages";
 
 const roomPreviewListFragment = graphql`
   fragment RoomPreviewListFragment on RoomConnection {
@@ -14,13 +15,22 @@ const roomPreviewListFragment = graphql`
   }
 `;
 
+const EmptyState = () => {
+  return (
+    <div className="w-full px-4 flex items-center h-full justify-center flex-col">
+      <NoMessages />
+      <p className="text-lg font-semibold">No Messages</p>
+      <p className="text-zinc-600">You have no active chats</p>
+    </div>
+  );
+};
+
 export const RoomPreviewList = ({
   fragmentRef,
 }: {
   fragmentRef: RoomPreviewListFragment$key;
 }) => {
   const data = useFragment(roomPreviewListFragment, fragmentRef);
-  if (!data) return;
   const { edges } = data;
 
   return (
@@ -28,7 +38,7 @@ export const RoomPreviewList = ({
       <div className="px-3">
         <Search />
       </div>
-      {edges && edges.length > 0 && (
+      {edges && edges.length > 0 ? (
         <div className="h-full max-h-full flex flex-col overflow-y-auto px-3">
           {edges.map((edge) => {
             const room = edge?.node;
@@ -37,6 +47,8 @@ export const RoomPreviewList = ({
             return <RoomPreview key={room.id} fragmentKey={room} />;
           })}
         </div>
+      ) : (
+        <EmptyState />
       )}
     </section>
   );

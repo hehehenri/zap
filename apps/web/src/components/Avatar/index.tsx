@@ -1,3 +1,12 @@
-export const Avatar = () => {
-  return <span className="w-12 h-12 rounded-full bg-secondary-500"></span>;
+import { cn } from "@/utils/cn";
+
+export const Avatar = ({ className }: { className?: string }) => {
+  return (
+    <span
+      className={cn(
+        "aspect-square w-12 h-12 rounded-full bg-secondary-500",
+        className,
+      )}
+    />
+  );
 };

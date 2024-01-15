@@ -1,19 +1,18 @@
 "use client";
 
 import { Button, Input } from "@/components";
-import { Login } from "@/components/mutations";
 import { Logo } from "@/components/Logo";
-import { useMutation } from "react-relay";
+import { graphql, useMutation } from "react-relay";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
-import {
-  LoginMutation,
-  LoginMutation$variables as Variables,
-  LoginMutation$data as Response,
-} from "@/__generated__/LoginMutation.graphql";
-import { login } from "@/auth";
 import { useState } from "react";
+import {
+  pageLoginMutation,
+  pageLoginMutation$data,
+  pageLoginMutation$variables,
+} from "@/__generated__/pageLoginMutation.graphql";
+import { login } from "@/auth";
 
 const Error = ({ error }: { error: string | null }) => {
   return (
@@ -23,19 +22,30 @@ const Error = ({ error }: { error: string | null }) => {
   );
 };
 
+const Login = graphql`
+  mutation pageLoginMutation($username: String!, $password: String!) {
+    login(input: { username: $username, password: $password }) {
+      token
+      user {
+        id
+        username
+      }
+    }
+  }
+`;
+
 const LoginPage = () => {
-  const [commitMutation] = useMutation<LoginMutation>(Login);
+  const [commitMutation] = useMutation<pageLoginMutation>(Login);
   const [error, setError] = useState<string | null>(null);
-  const { register, handleSubmit } = useForm<Variables>();
+
+  const { register, handleSubmit } = useForm<pageLoginMutation$variables>();
   const router = useRouter();
 
-  // TODO: validate with zod before commiting
-  // TODO: display errors
-  const onSubmit = (variables: Variables) => {
+  const onSubmit = (variables: pageLoginMutation$variables) => {
     commitMutation({
       variables,
-      onCompleted: ({ login: response }: Response) => {
-        if (!response?.token) {
+      onCompleted: ({ login: response }: pageLoginMutation$data) => {
+        if (!response?.token || !response.user) {
           return;
         }
 

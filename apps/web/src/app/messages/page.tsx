@@ -1,18 +1,14 @@
 "use client";
 
 import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
-import {
-  QueryRenderer,
-  graphql,
-  loadQuery,
-  usePreloadedQuery,
-} from "react-relay";
+import { graphql, loadQuery, usePreloadedQuery } from "react-relay";
 import env from "@/relay/environment";
 import { NewRoom } from "@/components";
 import {
   pageMessagesQuery,
   pageMessagesQuery$data,
 } from "@/__generated__/pageMessagesQuery.graphql";
+import { useUser } from "@/hooks/useUser";
 
 const query = graphql`
   query pageMessagesQuery {

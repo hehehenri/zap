@@ -51,7 +51,6 @@ const UserPreview = ({
     commitMutation({
       variables,
       onCompleted: ({ createRoom }) => {
-        console.log(createRoom);
         const room = createRoom?.room;
         if (!room) {
           throw new Error("failed to create room");
@@ -90,7 +89,7 @@ export const NewRoom = ({
 }: {
   fragmentKey: NewRoomUserConnectionFragment$key;
 }) => {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const data = useFragment(userConnectionFragment, fragmentKey);
@@ -119,7 +118,7 @@ export const NewRoom = ({
             className="w-full pl-[4.5rem] py-2 border-b border-b-secondary-200 outline-none placeholder-zinc-500 tracking-wide"
           />
         </div>
-        <div className="h-[25rem] w-full">
+        <div className="h-[25rem] w-full overflow-y-auto">
           {data.edges
             ?.filter((edge) =>
               search.length > 0

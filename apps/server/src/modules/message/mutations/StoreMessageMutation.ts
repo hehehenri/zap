@@ -5,8 +5,9 @@ import { MessageType } from "../MessageType";
 import { Context } from "../../../routes/graphql";
 import MessageModel from "../MessageModel";
 import { RoomModel } from "../../room/RoomModel";
-import { InvalidPayloadError } from "../../../routes/error";
+import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import mongoose from "mongoose";
+import { UserModel } from "../../user/UserModel";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
@@ -22,18 +23,22 @@ export const StoreMessageMutation = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ content, roomId }, ctx: Context) => {
-    const sender = ctx.user;
-    if (!sender) return new Error("not authenticated");
+    const user = ctx.user;
+
+    if (!user) throw new UnauthorizedError();
+
+    // TODO: why do we need to store the password too?
+    const sender = await UserModel.findById(user._id).select("+password").exec();
+
+    if (!sender) throw new InvalidPayloadError("user not found: " + user._id.toString());
     
     const message = new MessageModel({
-      _id: new mongoose.Types.ObjectId(),
       content,
       sender,
-      roomId: new mongoose.Types.ObjectId(roomId)
+      room: new mongoose.Types.ObjectId(roomId)
     });
 
     await message.save();
-    await RoomModel.updateOne()
 
     return { message };
   }

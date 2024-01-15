@@ -2,42 +2,60 @@
 
 import { Button, Input } from "@/components";
 import { Logo } from "@/components/Logo";
-import { Register } from "@/components/mutations/RegisterMutation";
-import { useMutation } from "react-relay";
+import { graphql, useMutation } from "react-relay";
 import { useForm } from "react-hook-form";
-import { LogIn } from "lucide-react";
-import Cookie from "js-cookie";
-import {
-  RegisterMutation,
-  RegisterMutation$variables as Variables,
-  RegisterMutation$data as Response,
-} from "@/__generated__/RegisterMutation.graphql";
-
 import { useRouter } from "next/navigation";
+import { LogIn } from "lucide-react";
+import {
+  pageRegisterMutation,
+  pageRegisterMutation$data,
+  pageRegisterMutation$variables,
+} from "@/__generated__/pageRegisterMutation.graphql";
+import { useState } from "react";
+import { login } from "@/auth";
+
+const Error = ({ error }: { error: string | null }) => {
+  return (
+    <div className="w-full flex justify-center pt-2.5">
+      <span className="text-sm text-rose-500 font-semibold">{error}</span>
+    </div>
+  );
+};
+
+const RegisterMutation = graphql`
+  mutation pageRegisterMutation($username: String!, $password: String!) {
+    register(input: { username: $username, password: $password }) {
+      token
+      user {
+        id
+        username
+      }
+    }
+  }
+`;
 
 const RegisterPage = () => {
-  const [commitMutation, inFlight] = useMutation<RegisterMutation>(Register);
-  const { register, handleSubmit } = useForm<Variables>();
+  const [commitMutation, inFlight] =
+    useMutation<pageRegisterMutation>(RegisterMutation);
+  const [error, setError] = useState<string | null>(null);
+
+  const { register, handleSubmit } = useForm<pageRegisterMutation$variables>();
   const router = useRouter();
 
   // TODO: validate with zod before commiting
-  const onSubmit = (variables: Variables) => {
+  const onSubmit = (variables: pageRegisterMutation$variables) => {
     commitMutation({
       variables,
-      onCompleted: ({ register }: Response) => {
-        // TODO: move this somewhere else
-        // TODO: properly handle error
-        if (!register?.token) {
-          throw new Error(
-            "failed to register user: " + JSON.stringify(register),
-          );
+      onCompleted: ({ register: response }: pageRegisterMutation$data) => {
+        if (!response?.token || !response.user) {
+          return;
         }
 
-        Cookie.set("auth.token", register.token, {
-          sameSite: "None",
-          secure: true,
-        });
+        login(response.token);
         router.push("/messages");
+      },
+      onError: (error) => {
+        setError(error.message);
       },
     });
   };
@@ -89,6 +107,7 @@ const RegisterPage = () => {
             <LogIn strokeWidth={1} />
           </Button>
         </form>
+        <Error error={error} />
       </section>
 
       <div className="flex gap-1.5">
