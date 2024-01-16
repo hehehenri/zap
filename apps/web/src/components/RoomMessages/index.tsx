@@ -1,7 +1,7 @@
 "use client";
 
 import { SendHorizonal } from "lucide-react";
-import { Avatar } from "..";
+import { Avatar, BackgroundTile } from "..";
 import { useForm } from "react-hook-form";
 import {
   graphql,
@@ -30,15 +30,6 @@ import {
   RoomMessagesMessageFragment$key,
 } from "@/__generated__/RoomMessagesMessageFragment.graphql";
 import { useUser } from "@/hooks/useUser";
-
-// const Message = ({ content }: { content: string }) => {
-//   return (
-//     <div className="bg-white rounded-lg shadow px-2 py-1.5 flex items-end gap-1 w-fit">
-//       <p className="p-0.5">{content}</p>
-//       <span className="text-xs text-gray-400">17:44</span>
-//     </div>
-//   );
-// };
 
 const messageAddedSubscription = graphql`
   subscription RoomMessagesMessageAddedSubscription(
@@ -332,22 +323,34 @@ export const RoomMessages = ({
 
   return (
     <form
+      className="h-full w-full relative"
       onSubmit={handleSubmit(sendMessage)}
-      className="h-full max-h-full overflow-y-auto mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 container flex justify-end flex-col gap-y-1.5"
     >
-      <Messages messagesFragment={messagesFragment} />
-      <PendingMessages messages={pendingMessages} />
+      <BackgroundTile className="text-secondary-500 fill-secondary-500 opacity-15 absolute -z-10" />
+      <div
+        className="
+          h-full max-h-full overflow-y-auto mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
+          container flex justify-end flex-col gap-y-1.5
+        "
+      >
+        <Messages messagesFragment={messagesFragment} />
+        <PendingMessages messages={pendingMessages} />
 
-      <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
-        <input
-          placeholder="Message"
-          className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
-          {...register("input.content")}
-        />
-        <button className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white">
-          <SendHorizonal />
-        </button>
+        <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
+          <input
+            placeholder="Message"
+            className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
+            {...register("input.content")}
+          />
+          <button className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white">
+            <SendHorizonal />
+          </button>
+        </div>
       </div>
+      {/** <div
+        style={{ backgroundImage: "url('/bg-tile.svg')" }}
+        className="w-full h-full absolute top-0 -z-10 opacity-100"
+      />**/}
     </form>
   );
 };

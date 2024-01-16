@@ -7,3 +7,4 @@ export * from "./Avatar";
 export * from "./Dialog";
 export * from "./NewRoom";
 export * from "./EmptyState";
+export * from "./BackgroundTile";
