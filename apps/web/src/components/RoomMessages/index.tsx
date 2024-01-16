@@ -10,7 +10,6 @@ import {
   useSubscription,
 } from "react-relay";
 import {
-  RoomMessagesStoreMessageMutation$data,
   RoomMessagesStoreMessageMutation as StoreMessage,
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
@@ -22,20 +21,20 @@ import {
 } from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
 import { GraphQLSubscriptionConfig } from "relay-runtime";
 import {
-  RoomMessagesListFragment$data,
-  RoomMessagesListFragment$key,
-} from "@/__generated__/RoomMessagesListFragment.graphql";
-import {
   RoomMessagesMessageFragment$data,
   RoomMessagesMessageFragment$key,
 } from "@/__generated__/RoomMessagesMessageFragment.graphql";
 import { useUser } from "@/hooks/useUser";
+import {
+  RoomMessagesQuery$data,
+  RoomMessagesQuery$key,
+} from "@/__generated__/RoomMessagesQuery.graphql";
 
 const messageAddedSubscription = graphql`
   subscription RoomMessagesMessageAddedSubscription(
     $input: MessageAddedInput!
   ) {
-    messageAdded(input: $input) {
+    messageAddedSubscribe(input: $input) {
       message {
         id
         content
@@ -53,7 +52,7 @@ const useMessageAddedSubscription = (variables: MessageAddedVariables) => {
     [variables],
   );
 
-  useSubscription(config);
+  return useSubscription(config);
 };
 
 export const MessagesHeader = () => {
@@ -93,7 +92,7 @@ const MessageFragment = graphql`
   }
 `;
 
-function groupByUser(messages: RoomMessagesListFragment$data) {
+function groupByUser({ roomMessages: messages }: RoomMessagesQuery$data) {
   const groups = [];
   let currentGroup: RoomMessagesMessageFragment$data[] = [];
 
@@ -129,7 +128,7 @@ function groupByUser(messages: RoomMessagesListFragment$data) {
   return groups;
 }
 
-const getLastMessage = (messages: Message[]) => {
+const getLastMessage = (messages: RoomMessagesMessageFragment$data[]) => {
   const lastMessages = messages.slice(-1);
   if (lastMessages.length == 1) {
     return lastMessages[0];
@@ -138,9 +137,9 @@ const getLastMessage = (messages: Message[]) => {
   return null;
 };
 
-const getSentAt = (message: Message) => {
-  console.log(message.sent_at);
-  const date = new Date(message.sent_at);
+const getSentAt = (message: RoomMessagesMessageFragment$data) => {
+  console.log(message.sentAt);
+  const date = new Date(message.sentAt);
 
   return new Intl.DateTimeFormat("pt-BR", {
     hour: "numeric",
@@ -233,14 +232,25 @@ const PendingMessages = ({ messages }: { messages: string[] }) => {
   );
 };
 
-const Messages = ({
-  messagesFragment,
-}: {
-  messagesFragment: RoomMessagesListFragment$key;
-}) => {
+const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
+  const data = useFragment(
+    graphql`
+      fragment RoomMessagesQuery on Query {
+        roomMessages(roomId: $roomId, first: $messageCount)
+          @connection(key: "query__roomMessages") {
+          edges {
+            node {
+              ...RoomMessagesMessageFragment
+            }
+          }
+        }
+      }
+    `,
+    queryRef,
+  );
+
   const user = useUser();
-  const messages = useFragment(MessagesFragment, messagesFragment);
-  const messageGroups = groupByUser(messages);
+  const messageGroups = groupByUser(data);
 
   if (!user) return;
 
@@ -265,7 +275,7 @@ const Messages = ({
               {isSender && isLastGroup && (
                 <span className="text-sm mt-1">Sent</span>
               )}
-              {lastMessage?.sent_at && (
+              {lastMessage?.sentAt && (
                 <span className="text-sm mt-1">{getSentAt(lastMessage)}</span>
               )}
             </div>
@@ -289,10 +299,10 @@ const MessagesFragment = graphql`
 
 export const RoomMessages = ({
   roomId,
-  messagesFragment,
+  queryRef,
 }: {
   roomId: string;
-  messagesFragment: RoomMessagesListFragment$key;
+  queryRef: RoomMessagesQuery$key;
 }) => {
   const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
   const [pendingMessages, setPendingMessages] = useState<string[]>([]);
@@ -322,18 +332,14 @@ export const RoomMessages = ({
   };
 
   return (
-    <form
-      className="h-full w-full relative"
-      onSubmit={handleSubmit(sendMessage)}
-    >
-      <BackgroundTile className="text-secondary-500 fill-secondary-500 opacity-15 absolute -z-10" />
+    <form className="h-full w-full" onSubmit={handleSubmit(sendMessage)}>
       <div
         className="
           h-full max-h-full overflow-y-auto mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
           container flex justify-end flex-col gap-y-1.5
         "
       >
-        <Messages messagesFragment={messagesFragment} />
+        <Messages queryRef={queryRef} />
         <PendingMessages messages={pendingMessages} />
 
         <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
@@ -347,10 +353,10 @@ export const RoomMessages = ({
           </button>
         </div>
       </div>
-      {/** <div
-        style={{ backgroundImage: "url('/bg-tile.svg')" }}
-        className="w-full h-full absolute top-0 -z-10 opacity-100"
-      />**/}
+      <div
+        style={{ mask: "url('/bg-tile.svg')" }}
+        className="h-full w-full bg-secondary-500 absolute top-0 -z-10 opacity-30"
+      />
     </form>
   );
 };

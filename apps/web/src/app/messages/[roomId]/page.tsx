@@ -5,16 +5,13 @@ import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { useParams } from "next/navigation";
 import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.graphql";
-import Image from "next/image";
 
 const RoomMessagesQuery = graphql`
-  query pageRoomMessagesQuery($roomId: ID!) {
+  query pageRoomMessagesQuery($roomId: ID!, $messageCount: Int!) {
     rooms {
       ...RoomPreviewListFragment
     }
-    roomMessages(roomId: $roomId) {
-      ...RoomMessagesListFragment
-    }
+    ...RoomMessagesQuery
   }
 `;
 
@@ -22,10 +19,11 @@ const RoomMessagesPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
 
   // TODO: discover how to use usePreloadedQuery hook instead
-  const { rooms, roomMessages } = useLazyLoadQuery<pageRoomMessagesQuery>(
-    RoomMessagesQuery,
-    { roomId },
-  );
+  const { rooms, ...roomMessagesQuery } =
+    useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
+      roomId,
+      messageCount: 30,
+    });
 
   return (
     <main className="grid grid-cols-[auto_1fr]">
@@ -36,12 +34,7 @@ const RoomMessagesPage = () => {
         "
       >
         <MessagesHeader />
-        <RoomMessages messagesFragment={roomMessages} roomId={roomId} />
-        <div
-          className="
-          bg-gradient-to-br from-amber-100 to-amber-50
-          absolute w-full h-full -z-20"
-        />
+        <RoomMessages queryRef={roomMessagesQuery} roomId={roomId} />
       </div>
     </main>
   );
