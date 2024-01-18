@@ -3,7 +3,7 @@ import { GraphQLObjectType } from "graphql";
 import { LoginMutation } from "../modules/user/mutations/LoginMutation";
 import { RegisterMutation } from "../modules/user/mutations/RegisterMutation";
 import { StoreMessageMutation } from "../modules/message/mutations/StoreMessageMutation";
-import { CreateRoomMutation } from "../modules/room/mutations/CreateRoomMutation";
+import { GetOrCreateRoomMutation } from "../modules/room/mutations/GetOrCreateRoomMutation";
 
 export const mutation = new GraphQLObjectType({
   name: "Mutation",
@@ -11,6 +11,6 @@ export const mutation = new GraphQLObjectType({
     login: LoginMutation,
     register: RegisterMutation,
     storeMessage: StoreMessageMutation,
-    createRoom: CreateRoomMutation
+    getOrCreateRoom: GetOrCreateRoomMutation
   })
 });

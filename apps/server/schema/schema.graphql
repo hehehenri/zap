@@ -128,8 +128,10 @@ type Mutation {
   """Store user's message"""
   storeMessage(input: StoreMessageInput!): StoreMessagePayload
 
-  """Create Room"""
-  createRoom(input: CreateRoomInput!): CreateRoomPayload
+  """
+  Get the room based on it participants ids or create it if it doesn't exists yet.
+  """
+  getOrCreateRoom(input: GetOrCreateRoomInput!): GetOrCreateRoomPayload
 }
 
 type LoginMutationPayload {
@@ -167,19 +169,19 @@ input StoreMessageInput {
   clientMutationId: String
 }
 
-type CreateRoomPayload {
+type GetOrCreateRoomPayload {
   room: Room
   clientMutationId: String
 }
 
-input CreateRoomInput {
+input GetOrCreateRoomInput {
   userId: String!
   clientMutationId: String
 }
 
 """Subscription Root"""
 type Subscription {
-  messageAdded(input: MessageAddedInput!): MessageAddedPayload
+  messageAddedSubscribe(input: MessageAddedInput!): MessageAddedPayload
 }
 
 type MessageAddedPayload {

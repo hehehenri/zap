@@ -5,6 +5,6 @@ export const subscription = new GraphQLObjectType({
   name: "Subscription",
   description: "Subscription Root",
   fields: () => ({
-    messageAdded: MessageAddedSubscription,
+    messageAddedSubscribe: MessageAddedSubscription,
   })
 });

@@ -1,13 +1,13 @@
 import { mutationWithClientMutationId } from "graphql-relay";
-import { GraphQLNonNull, GraphQLID, GraphQLList, GraphQLString } from "graphql/type";
+import { GraphQLNonNull, GraphQLString } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
 import { UserModel } from "../../user/UserModel";
 import { Context } from "../../../routes/graphql";
 
-export const CreateRoomMutation = mutationWithClientMutationId({
-  name: "CreateRoom",
-  description: "Create Room",
+export const GetOrCreateRoomMutation = mutationWithClientMutationId({
+  name: "GetOrCreateRoom",
+  description: "Get the room based on it participants ids or create it if it doesn't exists yet.",
   inputFields: {
     userId: { type: new GraphQLNonNull(GraphQLString) }
   },
@@ -22,18 +22,27 @@ export const CreateRoomMutation = mutationWithClientMutationId({
     
     if (!authUser) return new Error("new authenticated");
 
+    const room = await RoomModel.findOne({ $and: [
+      { "participants._id": authUser._id },
+      { "participants._id": userId },
+    ]}).exec();
+
+    if (room) return { room };
+
     const firstParticipant = await UserModel.findById(authUser._id).select("+password").exec();
     const secondParticipant = await UserModel.findById(userId).select("+password");
     
-    const room = new RoomModel({
+    const newRoom = new RoomModel({
       participants: [
         firstParticipant,
         secondParticipant
       ]
     });
 
-    await room.save();
+    console.log({ newRoom });
 
-    return { room };
+    await newRoom.save();
+
+    return { room: newRoom };
   }
 })
