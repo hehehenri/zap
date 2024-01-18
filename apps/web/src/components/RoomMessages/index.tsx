@@ -5,7 +5,6 @@ import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
   graphql,
-  useFragment,
   useMutation,
   usePaginationFragment,
   useSubscription,
@@ -14,23 +13,16 @@ import {
   RoomMessagesStoreMessageMutation as StoreMessage,
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
-import { cn } from "@/utils/cn";
+import { cn, extractNodes } from "@/utils/cn";
 import { useMemo, useState } from "react";
 import {
   RoomMessagesMessageAddedSubscription as MessageAdded,
   RoomMessagesMessageAddedSubscription$variables as MessageAddedVariables,
 } from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
 import { GraphQLSubscriptionConfig } from "relay-runtime";
-import {
-  RoomMessagesMessageFragment$data,
-  RoomMessagesMessageFragment$key,
-} from "@/__generated__/RoomMessagesMessageFragment.graphql";
-import { useUser } from "@/hooks/useUser";
-import {
-  RoomMessagesQuery$data,
-  RoomMessagesQuery$key,
-} from "@/__generated__/RoomMessagesQuery.graphql";
+import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
+import { User } from "@/auth";
 
 const messageAddedSubscription = graphql`
   subscription RoomMessagesMessageAddedSubscription(
@@ -82,66 +74,7 @@ const storeMessageMutation = graphql`
   }
 `;
 
-const MessageFragment = graphql`
-  fragment RoomMessagesMessageFragment on Message {
-    id
-    content
-    sender {
-      id
-      username
-    }
-    sentAt
-  }
-`;
-
-function groupByUser({ roomMessages: messages }: RoomMessagesQuery$data) {
-  const groups = [];
-  let currentGroup: RoomMessagesMessageFragment$data[] = [];
-
-  if (!messages.edges) return [];
-
-  for (const edge of messages.edges) {
-    const lastMessage = currentGroup[currentGroup.length - 1];
-
-    // Check if the current group is empty or if the user_id matches the user_id of
-    // the last message in the current group.
-    const messageNode = edge?.node;
-    if (!messageNode) continue;
-    const messageRef: RoomMessagesMessageFragment$key = messageNode;
-
-    // TODO: is it bad for performance to call useFragment on each message?
-    const message = useFragment(MessageFragment, messageRef);
-
-    // Split into a new group so each message sender has it own group
-    if (lastMessage?.sender.id !== message.sender.id) {
-      groups.push(currentGroup);
-      currentGroup = [message];
-      continue;
-    }
-
-    // Split into a new group if the time difference from the last messsage
-    // exceeds 5 minutes
-    const MAX_TIME_DIFF = 5 * 60000;
-    const lastMessageTime = new Date(lastMessage.sentAt).getTime();
-    const currentMessageTime = new Date(message.sentAt).getTime();
-    if (currentMessageTime - lastMessageTime > MAX_TIME_DIFF) {
-      groups.push(currentGroup);
-      currentGroup = [message];
-      continue;
-    }
-
-    currentGroup.push(message);
-  }
-
-  // Push the last group into the groups array
-  if (currentGroup.length > 0) {
-    groups.push(currentGroup);
-  }
-
-  return groups;
-}
-
-const getLastMessage = (messages: RoomMessagesMessageFragment$data[]) => {
+const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
   if (lastMessages.length == 1) {
     return lastMessages[0];
@@ -150,7 +83,7 @@ const getLastMessage = (messages: RoomMessagesMessageFragment$data[]) => {
   return null;
 };
 
-const getSentAt = (message: RoomMessagesMessageFragment$data) => {
+const getSentAt = (message: Message) => {
   const date = new Date(message.sentAt);
 
   return new Intl.DateTimeFormat("pt-BR", {
@@ -231,61 +164,64 @@ const MessageChunk = ({
   );
 };
 
-const PendingMessages = ({ messages }: { messages: string[] }) => {
-  if (!messages.length) return;
-
-  return (
-    <div>
-      <MessageChunk messages={messages} isSender={true} />
-      <span className="text-zinc-400 text-sm flex justify-end mt-1">
-        Sending...
-      </span>
-    </div>
-  );
+// TODO
+// Could not generate the message type because I couldn't map an
+// array of fragments into an array of data due to rule-of-hooks.
+type Message = {
+  content: string;
+  id: string;
+  sender: {
+    id: string;
+    username: string;
+  };
+  sentAt: string;
 };
 
-const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
-  const { data, loadNext, isLoadingNext } = usePaginationFragment<RoomMessagesPaginationQuery, any>(
-    graphql`
-      fragment RoomMessagesQuery on Query
-      @argumentDefinitions(
-        roomId: { type: "ID!" }
-        first: { type: "Int", defaultValue: 2 }
-        after: { type: "String" }
-      )
-      @refetchable(queryName: "RoomMessagesPaginationQuery") {
-        roomMessages(roomId: $roomId, first: $first, after: $after)
-          @connection(key: "messages_roomMessages", filters: []) {
-          edges {
-            node {
-              ...RoomMessagesMessageFragment
-            }
-          }
-          pageInfo {
-            hasNextPage
-          }
-        }
-      }
-    `,
-    queryRef,
-  );
+const MessageGroups = ({
+  messages,
+  user,
+}: {
+  messages: Message[];
+  user: User;
+}) => {
+  const groups = [];
 
-  const loadMore = () => {
-    if (isLoadingNext) return;
-    
-    loadNext(15);
+  let currentGroup: Message[] = [];
+
+  for (const message of messages) {
+    const lastMessage = currentGroup[currentGroup.length - 1];
+
+    // Split into a new group so each message sender has it own group
+    if (lastMessage?.sender.id !== message.sender.id) {
+      groups.push(currentGroup);
+      currentGroup = [message];
+      continue;
+    }
+
+    // Split into a new group if the time difference from the last messsage
+    // exceeds 5 minutes
+    const MAX_TIME_DIFF = 5 * 60000;
+    const lastMessageTime = new Date(lastMessage.sentAt).getTime();
+    const currentMessageTime = new Date(message.sentAt).getTime();
+    if (currentMessageTime - lastMessageTime > MAX_TIME_DIFF) {
+      groups.push(currentGroup);
+      currentGroup = [message];
+      continue;
+    }
+
+    currentGroup.push(message);
   }
 
-  const user = useUser();
-  const messageGroups = groupByUser(data);
-
-  if (!user) return;
+  // Push the last group into the groups array
+  if (currentGroup.length > 0) {
+    groups.push(currentGroup);
+  }
 
   return (
     <>
-      {messageGroups.map((messageGroup, id) => {
+      {groups.map((messageGroup, id) => {
         const isSender = messageGroup[0]?.sender.id == user.id;
-        const isLastGroup = id + 1 === messageGroups.length;
+        const isLastGroup = id + 1 === groups.length;
         const lastMessage = getLastMessage(messageGroup);
 
         return (
@@ -309,6 +245,64 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
           </div>
         );
       })}
+    </>
+  );
+};
+
+const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
+  const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
+    RoomMessagesPaginationQuery,
+    RoomMessagesQuery$key
+  >(
+    graphql`
+      fragment RoomMessagesQuery on Query
+      @argumentDefinitions(
+        roomId: { type: "ID!" }
+        first: { type: "Int", defaultValue: 2 }
+        after: { type: "String" }
+      )
+      @refetchable(queryName: "RoomMessagesPaginationQuery") {
+        roomMessages(roomId: $roomId, first: $first, after: $after)
+          @connection(key: "messages_roomMessages", filters: []) {
+          edges {
+            node {
+              id
+              content
+              sender {
+                id
+                username
+              }
+              sentAt
+            }
+          }
+          pageInfo {
+            hasNextPage
+          }
+        }
+        me {
+          id
+          username
+        }
+      }
+    `,
+    queryRef,
+  );
+
+  const { roomMessages, me: user } = data;
+
+  const loadMore = () => {
+    if (isLoadingNext || !hasNext) return;
+
+    loadNext(15);
+  };
+
+  const messages = extractNodes(roomMessages);
+
+  if (!user) return;
+
+  return (
+    <>
+      <MessageGroups messages={messages} user={user} />
       <button
         className="text-white bg-red-500 rounded-xl text-xl px-3 py-1"
         onClick={loadMore}
@@ -316,6 +310,19 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
         Load More
       </button>
     </>
+  );
+};
+
+const PendingMessages = ({ messages }: { messages: string[] }) => {
+  if (!messages.length) return;
+
+  return (
+    <div>
+      <MessageChunk messages={messages} isSender={true} />
+      <span className="text-zinc-400 text-sm flex justify-end mt-1">
+        Sending...
+      </span>
+    </div>
   );
 };
 
