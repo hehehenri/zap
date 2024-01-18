@@ -2,7 +2,6 @@ import { Logo } from "@/components/Logo";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { cookies } from "next/headers";
-import { useUser } from "@/hooks/useUser";
 
 const JoinAnchor = ({ href, content }: { href: string; content: string }) => {
   return (

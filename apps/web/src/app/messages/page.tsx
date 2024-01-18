@@ -8,7 +8,6 @@ import {
   pageMessagesQuery,
   pageMessagesQuery$data,
 } from "@/__generated__/pageMessagesQuery.graphql";
-import { useUser } from "@/hooks/useUser";
 
 const query = graphql`
   query pageMessagesQuery {

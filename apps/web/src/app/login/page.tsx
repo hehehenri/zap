@@ -35,7 +35,7 @@ const Login = graphql`
 `;
 
 const LoginPage = () => {
-  const [commitMutation] = useMutation<pageLoginMutation>(Login);
+  const [commitMutation, inFlight] = useMutation<pageLoginMutation>(Login);
   const [error, setError] = useState<string | null>(null);
 
   const { register, handleSubmit } = useForm<pageLoginMutation$variables>();
@@ -100,7 +100,10 @@ const LoginPage = () => {
               />
             </div>
           </div>
-          <Button className="flex items-center gap-1 w-full justify-center">
+          <Button
+            disabled={inFlight}
+            className="flex items-center gap-1 w-full justify-center"
+          >
             <span>Login</span>
             <LogIn strokeWidth={1} />
           </Button>

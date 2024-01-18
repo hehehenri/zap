@@ -1,12 +1,13 @@
 "use client";
 
 import { SendHorizonal } from "lucide-react";
-import { Avatar, BackgroundTile } from "..";
+import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
   graphql,
   useFragment,
   useMutation,
+  usePaginationFragment,
   useSubscription,
 } from "react-relay";
 import {
@@ -29,6 +30,7 @@ import {
   RoomMessagesQuery$data,
   RoomMessagesQuery$key,
 } from "@/__generated__/RoomMessagesQuery.graphql";
+import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 
 const messageAddedSubscription = graphql`
   subscription RoomMessagesMessageAddedSubscription(
@@ -99,6 +101,8 @@ function groupByUser({ roomMessages: messages }: RoomMessagesQuery$data) {
   if (!messages.edges) return [];
 
   for (const edge of messages.edges) {
+    const lastMessage = currentGroup[currentGroup.length - 1];
+
     // Check if the current group is empty or if the user_id matches the user_id of
     // the last message in the current group.
     const messageNode = edge?.node;
@@ -108,16 +112,25 @@ function groupByUser({ roomMessages: messages }: RoomMessagesQuery$data) {
     // TODO: is it bad for performance to call useFragment on each message?
     const message = useFragment(MessageFragment, messageRef);
 
-    if (
-      currentGroup.length === 0 ||
-      currentGroup[currentGroup.length - 1]?.sender.id === message.sender.id
-    ) {
-      currentGroup.push(message);
-    } else {
-      // Start a new group if the user_id changes
+    // Split into a new group so each message sender has it own group
+    if (lastMessage?.sender.id !== message.sender.id) {
       groups.push(currentGroup);
       currentGroup = [message];
+      continue;
     }
+
+    // Split into a new group if the time difference from the last messsage
+    // exceeds 5 minutes
+    const MAX_TIME_DIFF = 5 * 60000;
+    const lastMessageTime = new Date(lastMessage.sentAt).getTime();
+    const currentMessageTime = new Date(message.sentAt).getTime();
+    if (currentMessageTime - lastMessageTime > MAX_TIME_DIFF) {
+      groups.push(currentGroup);
+      currentGroup = [message];
+      continue;
+    }
+
+    currentGroup.push(message);
   }
 
   // Push the last group into the groups array
@@ -138,7 +151,6 @@ const getLastMessage = (messages: RoomMessagesMessageFragment$data[]) => {
 };
 
 const getSentAt = (message: RoomMessagesMessageFragment$data) => {
-  console.log(message.sentAt);
   const date = new Date(message.sentAt);
 
   return new Intl.DateTimeFormat("pt-BR", {
@@ -233,15 +245,24 @@ const PendingMessages = ({ messages }: { messages: string[] }) => {
 };
 
 const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
-  const data = useFragment(
+  const { data, loadNext, isLoadingNext } = usePaginationFragment<RoomMessagesPaginationQuery, any>(
     graphql`
-      fragment RoomMessagesQuery on Query {
-        roomMessages(roomId: $roomId, first: $messageCount)
-          @connection(key: "query__roomMessages") {
+      fragment RoomMessagesQuery on Query
+      @argumentDefinitions(
+        roomId: { type: "ID!" }
+        first: { type: "Int", defaultValue: 2 }
+        after: { type: "String" }
+      )
+      @refetchable(queryName: "RoomMessagesPaginationQuery") {
+        roomMessages(roomId: $roomId, first: $first, after: $after)
+          @connection(key: "messages_roomMessages", filters: []) {
           edges {
             node {
               ...RoomMessagesMessageFragment
             }
+          }
+          pageInfo {
+            hasNextPage
           }
         }
       }
@@ -249,13 +270,19 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
     queryRef,
   );
 
+  const loadMore = () => {
+    if (isLoadingNext) return;
+    
+    loadNext(15);
+  }
+
   const user = useUser();
   const messageGroups = groupByUser(data);
 
   if (!user) return;
 
   return (
-    <div>
+    <>
       {messageGroups.map((messageGroup, id) => {
         const isSender = messageGroup[0]?.sender.id == user.id;
         const isLastGroup = id + 1 === messageGroups.length;
@@ -282,20 +309,15 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
           </div>
         );
       })}
-    </div>
+      <button
+        className="text-white bg-red-500 rounded-xl text-xl px-3 py-1"
+        onClick={loadMore}
+      >
+        Load More
+      </button>
+    </>
   );
 };
-
-const MessagesFragment = graphql`
-  fragment RoomMessagesListFragment on MessageConnection {
-    edges {
-      node {
-        id
-        ...RoomMessagesMessageFragment
-      }
-    }
-  }
-`;
 
 export const RoomMessages = ({
   roomId,

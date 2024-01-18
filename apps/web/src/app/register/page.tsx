@@ -102,7 +102,10 @@ const RegisterPage = () => {
               />
             </div>
           </div>
-          <Button className="flex items-center gap-1 w-full justify-center">
+          <Button
+            disabled={inFlight}
+            className="flex items-center gap-1 w-full justify-center"
+          >
             Register
             <LogIn strokeWidth={1} />
           </Button>

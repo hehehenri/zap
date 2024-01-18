@@ -1,5 +1,10 @@
-import { RoomPreviewFragment$key } from "@/__generated__/RoomPreviewFragment.graphql";
+import {
+  RoomPreviewFragment$data,
+  RoomPreviewFragment$key,
+} from "@/__generated__/RoomPreviewFragment.graphql";
+import { User } from "@/auth";
 import { Avatar } from "@/components";
+import { useUser } from "@/hooks/useUser";
 import { graphql, useFragment } from "react-relay";
 
 const roomPreviewFragment = graphql`
@@ -43,19 +48,34 @@ function formatReadableDate(inputDate: string) {
   });
 }
 
+const getOtherPeer = (
+  { participants }: RoomPreviewFragment$data,
+  user: User,
+) => {
+  if (!user) return null;
+
+  const firstPeer = participants[0];
+  const secondPeer = participants[1];
+
+  if (firstPeer?.id == user.id) return secondPeer;
+  if (secondPeer?.id == user.id) return firstPeer;
+
+  return null;
+};
+
 export const RoomPreview = ({
   fragmentKey,
 }: {
   fragmentKey: RoomPreviewFragment$key;
 }) => {
-  const { id, participants, updatedAt } = useFragment(
-    roomPreviewFragment,
-    fragmentKey,
-  );
+  const data = useFragment(roomPreviewFragment, fragmentKey);
+  const user = useUser();
+  if (!user) return;
 
-  const firstParticipant = participants[0];
+  const peer = getOtherPeer(data, user);
+  if (!peer) return;
 
-  if (!firstParticipant) return;
+  const { id, updatedAt } = data;
 
   return (
     <a
@@ -64,9 +84,7 @@ export const RoomPreview = ({
     >
       <Avatar />
       <div className="flex justify-between w-full items-center">
-        <span className="font-medium text-ellipsis">
-          {firstParticipant.username}
-        </span>
+        <span className="font-medium text-ellipsis">{peer.username}</span>
         <p className="text-zinc-800">{formatReadableDate(updatedAt)}</p>
       </div>
     </a>

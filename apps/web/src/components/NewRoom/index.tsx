@@ -20,8 +20,8 @@ const Header = () => {
 };
 
 const newRoomMutation = graphql`
-  mutation NewRoomMutation($participants: CreateRoomInput!) {
-    createRoom(input: $participants) {
+  mutation NewRoomMutation($participants: GetOrCreateRoomInput!) {
+    getOrCreateRoom(input: $participants) {
       room {
         id
       }

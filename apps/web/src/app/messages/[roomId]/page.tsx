@@ -7,11 +7,11 @@ import { useParams } from "next/navigation";
 import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.graphql";
 
 const RoomMessagesQuery = graphql`
-  query pageRoomMessagesQuery($roomId: ID!, $messageCount: Int!) {
+  query pageRoomMessagesQuery($roomId: ID!) {
     rooms {
       ...RoomPreviewListFragment
     }
-    ...RoomMessagesQuery
+    ...RoomMessagesQuery @arguments(roomId: $roomId)
   }
 `;
 
@@ -21,8 +21,9 @@ const RoomMessagesPage = () => {
   // TODO: discover how to use usePreloadedQuery hook instead
   const { rooms, ...roomMessagesQuery } =
     useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
+      count: 1,
+      cursor: null,
       roomId,
-      messageCount: 30,
     });
 
   return (

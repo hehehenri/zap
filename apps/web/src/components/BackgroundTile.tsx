@@ -1,5 +1,3 @@
-import { cn } from "@/utils/cn";
-
 export const BackgroundTile = ({ className }: { className: string }) => {
   return (
     <svg
@@ -7,6 +5,7 @@ export const BackgroundTile = ({ className }: { className: string }) => {
       version="1.1"
       width="100%"
       height="100%"
+      className={className}
     >
       <defs>
         <pattern

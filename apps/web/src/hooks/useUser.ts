@@ -10,34 +10,14 @@ const MeQuery = graphql`
   }
 `;
 
-const getUser = () => {
-  const userString = localStorage.getItem("user");
-  if (!userString) return null;
+export const useUser = (): User | null => {
+  const { me } = useLazyLoadQuery<useUserQuery>(MeQuery, {});
+  const { push } = useRouter();
 
-  try {  
-    const user: User = JSON.parse(userString);
-    return user;
-  } catch(e) {
+  if (!me) {
+    push("/login");
     return null;
   }
-}
 
-const storeUser = (user: User) => {
-  const userString = JSON.stringify(user);
-
-  localStorage.setItem("user", userString);
-}
-
-export const useUser = () => {
-  const { push } = useRouter();
-  const user = getUser(); 
-
-  if (user) return user;
-
-  const { me } = useLazyLoadQuery<useUserQuery>(MeQuery, {});
-
-  if (!me) return push("/login");
-
-  storeUser(me);  
   return me;
 }
