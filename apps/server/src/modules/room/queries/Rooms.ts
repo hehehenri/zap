@@ -21,7 +21,7 @@ export const Rooms: GraphQLFieldConfig<any, GraphQLContext> = {
     });
 
     return connectionFromMongoCursor({
-      cursor: RoomModel.find({ "participants._id": user._id }),
+      cursor: RoomModel.find({ "participants._id": user._id }).sort({ lastMessage: -1, "lastMessage.createdAt": 1 }),
       context,
       args,
       loader: (_, id) => loader.load(id.toString()),
