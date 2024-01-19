@@ -133,7 +133,7 @@ const MessageChunk = ({
                       "bg-white": !isSender,
                       "bg-secondary-300": isSender,
                       "rounded-l-[18px] rounded-tr-[18px] rounded-br-xl":
-                        isFirstMessage && isSender,
+                        isFirstMessage && !isLastMessage && isSender,
                       "rounded-r-[18px] rounded-tl-[18px] rounded-bl-xl":
                         isFirstMessage && !isSender,
                       "rounded-bl-[18px] rounded-tr-xl rounded-br-0":
