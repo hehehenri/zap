@@ -5,6 +5,7 @@ import {
 import { User } from "@/auth";
 import { Avatar } from "@/components";
 import { useUser } from "@/hooks/useUser";
+import { getOtherParticipant } from "@/utils/cn";
 import { graphql, useFragment } from "react-relay";
 
 const roomPreviewFragment = graphql`
@@ -52,21 +53,6 @@ function formatReadableDate(inputDate: string) {
   });
 }
 
-const getOtherPeer = (
-  { participants }: RoomPreviewFragment$data,
-  user: User,
-) => {
-  if (!user) return null;
-
-  const firstPeer = participants[0];
-  const secondPeer = participants[1];
-
-  if (firstPeer?.id == user.id) return secondPeer;
-  if (secondPeer?.id == user.id) return firstPeer;
-
-  return null;
-};
-
 export const RoomPreview = ({
   roomFragmentKey,
 }: {
@@ -76,8 +62,8 @@ export const RoomPreview = ({
   const user = useUser();
   if (!user) return;
 
-  const peer = getOtherPeer(data, user);
-  if (!peer) return;
+  const part = getOtherParticipant(data.participants, user);
+  if (!part) return;
 
   const { id } = data;
 
@@ -89,7 +75,7 @@ export const RoomPreview = ({
       <Avatar />
       <div className="flex justify-between w-full items-center">
         <div className="flex flex-col leading-6">
-          <span className="font-medium text-ellipsis">{peer.username}</span>
+          <span className="font-medium text-ellipsis">{part.username}</span>
           <p className="text-stone-600">{data.lastMessage?.content}</p>
         </div>
         {data.lastMessage && (

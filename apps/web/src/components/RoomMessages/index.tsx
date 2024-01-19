@@ -14,7 +14,7 @@ import {
   RoomMessagesStoreMessageMutation as StoreMessage,
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
-import { cn, extractNodes } from "@/utils/cn";
+import { cn, extractNodes, getOtherParticipant } from "@/utils/cn";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   RoomMessagesMessageAddedSubscription,
@@ -43,22 +43,25 @@ export const MessagesHeader = ({
         }
         me {
           id
+          username
         }
       }
     `,
     queryRef,
   );
 
-  const peer = room?.participants.filter((peer) => peer.id !== me?.id)[0];
+  if (!room?.participants || !me) return;
 
-  if (!peer) return;
+  const otherParticipant = getOtherParticipant(room.participants, me);
+
+  if (!otherParticipant) return;
 
   return (
     <div className="flex items-center bg-white shadow px-6 py-2 gap-2">
       <Avatar />
       <div className="flex flex-col">
         <span className="text-lg font-semibold leading-tight">
-          {peer.username}
+          {otherParticipant.username}
         </span>
       </div>
     </div>

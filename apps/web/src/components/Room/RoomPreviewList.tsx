@@ -79,7 +79,7 @@ export const RoomPreviewList = ({
       ) : (
         <EmptyState />
       )}
-      {data.edges && (
+      {data?.edges && (
         <div className="absolute bottom-0 right-0 overflow-hidden">
           {transitions((style, isOpen) =>
             isOpen ? (

@@ -1,3 +1,4 @@
+import { User } from '@/auth';
 import { ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -22,4 +23,14 @@ export const extractNodes = <Node extends object, T = Node>(
       ?.map((edge) => (mapper ? (mapper(edge?.node!) as any) : edge?.node!))
       .filter((x) => x != null) ?? []
   )
+}
+
+export const getOtherParticipant = (participants: readonly User[], user: User) => {
+  const firstParticipant = participants[0];
+  const secondParticipant = participants[1];
+
+  if (firstParticipant?.id == user.id) return secondParticipant;
+  if (secondParticipant?.id == user.id) return firstParticipant;
+
+  return null;
 }
