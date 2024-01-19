@@ -5,7 +5,6 @@ import { useFragment, useMutation } from "react-relay";
 import { useRouter } from "next/navigation";
 import { CSSProperties, useState } from "react";
 import { graphql } from "react-relay";
-import { NewRoomUserFragment$key } from "@/__generated__/NewRoomUserFragment.graphql";
 import { Avatar } from "..";
 import { SearchIcon } from "lucide-react";
 import { NewRoomMutation } from "@/__generated__/NewRoomMutation.graphql";
@@ -20,13 +19,6 @@ const Header = () => {
     </div>
   );
 };
-
-const userFragment = graphql`
-  fragment NewRoomUserFragment on User {
-    id
-    username
-  }
-`;
 
 const UserPreview = ({ user }: { user: User }) => {
   const router = useRouter();
@@ -107,9 +99,7 @@ export const NewRoom = ({
 
   return (
     <div className="w-full">
-      <button className="w-full" onClick={() => setIsOpen(true)}>
-        {children}
-      </button>
+      <button onClick={() => setIsOpen(true)}>{children}</button>
       <Dialog
         title={<Header />}
         open={isOpen}

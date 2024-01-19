@@ -5,6 +5,7 @@ import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
   graphql,
+  useFragment,
   useMutation,
   usePaginationFragment,
   useSubscription,
@@ -23,16 +24,42 @@ import { GraphQLSubscriptionConfig, SelectorStoreUpdater } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
+import { RoomMessagesHeaderQuery$key } from "@/__generated__/RoomMessagesHeaderQuery.graphql";
 
-export const MessagesHeader = () => {
+export const MessagesHeader = ({
+  queryRef,
+}: {
+  queryRef: RoomMessagesHeaderQuery$key;
+}) => {
+  const { room, me } = useFragment(
+    graphql`
+      fragment RoomMessagesHeaderQuery on Query
+      @argumentDefinitions(roomId: { type: "ID!" }) {
+        room(roomId: $roomId) {
+          participants {
+            id
+            username
+          }
+        }
+        me {
+          id
+        }
+      }
+    `,
+    queryRef,
+  );
+
+  const peer = room?.participants.filter((peer) => peer.id !== me?.id)[0];
+
+  if (!peer) return;
+
   return (
     <div className="flex items-center bg-white shadow px-6 py-2 gap-2">
       <Avatar />
       <div className="flex flex-col">
-        <span className="text-lg font-semibold leading-tight">username</span>
-        <p className="text-sm text-zinc-600 font-medium">
-          Last seen yesterday at 17:32
-        </p>
+        <span className="text-lg font-semibold leading-tight">
+          {peer.username}
+        </span>
       </div>
     </div>
   );

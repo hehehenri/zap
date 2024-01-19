@@ -10,6 +10,7 @@ const RoomMessagesQuery = graphql`
   query pageRoomMessagesQuery($roomId: ID!) {
     ...RoomPreviewListQuery
     ...RoomMessagesQuery @arguments(roomId: $roomId)
+    ...RoomMessagesHeaderQuery @arguments(roomId: $roomId)
   }
 `;
 
@@ -29,7 +30,7 @@ const RoomMessagesPage = () => {
           flex flex-col h-screen relative
         "
       >
-        <MessagesHeader />
+        <MessagesHeader queryRef={queryRef} />
         <RoomMessages queryRef={queryRef} roomId={roomId} />
       </div>
     </main>
