@@ -49,10 +49,7 @@ const storeMessageMutation = graphql`
   }
 `;
 
-const messageUpdater: SelectorStoreUpdater = store => {
-  
-  
-}
+const messageUpdater: SelectorStoreUpdater = (store) => {};
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -331,6 +328,7 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
       {hasNext && (
         <div className="flex w-full justify-center pb-3">
           <button
+            type="button"
             disabled={isLoadingNext}
             className="py-1 bg-secondary-300 px-3 shadow rounded-full text-stone-800 flex items-center gap-1.5 transition hover:-translate-y-1"
             onClick={loadMore}
