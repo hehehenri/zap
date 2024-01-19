@@ -6,7 +6,6 @@ import { Context } from "../../../routes/graphql";
 import { MessageModel } from "../MessageModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import mongoose from "mongoose";
-import { UserModel } from "../../user/UserModel";
 import { EVENTS, pubsub } from "../../../pubsub";
 import { RoomModel } from "../../room/RoomModel";
 
@@ -28,15 +27,18 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     if (!user) throw new UnauthorizedError();
 
-    // TODO: why do we need to store the password too?
-    const sender = await UserModel.findById(user._id).select("+password").exec();
+    const room = await RoomModel.findById(roomId);
 
-    if (!sender) throw new InvalidPayloadError("user not found: " + user._id.toString());
+    if (!room) throw new InvalidPayloadError("room not found");
+
+    const isRoomMember = room.participants.map(u => u._id).includes(user._id);
+
+    if (!isRoomMember) throw new InvalidPayloadError("you can't send messages on this room");
     
     const message = new MessageModel({
       content,
-      sender,
-      room: new mongoose.Types.ObjectId(roomId)
+      sender: new mongoose.Types.ObjectId(user._id),
+      room: room._id,
     });
 
     await message.save();

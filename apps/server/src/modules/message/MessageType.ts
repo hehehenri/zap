@@ -1,9 +1,10 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import MessageModel, { MessageDefinition } from "./MessageModel";
+import { MessageDefinition, MessageModel } from "./MessageModel";
 import { connectionDefinitions } from "graphql-relay";
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
 import { RoomDefinition } from "../room/RoomModel";
+import { UserDefinition } from "../user/UserModel";
 
 export const MessageType = new GraphQLObjectType<MessageDefinition>({
   name: 'Message',
@@ -18,7 +19,14 @@ export const MessageType = new GraphQLObjectType<MessageDefinition>({
     },
     sender: {
       type: new GraphQLNonNull(UserType),
-      resolve: (message) => message.sender,
+      resolve: async (message) => {
+        const messageModel = await MessageModel
+          .findById(message._id)
+          .populate<{ sender: UserDefinition }>('sender')
+          .exec();
+
+        return messageModel?.sender;
+      }
     },
     room: {
       type: new GraphQLNonNull(RoomType),
