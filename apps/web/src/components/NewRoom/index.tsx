@@ -8,7 +8,7 @@ import { graphql } from "react-relay";
 import { Avatar } from "..";
 import { SearchIcon } from "lucide-react";
 import { NewRoomMutation } from "@/__generated__/NewRoomMutation.graphql";
-import { cn, extractNodes } from "@/utils/cn";
+import { extractNodes } from "@/utils/cn";
 import { NewRoomQuery$key } from "@/__generated__/NewRoomQuery.graphql";
 import { User } from "@/auth";
 
