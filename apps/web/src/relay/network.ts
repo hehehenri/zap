@@ -39,7 +39,7 @@ export const fetchFunction = async (request: RequestParameters, variables: Varia
 export const subscribeFunction = (request: RequestParameters, variables: Variables): Observable<any> => {
   // TODO: get url from .env
   const client = typeof window !== typeof undefined
-    ? createClient({ url: "https://localhost:8000/graphql/ws" })
+    ? createClient({ url: "ws://localhost:8000/graphql/ws" })
     : undefined;
 
   return Observable.create(sink => {

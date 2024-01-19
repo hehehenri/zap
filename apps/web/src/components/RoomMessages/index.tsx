@@ -1,6 +1,12 @@
 "use client";
 
-import { SendHorizonal } from "lucide-react";
+import {
+  MoreHorizontal,
+  MoreVertical,
+  PlusCircle,
+  PlusIcon,
+  SendHorizonal,
+} from "lucide-react";
 import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
@@ -14,40 +20,17 @@ import {
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
 import { cn, extractNodes } from "@/utils/cn";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   RoomMessagesMessageAddedSubscription as MessageAdded,
   RoomMessagesMessageAddedSubscription$variables as MessageAddedVariables,
+  RoomMessagesMessageAddedSubscription,
+  RoomMessagesMessageAddedSubscription$variables,
 } from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
 import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
-
-const messageAddedSubscription = graphql`
-  subscription RoomMessagesMessageAddedSubscription(
-    $input: MessageAddedInput!
-  ) {
-    messageAddedSubscribe(input: $input) {
-      message {
-        id
-        content
-      }
-    }
-  }
-`;
-
-const useMessageAddedSubscription = (variables: MessageAddedVariables) => {
-  const config = useMemo<GraphQLSubscriptionConfig<MessageAdded>>(
-    () => ({
-      subscription: messageAddedSubscription,
-      variables,
-    }),
-    [variables],
-  );
-
-  return useSubscription(config);
-};
 
 export const MessagesHeader = () => {
   return (
@@ -118,21 +101,25 @@ const MessageChunk = ({
               })}
             >
               <div className="rounded-tr-lg"></div>
-              <div className="relative">
+              <div className="relative mx-[7px]">
                 <p
                   className={cn(
-                    "px-3 py-1.5 bg-zinc-700 break-words max-w-full rounded-tl-3xl rounded-tr-3xl shadow",
+                    "px-3 py-1.5 bg-zinc-700 break-words max-w-full rounded-tl-3xl rounded-tr-3xl shadow text-stone-800",
                     {
-                      "bg-zinc-200": !isSender,
-                      "text-stone-800 bg-secondary-300": isSender,
-                      "rounded-l-3xl rounded-tr-3xl rounded-br-xl":
-                        isFirstMessage,
-                      "rounded-bl-3xl rounded-tr-xl rounded-br-0":
+                      "bg-white": !isSender,
+                      "bg-secondary-300": isSender,
+                      "rounded-l-[18px] rounded-tr-[18px] rounded-br-xl":
+                        isFirstMessage && isSender,
+                      "rounded-r-[18px] rounded-tl-[18px] rounded-bl-xl":
+                        isFirstMessage && !isSender,
+                      "rounded-bl-[18px] rounded-tr-xl rounded-br-0":
                         isLastMessage && isSender,
-                      "rounded-br-3xl rounded-tl-xl rounded-bl-0":
+                      "rounded-br-[18px] rounded-tl-xl rounded-bl-0":
                         isLastMessage && !isSender,
-                      "rounded-l-3xl rounded-r-xl":
-                        !isLastMessage && !isFirstMessage,
+                      "rounded-l-[18px] rounded-r-xl":
+                        !isLastMessage && !isFirstMessage && isSender,
+                      "rounded-r-[18px] rounded-l-xl":
+                        !isLastMessage && !isFirstMessage && !isSender,
                     },
                   )}
                 >
@@ -144,7 +131,7 @@ const MessageChunk = ({
                     width={7}
                     className={cn("absolute bottom-0", {
                       "fill-secondary-300 left-full": isSender,
-                      "fill-zinc-200 right-full": !isSender,
+                      "fill-white right-full -scale-x-100": !isSender,
                     })}
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 7 17"
@@ -168,8 +155,8 @@ const MessageChunk = ({
 // Could not generate the message type because I couldn't map an
 // array of fragments into an array of data due to rule-of-hooks.
 type Message = {
-  content: string;
   id: string;
+  content: string;
   sender: {
     id: string;
     username: string;
@@ -249,7 +236,49 @@ const MessageGroups = ({
   );
 };
 
-const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
+const useMessageAddedSubscription = (
+  variables: RoomMessagesMessageAddedSubscription$variables,
+) => {
+  const config = useMemo<
+    GraphQLSubscriptionConfig<RoomMessagesMessageAddedSubscription>
+  >(
+    () => ({
+      subscription: graphql`
+        subscription RoomMessagesMessageAddedSubscription(
+          $connections: [ID!]!
+        ) {
+          messageAddedSubscribe(input: {}) {
+            message
+              @appendNode(
+                connections: $connections
+                edgeTypeName: "MessageEdge"
+              ) {
+              id
+              content
+              sender {
+                id
+                username
+              }
+              sentAt
+            }
+          }
+        }
+      `,
+      variables,
+    }),
+    [],
+  );
+
+  return useSubscription(config);
+};
+
+const Messages = ({
+  queryRef,
+  roomId,
+}: {
+  queryRef: RoomMessagesQuery$key;
+  roomId: string;
+}) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     RoomMessagesPaginationQuery,
     RoomMessagesQuery$key
@@ -258,12 +287,13 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
       fragment RoomMessagesQuery on Query
       @argumentDefinitions(
         roomId: { type: "ID!" }
-        first: { type: "Int", defaultValue: 2 }
+        first: { type: "Int", defaultValue: 2525 }
         after: { type: "String" }
       )
       @refetchable(queryName: "RoomMessagesPaginationQuery") {
         roomMessages(roomId: $roomId, first: $first, after: $after)
           @connection(key: "messages_roomMessages", filters: []) {
+          __id
           edges {
             node {
               id
@@ -288,6 +318,10 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
     queryRef,
   );
 
+  useMessageAddedSubscription({
+    connections: [data.roomMessages.__id],
+  });
+
   const { roomMessages, me: user } = data;
 
   const loadMore = () => {
@@ -296,20 +330,27 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
     loadNext(15);
   };
 
-  const messages = extractNodes(roomMessages);
+  const descMessages = extractNodes(roomMessages);
+  const messages = descMessages.reverse();
 
   if (!user) return;
 
   return (
-    <>
+    <div className="pt-3">
+      {hasNext && (
+        <div className="flex w-full justify-center pb-3">
+          <button
+            disabled={isLoadingNext}
+            className="py-1 bg-secondary-300 px-3 shadow rounded-full text-stone-800 flex items-center gap-1.5 transition hover:-translate-y-1"
+            onClick={loadMore}
+          >
+            Load more
+            <MoreHorizontal size={18} strokeWidth={1} />
+          </button>
+        </div>
+      )}
       <MessageGroups messages={messages} user={user} />
-      <button
-        className="text-white bg-red-500 rounded-xl text-xl px-3 py-1"
-        onClick={loadMore}
-      >
-        Load More
-      </button>
-    </>
+    </div>
   );
 };
 
@@ -335,6 +376,7 @@ export const RoomMessages = ({
 }) => {
   const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
   const [pendingMessages, setPendingMessages] = useState<string[]>([]);
+  const messagesRef = useRef<HTMLDivElement>(null);
 
   const { register, handleSubmit, setValue } = useForm<StoreMessageVariables>({
     defaultValues: {
@@ -360,20 +402,43 @@ export const RoomMessages = ({
     setValue("input.content", "");
   };
 
+  const scrollToBottom = () => {
+    const messages = messagesRef.current;
+    if (!messages) return;
+
+    messages.scrollTo({
+      top: messages.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
+  useEffect(() => {
+    console.log("list changed");
+    scrollToBottom();
+  }, [pendingMessages]);
+
   return (
     <form className="h-full w-full" onSubmit={handleSubmit(sendMessage)}>
       <div
         className="
-          h-full max-h-full overflow-y-auto mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
+          h-[calc(100vh-64px)] mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
           container flex justify-end flex-col gap-y-1.5
         "
       >
-        <Messages queryRef={queryRef} />
-        <PendingMessages messages={pendingMessages} />
+        <div className="max-h-full overflow-y-auto" ref={messagesRef}>
+          <Messages queryRef={queryRef} roomId={roomId} />
+          <PendingMessages messages={pendingMessages} />
+        </div>
 
         <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
           <input
             placeholder="Message"
+            autoCapitalize="off"
+            autoComplete="off"
             className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
             {...register("input.content")}
           />

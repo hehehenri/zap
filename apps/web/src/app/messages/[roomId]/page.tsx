@@ -21,8 +21,6 @@ const RoomMessagesPage = () => {
   // TODO: discover how to use usePreloadedQuery hook instead
   const { rooms, ...roomMessagesQuery } =
     useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
-      count: 1,
-      cursor: null,
       roomId,
     });
 
