@@ -5,6 +5,7 @@ import bcrypt from "bcrypt";
 import config from "../../../config";
 import { UserModel } from "../UserModel";
 import { getToken } from "../../../authentication";
+import { DatabaseError, InvalidPayloadError } from "../../../routes/error";
 
 
 export const RegisterMutation = mutationWithClientMutationId({
@@ -36,7 +37,21 @@ export const RegisterMutation = mutationWithClientMutationId({
       password: hasedPassword,
     })
 
-    await user.save()
+    try { 
+      await user.save()
+    } catch (e) {
+      if (!(e instanceof Error)) {
+        throw new Error("unexpected error");
+      }
+
+      console.log(e.message);
+      
+      if (e.message.indexOf('duplicate key error') !== -1) {
+        throw new InvalidPayloadError("Username already registered");
+      }
+
+      throw new DatabaseError({ cause: e.message });
+    }
 
     const token = getToken(user, config.jwt.secret);
 

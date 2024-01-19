@@ -43,7 +43,6 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     await RoomModel.updateOne({ _id: roomId }, { $set: { lastMessage: message._id }});
 
-    console.log(message);
     console.log(`event published: ${EVENTS.MESSAGE.ADDED}`)
     await pubsub.publish(EVENTS.MESSAGE.ADDED, { messageId: message._id.toString() })
 

@@ -8,7 +8,7 @@ export type UserDefinition = {
 
 export const userSchema = new mongoose.Schema<UserDefinition>(
   {
-    username: { type: String, required: true },
+    username: { type: String, required: true, index: { unique: true } },
     password: { type: String, required: true, select: false },
   },
   { collection: 'User' }
