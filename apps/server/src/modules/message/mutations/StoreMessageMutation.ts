@@ -3,11 +3,12 @@ import { GraphQLString } from "graphql/type";
 
 import { MessageType } from "../MessageType";
 import { Context } from "../../../routes/graphql";
-import MessageModel from "../MessageModel";
-import { RoomModel } from "../../room/RoomModel";
+import { MessageModel } from "../MessageModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import mongoose from "mongoose";
 import { UserModel } from "../../user/UserModel";
+import { EVENTS, pubsub } from "../../../pubsub";
+import { RoomModel } from "../../room/RoomModel";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
@@ -39,6 +40,12 @@ export const StoreMessageMutation = mutationWithClientMutationId({
     });
 
     await message.save();
+
+    await RoomModel.updateOne({ _id: roomId }, { $set: { lastMessage: message._id }});
+
+    console.log(message);
+    console.log(`event published: ${EVENTS.MESSAGE.ADDED}`)
+    await pubsub.publish(EVENTS.MESSAGE.ADDED, { messageId: message._id.toString() })
 
     return { message };
   }

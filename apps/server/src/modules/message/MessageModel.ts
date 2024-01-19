@@ -12,7 +12,7 @@ export type MessageDefinition = {
 export const messageSchema = new mongoose.Schema<MessageDefinition>({
     content: { type: String, required: true },
     sender: { type: userSchema, required: true },
-    room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true }
+    room: { type: mongoose.Schema.Types.ObjectId, ref: 'Room', required: true },
   }, 
   { 
     collection: 'Message', 
@@ -20,6 +20,6 @@ export const messageSchema = new mongoose.Schema<MessageDefinition>({
   }
 );
 
-const MessageModel = mongoose.model<MessageDefinition>('Message', messageSchema);
+messageSchema.index({ createdAt: 1 })
 
-export default MessageModel;
+export const MessageModel = mongoose.model<MessageDefinition>('Message', messageSchema);

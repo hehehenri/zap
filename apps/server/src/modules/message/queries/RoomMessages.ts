@@ -4,7 +4,7 @@ import { MessageConnection } from "../MessageType";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
 import DataLoader from "dataloader";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
-import MessageModel from "../MessageModel";
+import { MessageModel } from "../MessageModel";
 import { UnauthorizedError } from "../../../routes/error";
 
 export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments & {
@@ -29,7 +29,7 @@ export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArg
     });
 
     return connectionFromMongoCursor({
-      cursor: MessageModel.find({ room: args.roomId }),
+      cursor: MessageModel.find({ room: args.roomId }).sort({ createdAt: -1}),
       context,
       args,
       loader: (_ctx, id) => loader.load(id.toString()),

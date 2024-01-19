@@ -1,9 +1,10 @@
-import { GraphQLSchema, execute, subscribe, validate, parse } from "graphql";
+import { GraphQLSchema, execute, subscribe, validate } from "graphql";
 import { WebSocketServer } from "ws";
 import http from "http";
 import { useServer } from "graphql-ws/lib/use/ws";
+import url from 'url';
 
-const handleUpgrade = (
+export const createWsServer = (
   http: http.Server,
   schema: GraphQLSchema,
   path = '/graphql/ws',
@@ -14,6 +15,9 @@ const handleUpgrade = (
     schema,
     execute,
     subscribe,
+    onConnect: () => {
+      console.log(`connected to ws: ${path}`)
+    },
     onSubscribe: async (_, message) => {
       const { operationName, query, variables } = message.payload;
 
@@ -40,7 +44,8 @@ const handleUpgrade = (
   http.on('upgrade', (req, socket, head) => {
     if (!req.url) return;
 
-    const { pathname } = new URL(req.url);
+    const baseUrl = `ws://${req.headers.host}/`;
+    const { pathname } = new URL(req.url, baseUrl);
 
     if (pathname === path) {
       server.handleUpgrade(
@@ -52,5 +57,3 @@ const handleUpgrade = (
     }
   });
 };
-
-export default { handleUpgrade };

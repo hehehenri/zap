@@ -1,14 +1,16 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNullableType } from "graphql/type";
 import { connectionDefinitions } from "graphql-relay";
 
-import { RoomDefinition } from "./RoomModel";
+import { RoomDefinition, RoomModel } from "./RoomModel";
 import { UserType } from "../user/UserType";
+import MessageType from "../message/MessageType";
+import { MessageModel, MessageDefinition } from "../message/MessageModel";
 
 const list = <T extends GraphQLNullableType>(type: T) => {
   return new GraphQLNonNull(new GraphQLList( new GraphQLNonNull(type)))
 }
 
-export const RoomType = new GraphQLObjectType<RoomDefinition>({
+export const RoomType: GraphQLObjectType<RoomDefinition, any> = new GraphQLObjectType<RoomDefinition>({
   name: "Room",
   description: "Room Type",
   fields: () => ({
@@ -23,6 +25,17 @@ export const RoomType = new GraphQLObjectType<RoomDefinition>({
     createdAt: {
       type: new GraphQLNonNull(GraphQLString),
       resolve: (room) => room.createdAt.toString(),
+    },
+    lastMessage: {
+      type: MessageType,
+      resolve: async (room) => {        
+        const roomModel = await RoomModel
+          .findById(room._id)
+          .populate<{ lastMessage: MessageDefinition}>('lastMessage')
+          .exec();
+
+        return roomModel?.lastMessage
+      }
     },
     updatedAt: {
       type: new GraphQLNonNull(GraphQLString),

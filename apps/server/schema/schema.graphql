@@ -71,7 +71,16 @@ type Room {
   id: String!
   participants: [User!]!
   createdAt: String!
+  lastMessage: Message
   updatedAt: String!
+}
+
+type Message {
+  id: String!
+  content: String!
+  sender: User!
+  room: Room!
+  sentAt: String!
 }
 
 """A connection to a list of items."""
@@ -108,14 +117,6 @@ type MessageEdge {
 
   """A cursor for use in pagination"""
   cursor: String!
-}
-
-type Message {
-  id: String!
-  content: String!
-  sender: User!
-  room: Room!
-  sentAt: String!
 }
 
 type Mutation {
@@ -190,6 +191,5 @@ type MessageAddedPayload {
 }
 
 input MessageAddedInput {
-  content: String!
   clientSubscriptionId: String
 }
