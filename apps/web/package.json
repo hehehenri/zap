@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.0.5",
+    "@react-spring/web": "^9.7.3",
     "@repo/ui": "*",
     "@types/react-infinite-scroller": "^1.2.5",
     "clsx": "^2.1.0",

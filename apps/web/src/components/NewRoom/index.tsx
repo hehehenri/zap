@@ -3,13 +3,15 @@
 import Dialog from "../Dialog";
 import { useFragment, useMutation } from "react-relay";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { CSSProperties, useState } from "react";
 import { graphql } from "react-relay";
 import { NewRoomUserFragment$key } from "@/__generated__/NewRoomUserFragment.graphql";
-import { NewRoomUserConnectionFragment$key } from "@/__generated__/NewRoomUserConnectionFragment.graphql";
 import { Avatar } from "..";
 import { SearchIcon } from "lucide-react";
 import { NewRoomMutation } from "@/__generated__/NewRoomMutation.graphql";
+import { cn, extractNodes } from "@/utils/cn";
+import { NewRoomQuery$key } from "@/__generated__/NewRoomQuery.graphql";
+import { User } from "@/auth";
 
 const Header = () => {
   return (
@@ -19,16 +21,6 @@ const Header = () => {
   );
 };
 
-const newRoomMutation = graphql`
-  mutation NewRoomMutation($participants: GetOrCreateRoomInput!) {
-    getOrCreateRoom(input: $participants) {
-      room {
-        id
-      }
-    }
-  }
-`;
-
 const userFragment = graphql`
   fragment NewRoomUserFragment on User {
     id
@@ -36,22 +28,25 @@ const userFragment = graphql`
   }
 `;
 
-const UserPreview = ({
-  fragmentKey,
-}: {
-  fragmentKey: NewRoomUserFragment$key;
-}) => {
-  const user = useFragment(userFragment, fragmentKey);
+const UserPreview = ({ user }: { user: User }) => {
   const router = useRouter();
-  const [commitMutation] = useMutation<NewRoomMutation>(newRoomMutation);
+  const [commitMutation] = useMutation<NewRoomMutation>(graphql`
+    mutation NewRoomMutation($participants: GetOrCreateRoomInput!) {
+      getOrCreateRoom(input: $participants) {
+        room {
+          id
+        }
+      }
+    }
+  `);
 
   const onClick = () => {
     const variables = { participants: { userId: user.id } };
 
     commitMutation({
       variables,
-      onCompleted: ({ createRoom }) => {
-        const room = createRoom?.room;
+      onCompleted: ({ getOrCreateRoom }) => {
+        const room = getOrCreateRoom?.room;
         if (!room) {
           throw new Error("failed to create room");
         }
@@ -73,12 +68,18 @@ const UserPreview = ({
 };
 
 const userConnectionFragment = graphql`
-  fragment NewRoomUserConnectionFragment on UserConnection {
-    edges {
-      node {
-        id
-        username
-        ...NewRoomUserFragment
+  fragment NewRoomQuery on Query
+  @argumentDefinitions(
+    first: { type: "Int", defaultValue: 30 }
+    after: { type: "String" }
+  ) {
+    users(first: $first, after: $after)
+      @connection(key: "NewRoom_users", filters: []) {
+      edges {
+        node {
+          id
+          username
+        }
       }
     }
   }
@@ -86,23 +87,28 @@ const userConnectionFragment = graphql`
 
 export const NewRoom = ({
   fragmentKey,
+  className,
+  children,
 }: {
-  fragmentKey: NewRoomUserConnectionFragment$key;
+  fragmentKey: NewRoomQuery$key;
+  className?: string;
+  style?: CSSProperties;
+  children: React.ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  const data = useFragment(userConnectionFragment, fragmentKey);
+  const { users: maybeUsers } = useFragment(
+    userConnectionFragment,
+    fragmentKey,
+  );
 
-  if (!data) return;
+  const users = extractNodes(maybeUsers);
 
   return (
-    <div>
-      <button
-        onClick={() => setIsOpen(true)}
-        className="bg-secondary-400 px-8 py-3 rounded-full text-2xl text-white font-bold"
-      >
-        New Message
+    <div className="w-full">
+      <button className="w-full" onClick={() => setIsOpen(true)}>
+        {children}
       </button>
       <Dialog
         title={<Header />}
@@ -119,17 +125,12 @@ export const NewRoom = ({
           />
         </div>
         <div className="h-[25rem] w-full overflow-y-auto">
-          {data.edges
-            ?.filter((edge) =>
-              search.length > 0
-                ? edge?.node?.username.startsWith(search)
-                : true,
+          {users
+            ?.filter((user) =>
+              search.length > 0 ? user.username.startsWith(search) : true,
             )
-            .map((edge) => {
-              const user = edge?.node;
-              if (!user) return;
-
-              return <UserPreview key={user.id} fragmentKey={user} />;
+            .map((user) => {
+              return <UserPreview key={user.id} user={user} />;
             })}
         </div>
       </Dialog>

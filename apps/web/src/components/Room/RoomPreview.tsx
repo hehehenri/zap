@@ -14,7 +14,10 @@ const roomPreviewFragment = graphql`
       id
       username
     }
-    updatedAt
+    lastMessage {
+      content
+      sentAt
+    }
   }
 `;
 
@@ -44,6 +47,7 @@ function formatReadableDate(inputDate: string) {
   // 22:34
   return date.toLocaleTimeString("en-US", {
     hour: "numeric",
+    hour12: false,
     minute: "2-digit",
   });
 }
@@ -64,18 +68,18 @@ const getOtherPeer = (
 };
 
 export const RoomPreview = ({
-  fragmentKey,
+  roomFragmentKey,
 }: {
-  fragmentKey: RoomPreviewFragment$key;
+  roomFragmentKey: RoomPreviewFragment$key;
 }) => {
-  const data = useFragment(roomPreviewFragment, fragmentKey);
+  const data = useFragment(roomPreviewFragment, roomFragmentKey);
   const user = useUser();
   if (!user) return;
 
   const peer = getOtherPeer(data, user);
   if (!peer) return;
 
-  const { id, updatedAt } = data;
+  const { id } = data;
 
   return (
     <a
@@ -84,8 +88,15 @@ export const RoomPreview = ({
     >
       <Avatar />
       <div className="flex justify-between w-full items-center">
-        <span className="font-medium text-ellipsis">{peer.username}</span>
-        <p className="text-zinc-800">{formatReadableDate(updatedAt)}</p>
+        <div className="flex flex-col leading-6">
+          <span className="font-medium text-ellipsis">{peer.username}</span>
+          <p className="text-stone-600">{data.lastMessage?.content}</p>
+        </div>
+        {data.lastMessage && (
+          <p className="text-stone-700 text-xs">
+            {formatReadableDate(data.lastMessage?.sentAt)}
+          </p>
+        )}
       </div>
     </a>
   );

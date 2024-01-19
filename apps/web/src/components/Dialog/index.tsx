@@ -7,7 +7,7 @@ type Props = {
   description?: string | React.ReactNode;
   className?: string;
   open: boolean;
-  onOpenChange: () => void;
+  onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
 };
 

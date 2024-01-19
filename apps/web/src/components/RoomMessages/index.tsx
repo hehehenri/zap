@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  MoreHorizontal,
-  MoreVertical,
-  PlusCircle,
-  PlusIcon,
-  SendHorizonal,
-} from "lucide-react";
+import { MoreHorizontal, SendHorizonal } from "lucide-react";
 import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
@@ -22,12 +16,10 @@ import {
 import { cn, extractNodes } from "@/utils/cn";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  RoomMessagesMessageAddedSubscription as MessageAdded,
-  RoomMessagesMessageAddedSubscription$variables as MessageAddedVariables,
   RoomMessagesMessageAddedSubscription,
   RoomMessagesMessageAddedSubscription$variables,
 } from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
-import { GraphQLSubscriptionConfig } from "relay-runtime";
+import { GraphQLSubscriptionConfig, SelectorStoreUpdater } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
@@ -56,6 +48,11 @@ const storeMessageMutation = graphql`
     }
   }
 `;
+
+const messageUpdater: SelectorStoreUpdater = store => {
+  
+  
+}
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -272,13 +269,7 @@ const useMessageAddedSubscription = (
   return useSubscription(config);
 };
 
-const Messages = ({
-  queryRef,
-  roomId,
-}: {
-  queryRef: RoomMessagesQuery$key;
-  roomId: string;
-}) => {
+const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     RoomMessagesPaginationQuery,
     RoomMessagesQuery$key
@@ -287,7 +278,7 @@ const Messages = ({
       fragment RoomMessagesQuery on Query
       @argumentDefinitions(
         roomId: { type: "ID!" }
-        first: { type: "Int", defaultValue: 2525 }
+        first: { type: "Int", defaultValue: 25 }
         after: { type: "String" }
       )
       @refetchable(queryName: "RoomMessagesPaginationQuery") {
@@ -417,12 +408,11 @@ export const RoomMessages = ({
   }, []);
 
   useEffect(() => {
-    console.log("list changed");
     scrollToBottom();
   }, [pendingMessages]);
 
   return (
-    <form className="h-full w-full" onSubmit={handleSubmit(sendMessage)}>
+    <form className="w-full" onSubmit={handleSubmit(sendMessage)}>
       <div
         className="
           h-[calc(100vh-64px)] mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
@@ -430,7 +420,7 @@ export const RoomMessages = ({
         "
       >
         <div className="max-h-full overflow-y-auto" ref={messagesRef}>
-          <Messages queryRef={queryRef} roomId={roomId} />
+          <Messages queryRef={queryRef} />
           <PendingMessages messages={pendingMessages} />
         </div>
 
@@ -442,7 +432,10 @@ export const RoomMessages = ({
             className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
             {...register("input.content")}
           />
-          <button className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white">
+          <button
+            type="submit"
+            className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white"
+          >
             <SendHorizonal />
           </button>
         </div>

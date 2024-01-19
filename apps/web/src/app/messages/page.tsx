@@ -11,12 +11,8 @@ import {
 
 const query = graphql`
   query pageMessagesQuery {
-    rooms {
-      ...RoomPreviewListFragment
-    }
-    users {
-      ...NewRoomUserConnectionFragment
-    }
+    ...RoomPreviewListQuery
+    ...NewRoomQuery
   }
 `;
 
@@ -35,7 +31,11 @@ const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
             keep swimming.
           </p>
         </div>
-        <NewRoom fragmentKey={queryRef.users} />
+        <NewRoom fragmentKey={queryRef}>
+          <span className="bg-secondary-400 px-8 py-3 rounded-full text-2xl text-white font-bold">
+            New Message
+          </span>
+        </NewRoom>
       </div>
     </div>
   );
@@ -46,7 +46,7 @@ const Messages = () => {
 
   return (
     <main className="grid grid-cols-[auto_1fr] h-full">
-      <RoomPreviewList fragmentRef={data.rooms} />
+      <RoomPreviewList fragmentRef={data} />
       <ChatEmptyState queryRef={data} />
     </main>
   );
