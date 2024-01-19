@@ -31,13 +31,15 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     if (!room) throw new InvalidPayloadError("room not found");
 
-    const isRoomMember = room.participants.map(u => u._id).includes(user._id);
+    const isRoomMember = room.participants
+      .map(u => u._id.toString())
+      .includes(user._id.toString());
 
     if (!isRoomMember) throw new InvalidPayloadError("you can't send messages on this room");
-    
+
     const message = new MessageModel({
       content,
-      sender: new mongoose.Types.ObjectId(user._id),
+      sender: user._id,
       room: room._id,
     });
 
