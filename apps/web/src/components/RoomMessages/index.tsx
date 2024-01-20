@@ -20,7 +20,7 @@ import {
   RoomMessagesMessageAddedSubscription,
   RoomMessagesMessageAddedSubscription$variables,
 } from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
-import { GraphQLSubscriptionConfig, SelectorStoreUpdater } from "relay-runtime";
+import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
@@ -78,8 +78,6 @@ const storeMessageMutation = graphql`
     }
   }
 `;
-
-const messageUpdater: SelectorStoreUpdater = (store) => {};
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -290,7 +288,7 @@ const useMessageAddedSubscription = (
       `,
       variables,
     }),
-    [],
+    [variables],
   );
 
   return useSubscription(config);

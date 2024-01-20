@@ -21,7 +21,7 @@ const queryRef = loadQuery<pageMessagesQuery>(env, query, {});
 const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="space-y-5">
+      <div className="space-y-8">
         <div className="max-w-md">
           <h1 className="font-mono text-5xl font-semibold text-secondary-400">
             Select a message

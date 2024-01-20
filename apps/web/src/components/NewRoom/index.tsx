@@ -3,7 +3,7 @@
 import Dialog from "../Dialog";
 import { useFragment, useMutation } from "react-relay";
 import { useRouter } from "next/navigation";
-import { CSSProperties, useState } from "react";
+import { useState } from "react";
 import { graphql } from "react-relay";
 import { Avatar } from "..";
 import { SearchIcon } from "lucide-react";
@@ -79,12 +79,9 @@ const userConnectionFragment = graphql`
 
 export const NewRoom = ({
   fragmentKey,
-  className,
   children,
 }: {
   fragmentKey: NewRoomQuery$key;
-  className?: string;
-  style?: CSSProperties;
   children: React.ReactNode;
 }) => {
   const [isOpen, setIsOpen] = useState(false);

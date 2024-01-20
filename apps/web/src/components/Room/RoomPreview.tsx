@@ -1,8 +1,4 @@
-import {
-  RoomPreviewFragment$data,
-  RoomPreviewFragment$key,
-} from "@/__generated__/RoomPreviewFragment.graphql";
-import { User } from "@/auth";
+import { RoomPreviewFragment$key } from "@/__generated__/RoomPreviewFragment.graphql";
 import { Avatar } from "@/components";
 import { useUser } from "@/hooks/useUser";
 import { getOtherParticipant } from "@/utils/cn";

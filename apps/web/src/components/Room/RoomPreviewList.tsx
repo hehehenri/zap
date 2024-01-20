@@ -6,8 +6,8 @@ import NoMessages from "../EmptyState/NoMessages";
 import { RoomPreviewListQuery$key } from "@/__generated__/RoomPreviewListQuery.graphql";
 import { extractNodes } from "@/utils/cn";
 import { Pen } from "lucide-react";
-import { useEffect, useState } from "react";
-import { animated, useTransition, config } from "@react-spring/web";
+import { useState } from "react";
+import { animated, useTransition } from "@react-spring/web";
 
 const roomPreviewListFragment = graphql`
   fragment RoomPreviewListFragment on RoomConnection {
@@ -83,10 +83,7 @@ export const RoomPreviewList = ({
         <div className="absolute bottom-0 right-0 overflow-hidden">
           {transitions((style, isOpen) =>
             isOpen ? (
-              <NewRoom
-                fragmentKey={users}
-                className="px-4 py-4 shadow hover:bg-secondary-300 transition"
-              >
+              <NewRoom fragmentKey={users}>
                 <animated.div style={style}>
                   <span className="bg-secondary-400 text-white aspect-square p-4 mb-8 mr-8 rounded-full shadow inline-block">
                     <Pen size={24} fill="white" />

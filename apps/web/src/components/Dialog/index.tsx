@@ -2,14 +2,13 @@ import React from "react";
 import * as D from "@radix-ui/react-dialog";
 import { cn } from "@/utils/cn";
 import { useTransition, animated, config } from "@react-spring/web";
-import { Airplay } from "lucide-react";
 
 type Props = {
   title?: string | React.ReactNode;
   description?: string | React.ReactNode;
   className?: string;
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange(open: boolean): void;
   children: React.ReactNode;
 };
 
