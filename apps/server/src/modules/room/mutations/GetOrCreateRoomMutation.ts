@@ -2,8 +2,10 @@ import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLNonNull, GraphQLString } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
-import { UserModel } from "../../user/UserModel";
 import { Context } from "../../../routes/graphql";
+import mongoose from "mongoose";
+import { UserModel } from "../../user/UserModel";
+import { InvalidPayloadError } from "../../../routes/error";
 
 export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   name: "GetOrCreateRoom",
@@ -19,30 +21,27 @@ export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({ userId }: { userId: string }, ctx: Context) => {
     const authUser = ctx.user;
-    
-    if (!authUser) return new Error("new authenticated");
+    if (!authUser) throw new Error("new authenticated");
 
-    const room = await RoomModel.findOne({ $and: [
-      { "participants._id": authUser._id },
-      { "participants._id": userId },
+    const user = await UserModel.findById(userId);
+    if (!user) throw new InvalidPayloadError("user not found");
+
+    const existingRoom = await RoomModel.findOne({ $and: [
+      { "participants": authUser._id },
+      { "participants": user._id },
     ]}).exec();
 
-    if (room) return { room };
-
-    const firstParticipant = await UserModel.findById(authUser._id).select("+password").exec();
-    const secondParticipant = await UserModel.findById(userId).select("+password");
+    if (existingRoom) return { room: existingRoom };
     
-    const newRoom = new RoomModel({
+    const room = new RoomModel({
       participants: [
-        firstParticipant,
-        secondParticipant
+        authUser._id,
+        user._id
       ]
     });
 
-    console.log({ newRoom });
+    await room.save();
 
-    await newRoom.save();
-
-    return { room: newRoom };
+    return { room };
   }
 })

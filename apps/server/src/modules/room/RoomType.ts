@@ -4,7 +4,8 @@ import { connectionDefinitions } from "graphql-relay";
 import { RoomDefinition, RoomModel } from "./RoomModel";
 import { UserType } from "../user/UserType";
 import MessageType from "../message/MessageType";
-import { MessageModel, MessageDefinition } from "../message/MessageModel";
+import { MessageDefinition } from "../message/MessageModel";
+import { UserDefinition } from "../user/UserModel";
 
 const list = <T extends GraphQLNullableType>(type: T) => {
   return new GraphQLNonNull(new GraphQLList( new GraphQLNonNull(type)))
@@ -20,7 +21,14 @@ export const RoomType: GraphQLObjectType<RoomDefinition, any> = new GraphQLObjec
     },
     participants: {
       type: list(UserType),
-      resolve: (room) => room.participants
+      resolve: async (room) => {
+        const roomModel = await RoomModel
+          .findById(room._id)
+          .populate<{ participants: UserDefinition[] }>('participants')
+          .exec();
+
+        return roomModel?.participants
+      }
     },
     createdAt: {
       type: new GraphQLNonNull(GraphQLString),

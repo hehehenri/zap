@@ -1,10 +1,9 @@
 import mongoose from "mongoose";
-import { UserDefinition, userSchema } from "../user/UserModel"
-import { MessageDefinition, messageSchema } from "../message/MessageModel";
+import { MessageDefinition} from "../message/MessageModel";
 
 export type RoomDefinition = {
   readonly _id: mongoose.Types.ObjectId;
-  readonly participants: UserDefinition[];
+  readonly participants: mongoose.Types.ObjectId[];
   readonly createdAt: Date,
   lastMessage: MessageDefinition | null,
   updatedAt: Date,
@@ -12,8 +11,8 @@ export type RoomDefinition = {
 
 const roomSchema = new mongoose.Schema<RoomDefinition>(
   {
-    participants: [{ type: userSchema, required: true }],
-    lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: 'Message', required: false, default: null }
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }],
+    lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message", required: false, default: null }
   },
   {
     collection: "Room",
