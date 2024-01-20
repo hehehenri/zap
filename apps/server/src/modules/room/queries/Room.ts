@@ -3,15 +3,10 @@ import { GraphQLContext } from "../../../schemas/context";
 import { RoomType } from "../RoomType";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import { RoomModel } from "../RoomModel";
-import { UserDefinition } from "../../user/UserModel";
 
 type Args = {
   roomId: string
 };
-
-const isParticipant = (user: UserDefinition, participants: UserDefinition[]) => {
-  return participants.filter(part => part._id.toString() == user._id.toString());
-}
 
 export const Room: GraphQLFieldConfig<any, GraphQLContext, Args> = {
   type: RoomType,
@@ -27,7 +22,11 @@ export const Room: GraphQLFieldConfig<any, GraphQLContext, Args> = {
     if (!room)
       throw new InvalidPayloadError("room doesn't exists")
 
-    if (!isParticipant(user, room.participants))
+    const isParticipant = room
+      .participants
+      .filter(partId => partId.toString() == user._id.toString())
+
+    if (!isParticipant)
       throw new InvalidPayloadError("you can't access this room information");
 
     return room;
