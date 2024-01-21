@@ -1,0 +1,220 @@
+"""Query Root"""
+type Query {
+  """Get the authenticated user"""
+  me: User
+
+  """List users"""
+  users(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): UserConnection!
+
+  """List room messages"""
+  roomMessages(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+
+    """The messages' room id"""
+    roomId: ID!
+  ): MessageConnection!
+
+  """List user's rooms"""
+  rooms(
+    """Returns the items in the list that come after the specified cursor."""
+    after: String
+
+    """Returns the first n items from the list."""
+    first: Int
+
+    """Returns the items in the list that come before the specified cursor."""
+    before: String
+
+    """Returns the last n items from the list."""
+    last: Int
+  ): RoomConnection!
+  room(roomId: ID!): Room
+}
+
+type User {
+  id: String!
+  username: String!
+}
+
+"""A connection to a list of items."""
+type UserConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [UserEdge]
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""An edge in a connection."""
+type UserEdge {
+  """The item at the end of the edge"""
+  node: User
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""A connection to a list of items."""
+type MessageConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MessageEdge]
+}
+
+"""An edge in a connection."""
+type MessageEdge {
+  """The item at the end of the edge"""
+  node: Message
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Message {
+  id: String!
+  content: String!
+  sender: User!
+  room: Room!
+  sentAt: String!
+}
+
+"""Room Type"""
+type Room {
+  id: String!
+  participants: [User!]!
+  createdAt: String!
+  lastMessage: Message
+  updatedAt: String!
+}
+
+"""A connection to a list of items."""
+type RoomConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [RoomEdge]
+}
+
+"""An edge in a connection."""
+type RoomEdge {
+  """The item at the end of the edge"""
+  node: Room
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type Mutation {
+  """Validate password and return user's token"""
+  login(input: LoginMutationInput!): LoginMutationPayload
+
+  """Register user"""
+  register(input: RegisterMutationInput!): RegisterMutationPayload
+
+  """Store user's message"""
+  storeMessage(input: StoreMessageInput!): StoreMessagePayload
+
+  """
+  Get the room based on it participants ids or create it if it doesn't exists yet.
+  """
+  getOrCreateRoom(input: GetOrCreateRoomInput!): GetOrCreateRoomPayload
+}
+
+type LoginMutationPayload {
+  token: String
+  user: User
+  clientMutationId: String
+}
+
+input LoginMutationInput {
+  username: String!
+  password: String!
+  clientMutationId: String
+}
+
+type RegisterMutationPayload {
+  token: String
+  user: User
+  clientMutationId: String
+}
+
+input RegisterMutationInput {
+  username: String!
+  password: String!
+  clientMutationId: String
+}
+
+type StoreMessagePayload {
+  message: Message
+  clientMutationId: String
+}
+
+input StoreMessageInput {
+  content: String
+  roomId: String
+  clientMutationId: String
+}
+
+type GetOrCreateRoomPayload {
+  room: Room
+  clientMutationId: String
+}
+
+input GetOrCreateRoomInput {
+  userId: String!
+  clientMutationId: String
+}
+
+"""Subscription Root"""
+type Subscription {
+  messageAddedSubscribe(input: MessageAddedInput!): MessageAddedPayload
+}
+
+type MessageAddedPayload {
+  message: Message
+  clientSubscriptionId: String
+}
+
+input MessageAddedInput {
+  clientSubscriptionId: String
+}
