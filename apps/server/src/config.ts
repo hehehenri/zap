@@ -8,6 +8,7 @@ const schema = z.object({
   API_PORT: z.string(),
   TOKEN_SECRET: z.string(),
   TOKEN_SALT_ROUNDS: z.string(),
+  ENV: z.literal("prod").or(z.literal("local")),
 })
 
 const env = schema.parse(process.env);
@@ -17,10 +18,11 @@ export default {
     uri: env.DATABASE_URL,
   },
   app: {
+    env: env.ENV,
     port: env.API_PORT
   },
   jwt: {
     secret: env.TOKEN_SECRET,
     saltRounds: env.TOKEN_SALT_ROUNDS,
-  }
+  },
 } as const
