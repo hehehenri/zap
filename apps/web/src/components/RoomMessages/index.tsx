@@ -4,6 +4,7 @@ import { MoreHorizontal, SendHorizonal } from "lucide-react";
 import { Avatar } from "..";
 import { useForm } from "react-hook-form";
 import {
+  UseMutationConfig,
   graphql,
   useFragment,
   useMutation,
@@ -15,16 +16,14 @@ import {
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
 import { cn, extractNodes, getOtherParticipant } from "@/utils/cn";
-import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  RoomMessagesMessageAddedSubscription,
-  RoomMessagesMessageAddedSubscription$variables,
-} from "@/__generated__/RoomMessagesMessageAddedSubscription.graphql";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
 import { RoomMessagesHeaderQuery$key } from "@/__generated__/RoomMessagesHeaderQuery.graphql";
+import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscription.graphql";
+import { RoomMessagesMessagesQuery$key } from "@/__generated__/RoomMessagesMessagesQuery.graphql";
 
 export const MessagesHeader = ({
   queryRef,
@@ -258,43 +257,7 @@ const MessageGroups = ({
   );
 };
 
-const useMessageAddedSubscription = (
-  variables: RoomMessagesMessageAddedSubscription$variables,
-) => {
-  const config = useMemo<
-    GraphQLSubscriptionConfig<RoomMessagesMessageAddedSubscription>
-  >(
-    () => ({
-      subscription: graphql`
-        subscription RoomMessagesMessageAddedSubscription(
-          $connections: [ID!]!
-        ) {
-          messageAddedSubscribe(input: {}) {
-            message
-              @appendNode(
-                connections: $connections
-                edgeTypeName: "MessageEdge"
-              ) {
-              id
-              content
-              sender {
-                id
-                username
-              }
-              sentAt
-            }
-          }
-        }
-      `,
-      variables,
-    }),
-    [variables],
-  );
-
-  return useSubscription(config);
-};
-
-const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
+const LoadedMessages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     RoomMessagesPaginationQuery,
     RoomMessagesQuery$key
@@ -329,14 +292,11 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
           id
           username
         }
+        ...RoomMessagesMessagesQuery
       }
     `,
     queryRef,
   );
-
-  useMessageAddedSubscription({
-    connections: [data.roomMessages.__id],
-  });
 
   const { roomMessages, me: user } = data;
 
@@ -371,6 +331,64 @@ const Messages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
   );
 };
 
+const Messages = ({
+  queryRef,
+}: {
+  queryRef: RoomMessagesMessagesQuery$key;
+}) => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const config = useMemo<GraphQLSubscriptionConfig<RoomMessagesSubscription>>(
+    () => ({
+      subscription: graphql`
+        subscription RoomMessagesSubscription {
+          messageAddedSubscribe(input: {}) {
+            message {
+              id
+              content
+              sender {
+                id
+                username
+              }
+              sentAt
+            }
+          }
+        }
+      `,
+      variables: {},
+      onNext: (res) => {
+        const message = res?.messageAddedSubscribe?.message;
+        if (!message) return;
+
+        setMessages((prevMessages) => [...prevMessages, message]);
+      },
+    }),
+    [],
+  );
+
+  useSubscription(config);
+
+  const { me: user } = useFragment(
+    graphql`
+      fragment RoomMessagesMessagesQuery on Query {
+        me {
+          id
+          username
+        }
+      }
+    `,
+    queryRef,
+  );
+
+  if (!user) return;
+
+  return (
+    <div>
+      <MessageGroups messages={messages} user={user} />
+    </div>
+  );
+};
+
 const PendingMessages = ({ messages }: { messages: string[] }) => {
   if (!messages.length) return;
 
@@ -391,7 +409,6 @@ export const RoomMessages = ({
   roomId: string;
   queryRef: RoomMessagesQuery$key;
 }) => {
-  const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
   const [pendingMessages, setPendingMessages] = useState<string[]>([]);
   const messagesRef = useRef<HTMLDivElement>(null);
 
@@ -404,20 +421,21 @@ export const RoomMessages = ({
     },
   });
 
-  const sendMessage = (input: StoreMessageVariables) => {
-    const content = input.input.content;
+  const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
+
+  const sendMessage = useCallback(async (variables: StoreMessageVariables) => {
+    const content = variables.input.content;
     if (!content) return;
 
-    commitMutation({
-      variables: input,
-      onError: (err) => {
-        console.error(err);
-      },
-    });
+    const config: UseMutationConfig<StoreMessage> = {
+      variables,
+    };
+
+    commitMutation(config);
 
     setPendingMessages((messages) => [...messages, content]);
     setValue("input.content", "");
-  };
+  }, []);
 
   const scrollToBottom = () => {
     const messages = messagesRef.current;
@@ -446,6 +464,7 @@ export const RoomMessages = ({
         "
       >
         <div className="max-h-full overflow-y-auto" ref={messagesRef}>
+          <LoadedMessages queryRef={queryRef} />
           <Messages queryRef={queryRef} />
           <PendingMessages messages={pendingMessages} />
         </div>

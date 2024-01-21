@@ -9,6 +9,7 @@ import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.gra
 const RoomMessagesQuery = graphql`
   query pageRoomMessagesQuery($roomId: ID!) {
     ...RoomPreviewListQuery
+    ...RoomMessagesMessagesQuery
     ...RoomMessagesQuery @arguments(roomId: $roomId)
     ...RoomMessagesHeaderQuery @arguments(roomId: $roomId)
   }
