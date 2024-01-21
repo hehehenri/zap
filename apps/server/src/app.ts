@@ -10,10 +10,7 @@ import { WebSocketServer } from "ws";
 import schema from "./schemas";
 import { errorHandlerMiddleware } from "./routes/middlewares";
 import { useServer } from "graphql-ws/lib/use/ws";
-
-type Config = {
-  port: number,
-}
+import config from "./config";
 
 const logger = () => {  
   const options = {
@@ -38,11 +35,11 @@ const createApp = () => {
   return app;
 }
 
-const start = (config: Config) => {
+const start = () => {
   const app = createApp();
   const server = http.createServer(app.callback());
   
-  server.listen(config.port, () => {
+  server.listen(config.app.port, () => {
     console.log("http: server running on: http://localhost:8000/graphql");
 
     const wsServer = new WebSocketServer({

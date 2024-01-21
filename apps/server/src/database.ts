@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
+import config from "./config";
 
-type Config = {
-  uri: string
-};
-
-const connect = async (config: Config) => {
+const connect = async () => {
   mongoose.set('strictQuery', true);
-  await mongoose.connect(config.uri)
+  await mongoose.connect(config.database.uri)
 }
 
 export { connect };

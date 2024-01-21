@@ -23,7 +23,6 @@
     "@types/koa-router": "^7.4.8",
     "@types/mongoose": "^5.11.97",
     "@types/ws": "^8.5.10",
-    "ts-loader": "^9.5.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
@@ -51,6 +50,7 @@
     "koa-graphql": "^0.12.0",
     "koa-router": "^12.0.1",
     "mongoose": "^8.0.3",
+    "ts-loader": "^9.5.1",
     "ws": "^8.16.0",
     "zod": "^3.22.4"
   }
