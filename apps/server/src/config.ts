@@ -1,16 +1,26 @@
+import z from "zod";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const schema = z.object({
+  DATABASE_URL: z.string().url(),
+  API_PORT: z.string(),
+  TOKEN_SECRET: z.string(),
+  TOKEN_SALT_ROUNDS: z.string(),
+})
+
+const env = schema.parse(process.env);
+
 export default {
   database: {
-    uri: 'mongodb://localhost:27017/'
-  },
-  pubsub: {
-    host: '127.0.0.1',
-    port: 6379
+    uri: env.DATABASE_URL,
   },
   app: {
-    port: 8000
+    port: env.API_PORT
   },
   jwt: {
-    secret: "zap.secret",
-    saltRounds: 10,
+    secret: env.TOKEN_SECRET,
+    saltRounds: env.TOKEN_SALT_ROUNDS,
   }
-}
+} as const

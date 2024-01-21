@@ -37,6 +37,7 @@
     "bcrypt": "^5.1.1",
     "bunyan": "^1.8.15",
     "dataloader": "^2.2.2",
+    "dotenv": "^16.3.2",
     "graphql": "^16.8.1",
     "graphql-redis-subscriptions": "^2.6.0",
     "graphql-relay": "^0.10.0",
@@ -50,6 +51,7 @@
     "koa-graphql": "^0.12.0",
     "koa-router": "^12.0.1",
     "mongoose": "^8.0.3",
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "zod": "^3.22.4"
   }
 }
