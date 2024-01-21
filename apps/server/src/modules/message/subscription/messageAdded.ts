@@ -1,11 +1,12 @@
 import { subscriptionWithClientId } from "graphql-relay-subscription";
 import { MessageType } from "../MessageType";
 import { EVENTS, pubsub } from "../../../pubsub";
-import MessageModel from "../MessageModel";
+import { MessageModel } from "../MessageModel";
 import { GraphQLContext } from "../../../schemas/context";
 
 type NewMessage = {
-  messageId: string
+  id: string,
+  messageId: string,
 };
 
 export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, GraphQLContext>({
@@ -14,15 +15,13 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Gra
   outputFields: {
     message: {
       type: MessageType,
-      resolve: async ({ messageId }) => await MessageModel.findById(messageId)
+      resolve: async ({ id }: NewMessage) => await MessageModel.findById(id)
     }
   },
-  subscribe: (input, context) => {
-    console.log(`Subscribe: ${input}`, {context});
-
+  subscribe: () => {
     return pubsub.asyncIterator(EVENTS.MESSAGE.ADDED);
   },
-  getPayload: ({ messageId }) => {
-    return { messageId };
+  getPayload: (obj) => {
+    return { id: obj.messageId };
   } 
 });

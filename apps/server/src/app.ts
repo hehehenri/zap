@@ -5,9 +5,11 @@ import bunyan from "bunyan";
 import koaBunyan from "koa-bunyan-logger";
 import routes from "./routes";
 import { KoaContext } from "./schemas/context";
-import * as ws from "./routes/websocket";
+import { execute, subscribe } from "graphql";
+import { WebSocketServer } from "ws";
 import schema from "./schemas";
 import { errorHandlerMiddleware } from "./routes/middlewares";
+import { useServer } from "graphql-ws/lib/use/ws";
 
 type Config = {
   port: number,
@@ -38,12 +40,19 @@ const createApp = () => {
 
 const start = (config: Config) => {
   const app = createApp();
-
   const server = http.createServer(app.callback());
-
-  ws.createWsServer(server, schema);
   
-  server.listen(config.port);
+  server.listen(config.port, () => {
+    console.log("http: server running on: http://localhost:8000/graphql");
+
+    const wsServer = new WebSocketServer({
+      server,
+      path: "/graphql"
+    });
+
+    useServer({ schema, execute, subscribe }, wsServer)
+    console.log("ws: server running on ws://localhost:8000/graphql")
+  });
 };
 
 export { start }
