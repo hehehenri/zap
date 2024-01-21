@@ -16,7 +16,15 @@ import {
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
 import { cn, extractNodes, getOtherParticipant } from "@/utils/cn";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
@@ -332,9 +340,11 @@ const LoadedMessages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
 };
 
 const Messages = ({
-  queryRef,
+  user,
+  setPendingMessages,
 }: {
-  queryRef: RoomMessagesMessagesQuery$key;
+  user: User;
+  setPendingMessages: Dispatch<SetStateAction<string[]>>;
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -361,24 +371,20 @@ const Messages = ({
         if (!message) return;
 
         setMessages((prevMessages) => [...prevMessages, message]);
+
+        if (message.sender.id == user.id) {
+          setPendingMessages((pendingMessages) =>
+            pendingMessages.filter(
+              (pendingMessage) => pendingMessage !== message.content,
+            ),
+          );
+        }
       },
     }),
-    [],
+    [user, setPendingMessages],
   );
 
   useSubscription(config);
-
-  const { me: user } = useFragment(
-    graphql`
-      fragment RoomMessagesMessagesQuery on Query {
-        me {
-          id
-          username
-        }
-      }
-    `,
-    queryRef,
-  );
 
   if (!user) return;
 
@@ -455,6 +461,18 @@ export const RoomMessages = ({
     scrollToBottom();
   }, [pendingMessages]);
 
+  const { me: user } = useFragment(
+    graphql`
+      fragment RoomMessagesMessagesQuery on Query {
+        me {
+          id
+          username
+        }
+      }
+    `,
+    queryRef,
+  );
+
   return (
     <form className="w-full" onSubmit={handleSubmit(sendMessage)}>
       <div
@@ -465,7 +483,9 @@ export const RoomMessages = ({
       >
         <div className="max-h-full overflow-y-auto" ref={messagesRef}>
           <LoadedMessages queryRef={queryRef} />
-          <Messages queryRef={queryRef} />
+          {user && (
+            <Messages user={user} setPendingMessages={setPendingMessages} />
+          )}
           <PendingMessages messages={pendingMessages} />
         </div>
 
