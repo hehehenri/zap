@@ -362,7 +362,7 @@ const Messages = ({
 
   useEffect(() => {
     scrollToBottom(messagesRef);
-  }, [messages]);
+  }, [messages, messagesRef]);
 
   const config = useMemo<GraphQLSubscriptionConfig<RoomMessagesSubscription>>(
     () => ({
@@ -436,7 +436,7 @@ export const RoomMessages = ({
 
   useEffect(() => {
     scrollToBottom(messagesRef);
-  }, [pendingMessages]);
+  }, [pendingMessages, messagesRef]);
 
   const { register, handleSubmit, setValue } = useForm<StoreMessageVariables>({
     defaultValues: {
@@ -449,19 +449,22 @@ export const RoomMessages = ({
 
   const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
 
-  const sendMessage = useCallback(async (variables: StoreMessageVariables) => {
-    const content = variables.input.content;
-    if (!content) return;
+  const sendMessage = useCallback(
+    async (variables: StoreMessageVariables) => {
+      const content = variables.input.content;
+      if (!content) return;
 
-    const config: UseMutationConfig<StoreMessage> = {
-      variables,
-    };
+      const config: UseMutationConfig<StoreMessage> = {
+        variables,
+      };
 
-    commitMutation(config);
+      commitMutation(config);
 
-    setPendingMessages((messages) => [...messages, content]);
-    setValue("input.content", "");
-  }, []);
+      setPendingMessages((messages) => [...messages, content]);
+      setValue("input.content", "");
+    },
+    [commitMutation, setValue],
+  );
 
   const { me: user } = useFragment(
     graphql`
