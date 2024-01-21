@@ -18,6 +18,7 @@ import {
 import { cn, extractNodes, getOtherParticipant } from "@/utils/cn";
 import {
   Dispatch,
+  RefObject,
   SetStateAction,
   useCallback,
   useEffect,
@@ -31,7 +32,16 @@ import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginat
 import { User } from "@/auth";
 import { RoomMessagesHeaderQuery$key } from "@/__generated__/RoomMessagesHeaderQuery.graphql";
 import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscription.graphql";
-import { RoomMessagesMessagesQuery$key } from "@/__generated__/RoomMessagesMessagesQuery.graphql";
+
+const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
+  const div = divRef.current;
+  if (!div) return;
+
+  div.scrollTo({
+    top: div.scrollHeight,
+    behavior: "smooth",
+  });
+};
 
 export const MessagesHeader = ({
   queryRef,
@@ -342,11 +352,17 @@ const LoadedMessages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
 const Messages = ({
   user,
   setPendingMessages,
+  messagesRef,
 }: {
   user: User;
   setPendingMessages: Dispatch<SetStateAction<string[]>>;
+  messagesRef: RefObject<HTMLDivElement>;
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    scrollToBottom(messagesRef);
+  }, [messages]);
 
   const config = useMemo<GraphQLSubscriptionConfig<RoomMessagesSubscription>>(
     () => ({
@@ -418,6 +434,10 @@ export const RoomMessages = ({
   const [pendingMessages, setPendingMessages] = useState<string[]>([]);
   const messagesRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    scrollToBottom(messagesRef);
+  }, [pendingMessages]);
+
   const { register, handleSubmit, setValue } = useForm<StoreMessageVariables>({
     defaultValues: {
       input: {
@@ -443,24 +463,6 @@ export const RoomMessages = ({
     setValue("input.content", "");
   }, []);
 
-  const scrollToBottom = () => {
-    const messages = messagesRef.current;
-    if (!messages) return;
-
-    messages.scrollTo({
-      top: messages.scrollHeight,
-      behavior: "smooth",
-    });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, []);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [pendingMessages]);
-
   const { me: user } = useFragment(
     graphql`
       fragment RoomMessagesMessagesQuery on Query {
@@ -484,7 +486,11 @@ export const RoomMessages = ({
         <div className="max-h-full overflow-y-auto" ref={messagesRef}>
           <LoadedMessages queryRef={queryRef} />
           {user && (
-            <Messages user={user} setPendingMessages={setPendingMessages} />
+            <Messages
+              user={user}
+              setPendingMessages={setPendingMessages}
+              messagesRef={messagesRef}
+            />
           )}
           <PendingMessages messages={pendingMessages} />
         </div>
