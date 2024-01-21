@@ -25,7 +25,8 @@
     "react-infinite-scroller": "^1.2.6",
     "react-relay": "^16.1.0",
     "relay-runtime": "^16.1.0",
-    "tailwind-merge": "^2.2.0"
+    "tailwind-merge": "^2.2.0",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",

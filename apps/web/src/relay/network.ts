@@ -1,5 +1,6 @@
 import { createClient } from "graphql-ws";
 import {  ConcreteRequest, Network, Observable, RequestParameters, Variables } from "relay-runtime"
+import { config } from "../../config";
 
 export const getPreloadedQuery = async (
   { params }: ConcreteRequest,
@@ -11,8 +12,7 @@ export const getPreloadedQuery = async (
 };
 
 export const fetchFunction = async (request: RequestParameters, variables: Variables) => {
-  // TODO: get from .env
-  const response = await fetch('http://localhost:8000/graphql', {
+  const response = await fetch(`${config.api.httpUrl}/graphql`, {
     method: 'POST',
     credentials: "include",
 
@@ -37,9 +37,8 @@ export const fetchFunction = async (request: RequestParameters, variables: Varia
 }
 
 export const subscribeFunction = (request: RequestParameters, variables: Variables): Observable<any> => {
-  // TODO: get url from .env
   const client = typeof window !== typeof undefined
-    ? createClient({ url: "ws://localhost:8000/graphql" })
+    ? createClient({ url: `${config.api.wsUrl}/graphql` })
     : undefined;
 
   return Observable.create(sink => {

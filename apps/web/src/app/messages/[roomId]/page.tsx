@@ -18,7 +18,6 @@ const RoomMessagesQuery = graphql`
 const RoomMessagesPage = () => {
   const { roomId } = useParams<{ roomId: string }>();
 
-  // TODO: discover how to use usePreloadedQuery hook instead
   const queryRef = useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
     roomId,
   });
