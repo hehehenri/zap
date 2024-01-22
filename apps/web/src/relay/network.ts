@@ -1,19 +1,10 @@
 import { createClient } from "graphql-ws";
 import { Network, Observable, RequestParameters, Variables } from "relay-runtime"
 import { config } from "../../config";
-import Cookies from "js-cookie";
 
 export const IS_SERVER = typeof window === "undefined";
 
-export const fetchFunction = async (request: RequestParameters, variables: Variables) => {  
-  // TODO:
-  // This skips the communication with the API on the SSR, since I didn't find a way to
-  // get the user cookies inside the server.
-  // usePreloadedQuery wont work anymore.
-  if (IS_SERVER) return; 
-
-  const token = Cookies.get("token");
-    
+export const fetchFunction = ({token}: {token: string | undefined}) => async (request: RequestParameters, variables: Variables) => {
   const response = await fetch(`${config.api.httpUrl}/graphql`, {
     method: 'POST',
     credentials: "include",
@@ -56,4 +47,7 @@ export const subscribeFunction = (request: RequestParameters, variables: Variabl
   })
 }
 
-export const network = Network.create(fetchFunction, subscribeFunction);
+export const getNetwork = ({token}: {token: string | undefined}) => {
+  return Network.create(fetchFunction({token}), subscribeFunction);
+}
+

@@ -2,6 +2,7 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Providers from "./providers";
+import { cookies } from "next/headers";
 
 const bevellier = localFont({
   src: "../../public/bevellier.ttf",
@@ -23,12 +24,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
+  const token = cookies().get("token")?.value;
+
   return (
     <html lang="en" className="bg-secondary-50/40">
       <body
         className={`${bevellier.variable} ${satoshi.variable} font-sans h-full`}
       >
-        <Providers>{children}</Providers>
+        <Providers token={token}>{children}</Providers>
       </body>
     </html>
   );
