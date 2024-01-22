@@ -24,14 +24,14 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
-  const token = cookies().get("token")?.value;
+  const reqCookies = cookies().getAll();
 
   return (
     <html lang="en" className="bg-secondary-50/40">
       <body
         className={`${bevellier.variable} ${satoshi.variable} font-sans h-full`}
       >
-        <Providers token={token}>{children}</Providers>
+        <Providers cookies={reqCookies}>{children}</Providers>
       </body>
     </html>
   );

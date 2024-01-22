@@ -1,18 +1,18 @@
 "use client";
 
 import { getEnvironment } from "@/relay/environment";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
 import { useMemo } from "react";
 import { ReactRelayContext } from "react-relay";
-import Cookies from "js-cookie";
 
 const Providers = ({
   children,
-  token,
+  cookies,
 }: {
   children: React.ReactNode;
-  token: string | undefined;
+  cookies: RequestCookie[];
 }) => {
-  const environment = useMemo(() => getEnvironment({ token }), [token]);
+  const environment = useMemo(() => getEnvironment({ cookies }), [cookies]);
 
   return (
     <ReactRelayContext.Provider value={{ environment }}>

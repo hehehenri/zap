@@ -1,33 +1,39 @@
 import { createClient } from "graphql-ws";
 import { Network, Observable, RequestParameters, Variables } from "relay-runtime"
 import { config } from "../../config";
+import { RequestCookie } from "next/dist/compiled/@edge-runtime/cookies";
+import { getCookie } from "@/utils";
 
 export const IS_SERVER = typeof window === "undefined";
 
-export const fetchFunction = ({token}: {token: string | undefined}) => async (request: RequestParameters, variables: Variables) => {
-  const response = await fetch(`${config.api.httpUrl}/graphql`, {
-    method: 'POST',
-    credentials: "include",
-    headers: {
-      'content-type': 'application/json',
-      authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({
-      query: request.text,
-      variables,
-    }),
-  });
+type FetchProps = { cookies: RequestCookie[] }
+export const fetchFunction = ({ cookies }: FetchProps) => (
+  async (request: RequestParameters, variables: Variables) => {
+    const token = getCookie(cookies, "token");
+    const response = await fetch(`${config.api.httpUrl}/graphql`, {
+      method: 'POST',
+      credentials: "include",
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        query: request.text,
+        variables,
+      }),
+    });
   
-  const result = await response.json();
+    const result = await response.json();
 
-  if (Array.isArray(result.errors) && result.errors.length > 0) {
-    const message = result.errors[0].message as string;
+    if (Array.isArray(result.errors) && result.errors.length > 0) {
+      const message = result.errors[0].message as string;
     
-    throw new Error(message, { cause: response })
-  }
+      throw new Error(message, { cause: response })
+    }
 
-  return result;
-}
+    return result;
+  }
+);
 
 export const subscribeFunction = (request: RequestParameters, variables: Variables): Observable<any> => {
   const client = !IS_SERVER
@@ -47,7 +53,8 @@ export const subscribeFunction = (request: RequestParameters, variables: Variabl
   })
 }
 
-export const getNetwork = ({token}: {token: string | undefined}) => {
-  return Network.create(fetchFunction({token}), subscribeFunction);
+export type NetworkProps = {} & FetchProps; 
+export const getNetwork = (props: NetworkProps) => {
+  return Network.create(fetchFunction(props), subscribeFunction);
 }
 
