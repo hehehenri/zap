@@ -22,24 +22,22 @@ const Error = ({ error }: { error: string | null }) => {
   );
 };
 
-const Login = graphql`
-  mutation pageLoginMutation($username: String!, $password: String!) {
-    login(input: { username: $username, password: $password }) {
-      token
-      user {
-        id
-        username
+const LoginPage = () => {
+  const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [commitMutation, inFlight] = useMutation<pageLoginMutation>(graphql`
+    mutation pageLoginMutation($username: String!, $password: String!) {
+      login(input: { username: $username, password: $password }) {
+        token
+        user {
+          id
+          username
+        }
       }
     }
-  }
-`;
-
-const LoginPage = () => {
-  const [commitMutation, inFlight] = useMutation<pageLoginMutation>(Login);
-  const [error, setError] = useState<string | null>(null);
+  `);
 
   const { register, handleSubmit } = useForm<pageLoginMutation$variables>();
-  const router = useRouter();
 
   const onSubmit = (variables: pageLoginMutation$variables) => {
     commitMutation({
