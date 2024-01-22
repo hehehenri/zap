@@ -8,13 +8,6 @@ import {
   pageMessagesQuery$data,
 } from "@/__generated__/pageMessagesQuery.graphql";
 
-const query = graphql`
-  query pageMessagesQuery {
-    ...RoomPreviewListQuery
-    ...NewRoomQuery
-  }
-`;
-
 const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -39,7 +32,15 @@ const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
 };
 
 const Messages = () => {
-  const data = useLazyLoadQuery<pageMessagesQuery>(query, {});
+  const data = useLazyLoadQuery<pageMessagesQuery>(
+    graphql`
+      query pageMessagesQuery {
+        ...RoomPreviewListQuery
+        ...NewRoomQuery
+      }
+    `,
+    {},
+  );
 
   return (
     <main className="grid grid-cols-[auto_1fr] h-full">
