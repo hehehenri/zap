@@ -7,7 +7,7 @@ const schema = z.object({
   DATABASE_URL: z.string().url(),
   API_PORT: z.string(),
   TOKEN_SECRET: z.string(),
-  TOKEN_SALT_ROUNDS: z.string(),
+  TOKEN_SALT_ROUNDS: z.coerce.number(),
   ENV: z.literal("prod").or(z.literal("local")),
 })
 
