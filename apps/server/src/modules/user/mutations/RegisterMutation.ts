@@ -4,7 +4,7 @@ import { UserType } from "../UserType";
 import bcrypt from "bcrypt";
 import config from "../../../config";
 import { UserModel } from "../UserModel";
-import { getToken } from "../../../authentication";
+import { generateToken } from "../../../authentication";
 import { DatabaseError, InvalidPayloadError } from "../../../routes/error";
 
 
@@ -53,7 +53,7 @@ export const RegisterMutation = mutationWithClientMutationId({
       throw new DatabaseError({ cause: e.message });
     }
 
-    const token = getToken(user, config.jwt.secret);
+    const token = generateToken(user, config.jwt.secret);
 
     return { user, token };
   }

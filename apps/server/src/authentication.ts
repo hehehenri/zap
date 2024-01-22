@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import { UserModel, UserDefinition } from "./modules/user/UserModel";
+import { KoaContext } from "./schemas/context";
 
 export type Config = {
   secret: string
@@ -7,6 +8,17 @@ export type Config = {
 
 type TokenPayload = {
   id: string
+}
+
+export const getToken = (ctx: KoaContext) => {
+  const auth = ctx.headers.authorization;
+  if (!auth) return null;
+
+  if (auth.startsWith("Bearer ")) {
+    return auth.substring(7, auth.length);
+  }
+
+  return null
 }
 
 export const getAuth = async (token: string | null, secret: string) => {
@@ -22,6 +34,6 @@ export const getAuth = async (token: string | null, secret: string) => {
   }
 }
 
-export const getToken = (user: UserDefinition, secret: string) => {
+export const generateToken = (user: UserDefinition, secret: string) => {
   return jwt.sign({ id: user._id }, secret);
 }

@@ -3,7 +3,7 @@ import { GraphQLString, GraphQLNonNull } from "graphql/type";
 import bcrypt from "bcrypt";
 
 import { UserType } from "../UserType";
-import { getToken }  from "../../../authentication";
+import { generateToken }  from "../../../authentication";
 import config from "../../../config";
 import { UserModel } from "../UserModel";
 import { InvalidPayloadError } from "../../../routes/error";
@@ -42,7 +42,7 @@ export const LoginMutation = mutationWithClientMutationId({
       "Invalid password or user not found"
     );
 
-    const token = getToken(user, config.jwt.secret);
+    const token = generateToken(user, config.jwt.secret);
 
     return {
       token,
