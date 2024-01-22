@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const guess = ["/login", "/register", "/"];
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("auth.token")?.value;
+  const token = request.cookies.get("token")?.value;
   const headers = new Headers(request.headers);
 
   if (

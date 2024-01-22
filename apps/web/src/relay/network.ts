@@ -1,23 +1,25 @@
 import { createClient } from "graphql-ws";
-import {  ConcreteRequest, Network, Observable, RequestParameters, Variables } from "relay-runtime"
+import { Network, Observable, RequestParameters, Variables } from "relay-runtime"
 import { config } from "../../config";
+import Cookies from "js-cookie";
 
-export const getPreloadedQuery = async (
-  { params }: ConcreteRequest,
-  variables: Variables,
-) => {
-  const response = await fetchFunction(params, variables);
-  
-  return { params, variables, response }
-};
+export const IS_SERVER = typeof window === "undefined";
 
-export const fetchFunction = async (request: RequestParameters, variables: Variables) => {
+export const fetchFunction = async (request: RequestParameters, variables: Variables) => {  
+  // TODO:
+  // This skips the communication with the API on the SSR, since I didn't find a way to
+  // get the user cookies inside the server.
+  // usePreloadedQuery wont work anymore.
+  if (IS_SERVER) return; 
+
+  const token = Cookies.get("token");
+    
   const response = await fetch(`${config.api.httpUrl}/graphql`, {
     method: 'POST',
     credentials: "include",
-
     headers: {
       'content-type': 'application/json',
+      authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
       query: request.text,
@@ -37,7 +39,7 @@ export const fetchFunction = async (request: RequestParameters, variables: Varia
 }
 
 export const subscribeFunction = (request: RequestParameters, variables: Variables): Observable<any> => {
-  const client = typeof window !== typeof undefined
+  const client = !IS_SERVER
     ? createClient({ url: `${config.api.wsUrl}/graphql` })
     : undefined;
 
@@ -54,5 +56,4 @@ export const subscribeFunction = (request: RequestParameters, variables: Variabl
   })
 }
 
-const network = Network.create(fetchFunction, subscribeFunction);
-export default network;
+export const network = Network.create(fetchFunction, subscribeFunction);
