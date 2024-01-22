@@ -40,15 +40,12 @@ const start = () => {
   const server = http.createServer(app.callback());
   
   server.listen(config.app.port, () => {
-    console.log("http: server running on: http://localhost:8000/graphql");
-
     const wsServer = new WebSocketServer({
       server,
       path: "/graphql"
     });
 
     useServer({ schema, execute, subscribe }, wsServer)
-    console.log("ws: server running on ws://localhost:8000/graphql")
   });
 };
 

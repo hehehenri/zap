@@ -6,13 +6,13 @@
   "author": "henri <henri@henr.in>",
   "license": "MIT",
   "scripts": {
-    "build": "yarn schema && webpack --config ./webpack.config.js --progress",
-    "start": "yarn schema && node ./dist/bundle.js | bunyan",
+    "build": "yarn schema && tsup",
+    "start": "yarn schema && node ./dist/index.js | bunyan",
     "dev": "yarn schema && tsx --watch ./src/index.ts | bunyan",
     "schema": "tsx ./scripts/generateSchema.ts && cp ./schema/schema.graphql ../web/data"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/bunyan": "^1.8.11",
     "@types/graphql": "^14.5.0",
     "@types/graphql-relay": "^0.7.0",
@@ -23,6 +23,7 @@
     "@types/koa-router": "^7.4.8",
     "@types/mongoose": "^5.11.97",
     "@types/ws": "^8.5.10",
+    "tsup": "^8.0.1",
     "tsx": "^4.7.0",
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
@@ -33,7 +34,7 @@
     "@entria/graphql-mongoose-loader": "^4.4.0",
     "@types/koa-graphql": "^0.8.11",
     "@types/koa-router": "^7.4.8",
-    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "bunyan": "^1.8.15",
     "dataloader": "^2.2.2",
     "dotenv": "^16.3.2",

@@ -1,6 +1,6 @@
 import {mutationWithClientMutationId} from "graphql-relay";
 import { GraphQLString, GraphQLNonNull } from "graphql/type";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 import { UserType } from "../UserType";
 import { generateToken }  from "../../../authentication";
@@ -36,7 +36,7 @@ export const LoginMutation = mutationWithClientMutationId({
       "Invalid password or user not found"
     );
     
-    const isValidPassword = await bcrypt.compare(plainTextPassword, user.password);
+    const isValidPassword = bcrypt.compareSync(plainTextPassword, user.password);
 
     if (!isValidPassword) throw new InvalidPayloadError(
       "Invalid password or user not found"
