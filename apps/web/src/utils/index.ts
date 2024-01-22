@@ -1,5 +1,6 @@
 import { User } from '@/auth';
 import { ClassValue, clsx } from 'clsx';
+import { RequestCookie } from 'next/dist/compiled/@edge-runtime/cookies';
 import { twMerge } from 'tailwind-merge';
 
 export const cn = (...input: ClassValue[]) => twMerge(clsx(input));
@@ -34,3 +35,7 @@ export const getOtherParticipant = (participants: readonly User[], user: User) =
 
   return null;
 }
+
+export const getCookie = (cookies: RequestCookie[], key: string) => (
+  cookies.filter(c => c.name == key)[0]?.value
+)

@@ -4,7 +4,7 @@ import { RoomPreview } from "./RoomPreview";
 import { RoomPreviewListFragment$key } from "@/__generated__/RoomPreviewListFragment.graphql";
 import NoMessages from "../EmptyState/NoMessages";
 import { RoomPreviewListQuery$key } from "@/__generated__/RoomPreviewListQuery.graphql";
-import { extractNodes } from "@/utils/cn";
+import { extractNodes } from "@/utils";
 import { Pen } from "lucide-react";
 import { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";

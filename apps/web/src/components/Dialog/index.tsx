@@ -1,6 +1,6 @@
 import React from "react";
 import * as D from "@radix-ui/react-dialog";
-import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
 import { useTransition, animated, config } from "@react-spring/web";
 
 type Props = {

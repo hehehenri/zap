@@ -15,7 +15,7 @@ import {
   RoomMessagesStoreMessageMutation as StoreMessage,
   RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
 } from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
-import { cn, extractNodes, getOtherParticipant } from "@/utils/cn";
+import { cn, extractNodes, getOtherParticipant } from "@/utils";
 import {
   Dispatch,
   RefObject,

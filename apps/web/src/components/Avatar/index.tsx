@@ -1,4 +1,4 @@
-import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
 
 export const Avatar = ({ className }: { className?: string }) => {
   return (

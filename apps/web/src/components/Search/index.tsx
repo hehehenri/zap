@@ -1,4 +1,4 @@
-import { cn } from "@/utils/cn";
+import { cn } from "@/utils";
 import * as React from "react";
 import { Search as SearchIcon } from "lucide-react";
 
