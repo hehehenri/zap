@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie';
 
 export const logout = () => {
-  Cookies.remove('auth.token');
+  Cookies.remove('token');
 }
 
 export type User = {
@@ -10,5 +10,5 @@ export type User = {
 };
 
 export const login = (token: string) => {
-  Cookies.set("auth.token", token);
+  Cookies.set("token", token);
 }

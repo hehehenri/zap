@@ -19,7 +19,7 @@ const JoinAnchor = ({ href, content }: { href: string; content: string }) => {
 };
 
 const Home = () => {
-  const token = cookies().get("auth.token");
+  const token = cookies().get("token");
   const anchor = token
     ? {
         content: "Open",
