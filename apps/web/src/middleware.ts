@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const guess = ["/login", "/register", "/"];
+const guess = ["/login", "/register", "/", "/_next", "/api", "/favicon.ico"];
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
@@ -18,10 +18,3 @@ export async function middleware(request: NextRequest) {
 
   return NextResponse.next({ headers });
 }
-
-export const config = {
-  matcher: [
-    "/((?!api|_next|favicon.ico).*)",
-  ],
-};
-
