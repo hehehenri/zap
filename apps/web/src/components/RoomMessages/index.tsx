@@ -500,7 +500,7 @@ export const RoomMessages = ({
           </div>
         </div>
         <div
-          style={{ mask: "url('/bg-tile.svg')" }}
+          style={{ mask: "url('/img/bg-tile.svg')" }}
           className="h-full w-full bg-secondary-500 absolute top-0 -z-10 opacity-30"
         />
       </form>
