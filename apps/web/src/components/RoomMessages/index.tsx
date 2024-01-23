@@ -353,10 +353,12 @@ const Messages = ({
   user,
   setPendingMessages,
   messagesRef,
+  roomId,
 }: {
   user: User;
   setPendingMessages: Dispatch<SetStateAction<string[]>>;
   messagesRef: RefObject<HTMLDivElement>;
+  roomId: string;
 }) => {
   const [messages, setMessages] = useState<Message[]>([]);
 
@@ -367,8 +369,8 @@ const Messages = ({
   const config = useMemo<GraphQLSubscriptionConfig<RoomMessagesSubscription>>(
     () => ({
       subscription: graphql`
-        subscription RoomMessagesSubscription {
-          messageAddedSubscribe(input: {}) {
+        subscription RoomMessagesSubscription($input: MessageAddedInput!) {
+          messageAddedSubscribe(input: $input) {
             message {
               id
               content
@@ -381,7 +383,7 @@ const Messages = ({
           }
         }
       `,
-      variables: {},
+      variables: { input: { roomId } },
       onNext: (res) => {
         const message = res?.messageAddedSubscribe?.message;
         if (!message) return;
@@ -397,7 +399,7 @@ const Messages = ({
         }
       },
     }),
-    [user, setPendingMessages],
+    [user, setPendingMessages, roomId],
   );
 
   useSubscription(config);
@@ -490,6 +492,7 @@ export const RoomMessages = ({
           <LoadedMessages queryRef={queryRef} />
           {user && (
             <Messages
+              roomId={roomId}
               user={user}
               setPendingMessages={setPendingMessages}
               messagesRef={messagesRef}
