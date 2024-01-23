@@ -52,7 +52,9 @@ const RegisterPage = () => {
         }
 
         login(response.token);
+
         router.push("/messages");
+        router.refresh();
       },
       onError: (error) => {
         setError(error.message);

@@ -10,6 +10,7 @@ type FetchProps = { cookies: RequestCookie[] }
 export const fetchFunction = ({ cookies }: FetchProps) => (
   async (request: RequestParameters, variables: Variables) => {
     const token = getCookie(cookies, "token");
+
     const response = await fetch(`${config.api.httpUrl}/graphql`, {
       method: 'POST',
       credentials: "include",
