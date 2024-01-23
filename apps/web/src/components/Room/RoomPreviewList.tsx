@@ -65,7 +65,7 @@ export const RoomPreviewList = ({
     <section
       onMouseOver={() => setShowNewRoom(true)}
       onMouseOut={() => setShowNewRoom(false)}
-      className="relative min-w-64 max-w-md lg:w-[33vw] xl:w-[25vw] bg-white shadow py-2.5 flex flex-col gap-2 h-screen z-10"
+      className="relative min-w-64 max-w-[100vw] lg:max-w-md lg:w-[33vw] xl:w-[25vw] bg-white shadow py-2.5 flex flex-col gap-2 h-screen z-10"
     >
       <div className="px-3">
         <Search />

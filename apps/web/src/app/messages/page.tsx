@@ -10,7 +10,7 @@ import {
 
 const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
-    <div className="w-full h-full flex items-center justify-center">
+    <div className="w-full h-full items-center justify-center hidden lg:flex">
       <div className="space-y-8 px-8 min-w-[300px]">
         <div className="max-w-md">
           <h1 className="font-mono text-5xl font-semibold text-secondary-400">
@@ -44,7 +44,9 @@ const Messages = () => {
 
   return (
     <main className="grid grid-cols-[auto_1fr] h-full">
-      <RoomPreviewList fragmentRef={data} />
+      <div className="col-span-full lg:col-span-1">
+        <RoomPreviewList fragmentRef={data} />
+      </div>
       <ChatEmptyState queryRef={data} />
     </main>
   );

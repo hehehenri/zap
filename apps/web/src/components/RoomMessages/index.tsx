@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreHorizontal, SendHorizonal } from "lucide-react";
+import { ArrowLeft, MoreHorizontal, SendHorizonal } from "lucide-react";
 import { Avatar } from "..";
 import {
   graphql,
@@ -28,6 +28,7 @@ import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscripti
 import { sendMessageHandler, storeMessageMutation, useStoreMessageForm } from "../Messages/StoreMessage";
 import { StoreMessageMutation } from "@/__generated__/StoreMessageMutation.graphql";
 import { InvalidMessageDialog } from "../Messages/InvalidMessageDialog";
+import Link from "next/link";
 
 const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
   const div = divRef.current;
@@ -71,6 +72,9 @@ export const MessagesHeader = ({
 
   return (
     <div className="flex items-center bg-white shadow px-6 py-2 gap-2">
+      <Link href={"/messages"} className="p-2 lg:hidden">
+        <ArrowLeft className="text-stone-600" />
+      </Link>
       <Avatar />
       <div className="flex flex-col">
         <span className="text-lg font-semibold leading-tight">
@@ -124,11 +128,10 @@ const MessageChunk = ({
                 "items-start rounded-r-full": !isSender,
               })}
             >
-              <div className="rounded-tr-lg"></div>
               <div className="relative mx-[7px]">
                 <p
                   className={cn(
-                    "px-3 py-1.5 bg-zinc-700 break-words lg:max-w-[30rem] rounded-tl-3xl rounded-tr-3xl shadow text-stone-800",
+                    "px-3 py-1.5 bg-zinc-700 break-words max-w-[30rem] rounded-tl-3xl rounded-tr-3xl shadow text-stone-800",
                     {
                       "bg-white": !isSender,
                       "bg-secondary-300": isSender,

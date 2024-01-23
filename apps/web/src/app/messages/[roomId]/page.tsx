@@ -24,10 +24,12 @@ const RoomMessagesPage = () => {
 
   return (
     <main className="grid grid-cols-[auto_1fr]">
-      <RoomPreviewList fragmentRef={queryRef} />
+      <div className="hidden lg:block">
+        <RoomPreviewList fragmentRef={queryRef} />
+      </div>
       <div
         className="
-          flex flex-col h-screen relative
+          flex flex-col h-screen relative col-span-full lg:col-span-1
         "
       >
         <MessagesHeader queryRef={queryRef} />
