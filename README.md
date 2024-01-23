@@ -1,6 +1,6 @@
 # Zap
 
-Zap is a chat application built to explore the intricacies of Relay and GraphQL, aiming to understand their strengths and weaknesses. Drawing inspiration from popular messaging platforms like Telegram and WhatsApp, Zap provides a simple yet effective chat experience.
+Zap is a chat application built to explore Relay and GraphQL, aiming to understand their strengths and weaknesses. With inspiration from popular messaging platforms like Telegram and WhatsApp, Zap provides a simple yet effective chat experience.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Zap is a chat application built to explore the intricacies of Relay and GraphQL,
    ```
 2. Navigate to the project directory:
    ```sh
-   yarn install
+   cd zap
    ```
 3. Install dependencies for both web and server:
    ```sh
@@ -28,12 +28,16 @@ To start the application, run the following commands:
 
 2. Run the development server.
    ```sh
-   cd apps/server && yarn dev
+   cd apps/server
+   cp .env.example .env && xdg-open .env
+   yarn dev
    ```
 
 3. Run the web client.
    ```sh
-   cd apps/web && yarn dev
+   cd apps/web
+   cp .env.example .env
+   yarn dev
    ```
 
 Then, navigate to `http://localhost:3000` in your web browser to access the application.
