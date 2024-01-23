@@ -6,9 +6,9 @@ import { useRouter } from "next/navigation";
 export default function Error({ error }: { error: Error }) {
   const router = useRouter();
 
-  // if (error.cause instanceof Response && error.cause.status === 401) {
-  //   router.push("/login");
-  // }
+  if (error.cause instanceof Response && error.cause.status === 401) {
+    router.push("/login");
+  }
 
   return (
     <section className="w-full h-full flex items-center justify-center flex-col gap-y-0.5">
