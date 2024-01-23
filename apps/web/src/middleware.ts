@@ -18,3 +18,9 @@ export async function middleware(request: NextRequest) {
 
   return NextResponse.next({ headers });
 }
+
+export const config = {
+  matcher: [
+    "/((?!api|_next|favicon.ico).*)",
+  ],
+};
