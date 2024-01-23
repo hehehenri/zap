@@ -27,7 +27,7 @@ const Home = () => {
       }
     : {
         content: "Sign Up",
-        href: "/login",
+        href: "/register",
       };
 
   return (

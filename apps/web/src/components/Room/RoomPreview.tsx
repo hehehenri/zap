@@ -69,10 +69,10 @@ export const RoomPreview = ({
       className="flex items-center hover:bg-zinc-100/80 p-2 rounded-xl gap-2 text-left"
     >
       <Avatar />
-      <div className="flex justify-between w-full items-center">
-        <div className="flex flex-col leading-6">
-          <span className="font-medium text-ellipsis">{part.username}</span>
-          <p className="text-stone-600">{data.lastMessage?.content}</p>
+      <div className="flex justify-between w-full items-center overflow-hidden">
+        <div className="flex flex-col leading-6 overflow-hidden">
+          <span className="font-medium overflow-hidden text-ellipsis">{part.username}</span>
+          <p className="text-stone-600 overflow-hidden text-ellipsis">{data.lastMessage?.content}</p>
         </div>
         {data.lastMessage && (
           <p className="text-stone-700 text-xs">

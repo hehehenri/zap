@@ -134,7 +134,7 @@ const MessageChunk = ({
           return (
             <div
               key={id}
-              className={cn("w-full flex flex-col", {
+              className={cn("flex flex-col break-words", {
                 "items-end rounded-l-full": isSender,
                 "items-start rounded-r-full": !isSender,
               })}
@@ -143,7 +143,7 @@ const MessageChunk = ({
               <div className="relative mx-[7px]">
                 <p
                   className={cn(
-                    "px-3 py-1.5 bg-zinc-700 break-words max-w-full rounded-tl-3xl rounded-tr-3xl shadow text-stone-800",
+                    "px-3 py-1.5 bg-zinc-700 break-words lg:max-w-[30rem] rounded-tl-3xl rounded-tr-3xl shadow text-stone-800",
                     {
                       "bg-white": !isSender,
                       "bg-secondary-300": isSender,
