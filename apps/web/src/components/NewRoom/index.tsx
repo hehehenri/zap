@@ -101,7 +101,7 @@ export const NewRoom = ({
         title={<Header />}
         open={isOpen}
         onOpenChange={setIsOpen}
-        className="pt-6 pb-0 px-0"
+        className="px-0 pb-0 pt-6"
       >
         <div className="relative flex items-center mb-2">
           <SearchIcon className="absolute ml-10" strokeWidth={1} />

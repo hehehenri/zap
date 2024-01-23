@@ -44,7 +44,7 @@ const Dialog = ({
                 forceMount
                 asChild
                 className={cn(
-                  "fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
+                  "px-8 py-6 fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
                   "z-50 grid w-full max-w-lg rounded-t-xl sm:rounded-3xl lg:max-w-screen-sm",
                   "scale-100 overflow-y-auto opacity-100 bg-white dark:bg-black md:w-full",
                   className,
