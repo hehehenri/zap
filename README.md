@@ -4,7 +4,7 @@ Zap is a chat application built to explore Relay and GraphQL, aiming to understa
 
 ## Preview
 
-https://github.com/hnrbs/zap/assets/23015763/42a60cb8-77b1-4f41-a3a0-cb27cb764b74
+https://github.com/hnrbs/zap/assets/23015763/dc42b7f3-99a2-4319-9f04-35fb9e91e7ee
 
 ## Installation
 
