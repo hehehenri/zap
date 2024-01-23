@@ -58,7 +58,7 @@ export const sendMessageHandler = ({commitMutation, onSent, onValidationError}: 
       return;
     }
 
-    commitMutation({ variables: { input } });
+    commitMutation({ variables: { input }, updater: (store) => store.invalidateStore() });
     onSent(input.content);
   }
 );
