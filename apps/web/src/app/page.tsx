@@ -58,7 +58,7 @@ const Home = () => {
           layout="fill"
           objectFit="cover"
           alt="mountains"
-          src={"/trees.jpg"}
+          src={"/img/trees.jpg"}
           className="absolute -z-10"
         />
       </div>

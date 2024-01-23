@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import Providers from "./providers";
 import { cookies } from "next/headers";
-import { getCookie } from "@/utils";
 
 const bevellier = localFont({
   src: "../../public/bevellier.ttf",
