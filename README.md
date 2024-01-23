@@ -2,6 +2,10 @@
 
 Zap is a chat application built to explore Relay and GraphQL, aiming to understand their strengths and weaknesses. With inspiration from popular messaging platforms like Telegram and WhatsApp, Zap provides a simple yet effective chat experience.
 
+## Preview
+
+https://github.com/hnrbs/zap/assets/23015763/42a60cb8-77b1-4f41-a3a0-cb27cb764b74
+
 ## Installation
 
 1. Clone the repository:
