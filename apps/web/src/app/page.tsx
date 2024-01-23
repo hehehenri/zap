@@ -31,7 +31,7 @@ const Home = () => {
       };
 
   return (
-    <div className="px-12 py-4 flex flex-col gap-8">
+    <div className="px-12 py-4 flex flex-col">
       <header className="inset-x-0 top-0 z-10">
         <nav className="flex items-center justify-between">
           <Logo />
@@ -39,11 +39,11 @@ const Home = () => {
         </nav>
       </header>
 
-      <div className="pt-32 pb-14 sm:py-48 bg-cyan-950/50 rounded-3xl relative overflow-hidden text-white">
+      <div className="pt-32 pb-14 sm:py-48 bg-cyan-950/50 rounded-3xl relative overflow-hidden text-white mt-8">
         <div className="mx-auto max-w-6xl px-12 grid xl:grid-cols-2">
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-sans font-semibold tracking-tight text-zinc-50 leading-tight">
-              Send messages (not) privately
+              Send messages (not)* privately
             </h1>
             <p className="mt-6 text-lg sm:text-xl leading-8 tracking-tighter mb-20">
               Simple, reliable, private messaging and calling for free*,
@@ -62,6 +62,10 @@ const Home = () => {
           className="absolute -z-10"
         />
       </div>
+      <p className="text-end text-sm tracking-tighter text-stone-600 mt-2">
+        * No encryption involved in exchanging messages. Messages are not truly
+        private.
+      </p>
     </div>
   );
 };
