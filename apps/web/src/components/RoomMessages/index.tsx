@@ -2,25 +2,18 @@
 
 import { MoreHorizontal, SendHorizonal } from "lucide-react";
 import { Avatar } from "..";
-import { useForm } from "react-hook-form";
 import {
-  UseMutationConfig,
   graphql,
   useFragment,
   useMutation,
   usePaginationFragment,
   useSubscription,
 } from "react-relay";
-import {
-  RoomMessagesStoreMessageMutation as StoreMessage,
-  RoomMessagesStoreMessageMutation$variables as StoreMessageVariables,
-} from "@/__generated__/RoomMessagesStoreMessageMutation.graphql";
 import { cn, extractNodes, getOtherParticipant } from "@/utils";
 import {
   Dispatch,
   RefObject,
   SetStateAction,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -32,6 +25,9 @@ import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginat
 import { User } from "@/auth";
 import { RoomMessagesHeaderQuery$key } from "@/__generated__/RoomMessagesHeaderQuery.graphql";
 import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscription.graphql";
+import { sendMessageHandler, storeMessageMutation, useStoreMessageForm } from "../Messages/StoreMessage";
+import { StoreMessageMutation } from "@/__generated__/StoreMessageMutation.graphql";
+import { InvalidMessageDialog } from "../Messages/InvalidMessageDialog";
 
 const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
   const div = divRef.current;
@@ -84,17 +80,6 @@ export const MessagesHeader = ({
     </div>
   );
 };
-
-const storeMessageMutation = graphql`
-  mutation RoomMessagesStoreMessageMutation($input: StoreMessageInput!) {
-    storeMessage(input: $input) {
-      message {
-        id
-        content
-      }
-    }
-  }
-`;
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -434,39 +419,31 @@ export const RoomMessages = ({
   queryRef: RoomMessagesQuery$key;
 }) => {
   const [pendingMessages, setPendingMessages] = useState<string[]>([]);
+
+  const [commitMutation] = useMutation<StoreMessageMutation>(storeMessageMutation);
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const { register, handleSubmit, setValue } = useStoreMessageForm({ roomId });
   const messagesRef = useRef<HTMLDivElement>(null);
 
+  const onSent = (message: string) => {
+    console.log({ message });
+    setPendingMessages((messages) => [...messages, message]);
+    setValue("content", "")
+  };
+  const onValidationError = (error: string) => {
+    setValidationError(error);
+  };
+
+  const sendMessage = sendMessageHandler({
+    commitMutation,
+    onValidationError,
+    onSent,
+  });
+    
   useEffect(() => {
     scrollToBottom(messagesRef);
   }, [pendingMessages, messagesRef]);
-
-  const { register, handleSubmit, setValue } = useForm<StoreMessageVariables>({
-    defaultValues: {
-      input: {
-        roomId: roomId,
-        content: "",
-      },
-    },
-  });
-
-  const [commitMutation] = useMutation<StoreMessage>(storeMessageMutation);
-
-  const sendMessage = useCallback(
-    async (variables: StoreMessageVariables) => {
-      const content = variables.input.content;
-      if (!content) return;
-
-      const config: UseMutationConfig<StoreMessage> = {
-        variables,
-      };
-
-      commitMutation(config);
-
-      setPendingMessages((messages) => [...messages, content]);
-      setValue("input.content", "");
-    },
-    [commitMutation, setValue],
-  );
 
   const { me: user } = useFragment(
     graphql`
@@ -481,46 +458,50 @@ export const RoomMessages = ({
   );
 
   return (
-    <form className="w-full" onSubmit={handleSubmit(sendMessage)}>
-      <div
-        className="
-          h-[calc(100vh-64px)] mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
-          container flex justify-end flex-col gap-y-1.5
-        "
-      >
-        <div className="max-h-full overflow-y-auto" ref={messagesRef}>
-          <LoadedMessages queryRef={queryRef} />
-          {user && (
-            <Messages
-              roomId={roomId}
-              user={user}
-              setPendingMessages={setPendingMessages}
-              messagesRef={messagesRef}
-            />
-          )}
-          <PendingMessages messages={pendingMessages} />
-        </div>
+    <>
+      <form className="w-full" onSubmit={handleSubmit(sendMessage)}>
+        <div
+          className="
+            h-[calc(100vh-64px)] mx-auto max-w-3xl px-4 sm:px-6 lg:px-8
+            container flex justify-end flex-col gap-y-1.5
+          "
+        >
+          <div className="max-h-full overflow-y-auto" ref={messagesRef}>
+            <LoadedMessages queryRef={queryRef} />
+            {user && (
+              <Messages
+                roomId={roomId}
+                user={user}
+                setPendingMessages={setPendingMessages}
+                messagesRef={messagesRef}
+              />
+            )}
+            <PendingMessages messages={pendingMessages} />
+          </div>
 
-        <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
-          <input
-            placeholder="Message"
-            autoCapitalize="off"
-            autoComplete="off"
-            className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
-            {...register("input.content")}
-          />
-          <button
-            type="submit"
-            className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white"
-          >
-            <SendHorizonal />
-          </button>
+          <div className="w-full pt-2 pb-4 flex items-center gap-2.5">
+            <input
+              placeholder="Message"
+              autoCapitalize="off"
+              autoComplete="off"
+              className="rounded-2xl shadow px-6 py-3.5 w-full tracking-wide outline-none"
+              {...register("content")}
+            />
+            <button
+              type="submit"
+              disabled={Boolean(validationError)}
+              className="bg-white p-3.5 shadow rounded-full text-secondary-400 hover:bg-secondary-400 hover:text-white"
+            >
+              <SendHorizonal />
+            </button>
+          </div>
         </div>
-      </div>
-      <div
-        style={{ mask: "url('/bg-tile.svg')" }}
-        className="h-full w-full bg-secondary-500 absolute top-0 -z-10 opacity-30"
-      />
-    </form>
+        <div
+          style={{ mask: "url('/bg-tile.svg')" }}
+          className="h-full w-full bg-secondary-500 absolute top-0 -z-10 opacity-30"
+        />
+      </form>
+      <InvalidMessageDialog error={validationError} setError={setValidationError} />
+    </>
   );
 };
