@@ -1,7 +1,7 @@
 import Koa from "koa";
 import http from "http";
 import cors from "koa-cors";
-import bunyan from "bunyan";
+import bunyan, { LoggerOptions } from "bunyan";
 import koaBunyan from "koa-bunyan-logger";
 import routes from "./routes";
 import { KoaContext } from "./schemas/context";
@@ -13,9 +13,22 @@ import { useServer } from "graphql-ws/lib/use/ws";
 import config from "./config";
 
 const logger = () => {  
-  const options = {
+  const src = require.main?.path;
+  const file = 'logs.json';
+  
+  const options: LoggerOptions = {
     name: 'zap',
-    serializers: bunyan.stdSerializers
+    serializers: bunyan.stdSerializers,
+    streams: [
+      {
+        level: 'debug',
+        stream: process.stdout
+      },
+      {
+        level: 'info',
+        path: src ? `${src}/../${file}` : `/var/tmp/${file}`
+      }
+    ]
   };
   
   const logger = bunyan.createLogger(options);

@@ -23,9 +23,6 @@ const graphqlRoute = () => {
 
     return ({
       schema,
-      graphiql: {
-        headerEditorEnabled: true
-      },
       pretty: true,
       context: { user },
       customFormatErrorFn: (error) => {
