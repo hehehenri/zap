@@ -1,7 +1,9 @@
 import { PubSub } from "graphql-subscriptions";
 
-export const EVENTS = {
-  MESSAGE: { ADDED: "MESSAGE:ADDED" }
-} as const;
+export const events = {
+  message: {
+    added: (roomId: string) => `MESSAGE:ADDED:${roomId}`
+  }
+}
 
 export const pubsub = new PubSub();

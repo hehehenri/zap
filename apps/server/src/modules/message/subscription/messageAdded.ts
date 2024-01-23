@@ -1,25 +1,32 @@
 import { subscriptionWithClientId } from "graphql-relay-subscription";
 import { MessageType } from "../MessageType";
-import { EVENTS, pubsub } from "../../../pubsub";
+import { events, pubsub } from "../../../pubsub";
 import { MessageModel } from "../MessageModel";
 import { GraphQLContext } from "../../../schemas/context";
+import { GraphQLID, GraphQLNonNull } from "graphql";
 
 type NewMessage = {
   id: string,
   messageId: string,
 };
 
-export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, GraphQLContext>({
+type Input = {
+  roomId: string
+};
+
+export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, GraphQLContext, Input>({
   name: 'MessageAdded',
-  inputFields: { },
+  inputFields: {
+    roomId: { type: new GraphQLNonNull(GraphQLID) },
+  },
   outputFields: {
     message: {
       type: MessageType,
       resolve: async ({ id }: NewMessage) => await MessageModel.findById(id)
     }
   },
-  subscribe: () => {
-    return pubsub.asyncIterator(EVENTS.MESSAGE.ADDED);
+  subscribe: ({ roomId }) => {
+    return pubsub.asyncIterator(events.message.added(roomId));
   },
   getPayload: (obj) => {
     return { id: obj.messageId };

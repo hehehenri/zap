@@ -6,7 +6,7 @@ import { Context } from "../../../routes/graphql";
 import { MessageModel } from "../MessageModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import mongoose from "mongoose";
-import { EVENTS, pubsub } from "../../../pubsub";
+import { events, pubsub } from "../../../pubsub";
 import { RoomModel } from "../../room/RoomModel";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
@@ -45,7 +45,7 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     await message.save();
     await RoomModel.updateOne({ _id: roomId }, { $set: { lastMessage: message._id }});
-    await pubsub.publish(EVENTS.MESSAGE.ADDED, { messageId: message._id.toString() })
+    await pubsub.publish(events.message.added(roomId), { messageId: message._id.toString() })
 
     return { message };
   }

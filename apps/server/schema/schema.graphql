@@ -216,5 +216,6 @@ type MessageAddedPayload {
 }
 
 input MessageAddedInput {
+  roomId: ID!
   clientSubscriptionId: String
 }
