@@ -11,7 +11,7 @@ export type User = {
 
 export const login = (token: string) => {
   Cookies.set("token", token, {
-    sameSite: "Lax",
+    sameSite: "none",
     secure: true,
   });
 }

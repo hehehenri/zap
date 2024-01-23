@@ -48,6 +48,7 @@ const LoginPage = () => {
         }
 
         login(response.token);
+        // TODO: refresh is needed to load cookies before redirecting
         router.push("/messages");
       },
       onError: (error) => {
