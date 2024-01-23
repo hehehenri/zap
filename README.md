@@ -8,13 +8,21 @@ Zap is a chat application built to explore Relay and GraphQL, aiming to understa
    ```sh
    git clone https://github.com/hnrbs/zap.git
    ```
+
 2. Navigate to the project directory:
    ```sh
    cd zap
    ```
+
 3. Install dependencies for both web and server:
    ```sh
    yarn install
+   ```
+
+4. Setup the environment variables:
+   ```sh
+   cp apps/server/.env.example apps/server/.env &&
+   cp apps/web/.env.example apps/web/.env
    ```
 
 ## Usage
@@ -26,17 +34,8 @@ To start the application, run the following commands:
    docker-comopse up -d
    ```
 
-2. Run the development server.
+2. Run apps in develpment mode.
    ```sh
-   cd apps/server
-   cp .env.example .env && xdg-open .env
-   yarn dev
-   ```
-
-3. Run the web client.
-   ```sh
-   cd apps/web
-   cp .env.example .env
    yarn dev
    ```
 
