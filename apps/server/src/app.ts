@@ -8,7 +8,6 @@ import { KoaContext } from "./schemas/context";
 import { execute, subscribe } from "graphql";
 import { WebSocketServer } from "ws";
 import schema from "./schemas";
-import { errorHandlerMiddleware } from "./routes/middlewares";
 import { useServer } from "graphql-ws/lib/use/ws";
 import config from "./config";
 
@@ -43,7 +42,6 @@ const createApp = () => {
 
   const router = routes();  
   app.use(router.routes());
-  app.use(errorHandlerMiddleware());
 
   return app;
 }

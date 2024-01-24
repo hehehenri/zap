@@ -1,15 +1,35 @@
-import { GraphQLFieldConfig } from "graphql/type";
+import { GraphQLFieldConfig, GraphQLObjectType, GraphQLOutputType, GraphQLUnionType } from "graphql/type";
 import { GraphQLContext } from "../../../schemas/context";
 import { UserType } from "../UserType";
-import { UnauthorizedError } from "../../../routes/error";
+import { ErrorDefinition, ErrorType, unauthorized } from "../../../routes/error";
+
+type ResponseDefinition = {
+  data: GraphQLObjectType | null
+  error: ErrorDefinition | null
+};
+
+const ResponseType = (DataType: GraphQLObjectType, TypeName: string) => new GraphQLUnionType({
+  name: "Response",
+  types: [ErrorType, DataType],
+  resolveType: (response) => {
+    if (Object.prototype.hasOwnProperty.call(response, "errorKind")) {
+      return ErrorType.name
+    }
+
+    return DataType.name
+  }
+})
 
 export const Me: GraphQLFieldConfig<any, GraphQLContext> = {
-  type: UserType,
+  type: ResponseType(UserType, "UserType"),
   description: "Get the authenticated user",
   resolve: (_root, _args, context) => {
     const user = context.user;
+    console.log(user);
 
-    if (!user) throw new UnauthorizedError();
+    if (!user) {
+      return unauthorized();
+    };
 
     return user;
   },

@@ -6,7 +6,6 @@ import schema from "../schemas";
 import { getAuth, getToken } from "../authentication";
 import config from "../config";
 import { UserDefinition } from "../modules/user/UserModel";
-import { RouteError } from "./error";
 
 export type Context = {
   user: UserDefinition | null
@@ -20,20 +19,17 @@ const graphqlRoute = () => {
   ): Promise<OptionsData> => {    
     const token = getToken(ctx);
     const { user } = await getAuth(token, config.jwt.secret);
+    const isProd = config.app.env === "prod"; 
 
     return ({
       schema,
       pretty: true,
+      graphiql: isProd ? false : {
+        headerEditorEnabled: true,
+      },
       context: { user },
       customFormatErrorFn: (error) => {
-        // TODO: this workaround doesn't seems right.
-        // find a way to do the same using 
         ctx.log.error(error);
-
-        const err = error.originalError;
-        if (err && err instanceof RouteError) {
-          ctx.status = err.status
-        }
 
         return error;
       }

@@ -1,34 +1,53 @@
-export class RouteError extends Error {
-  message: string;
-  status: number;
-  cause: any;
-  
-  constructor({message, status, cause}: {message: string, status: number, cause?: any}) {
-    super();
+import { GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLUnionType } from "graphql";
+import { MongooseError } from "mongoose";
 
-    this.message = message;
-    this.status = status;
-    this.cause = cause;
-  }
-}
+type ErrorKind = "InvalidPayloadError" | "UnauthorizedError" | "DatabaseError";
+export type ErrorDefinition = {
+  message: string,
+  cause: string | null
+  kind: ErrorKind
+};
 
-export class InvalidPayloadError extends RouteError {
-  constructor(message: string) {
-    super({
-      message,
-      status: 422 
-    });
-  }
-}
+export const ErrorType = new GraphQLObjectType<ErrorDefinition>({
+  name: "Error",
+  fields: () => ({
+    message: {
+      type: new GraphQLNonNull(GraphQLString),
+      resolve: (error) => error.message,
+    },
+    cause: {
+      type: GraphQLString,
+      resolve: (error) => error.cause,
+    },
+    errorKind: {
+      type: GraphQLString,
+      resolve: (error) => error.kind
+    }
+  })
+})
 
-export class UnauthorizedError extends RouteError {
-  constructor() {
-    super({ message: "User not authorized", status: 401});
-  }
-}
+export const invalidPayload = (message: string): ErrorDefinition => ({
+  message: message,
+  cause: null,
+  kind: "InvalidPayloadError",
+});
 
-export class DatabaseError extends RouteError {
-  constructor({ message, cause }: { message?: string, cause: string}) {
-    super({ message: message ?? "Database query failed", status: 500, cause })
+export const unauthorized = (): ErrorDefinition => ({
+  message: "User not authorized",
+  cause: null,
+  kind: "UnauthorizedError"
+});
+
+export const databaseError = ({message, cause}: { message?: string, cause?: string}): ErrorDefinition => ({
+  message: message ?? "Database query failed",
+  cause: cause ?? null,
+  kind: "DatabaseError"
+});
+
+export const parseMongooseError = (e: unknown) => {
+  if (e instanceof MongooseError) {
+    return databaseError({ cause: e.message });
   }
-}
+
+  return databaseError({});
+};

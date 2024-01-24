@@ -4,8 +4,8 @@ import { UserType } from "../UserType";
 import config from "../../../config";
 import { UserModel } from "../UserModel";
 import { generateToken } from "../../../authentication";
-import { DatabaseError, InvalidPayloadError } from "../../../routes/error";
 import bcrypt from "bcryptjs";
+import { databaseError, invalidPayload } from "../../../routes/error";
 
 export const RegisterMutation = mutationWithClientMutationId({
   name: "RegisterMutation",
@@ -32,27 +32,27 @@ export const RegisterMutation = mutationWithClientMutationId({
     const salt = bcrypt.genSaltSync(config.jwt.saltRounds);
     const hasedPassword = bcrypt.hashSync(password, salt);
 
-    const user = new UserModel({
-      username,
-      password: hasedPassword,
-    })
+    try {
+      const user = new UserModel({
+        username,
+        password: hasedPassword,
+      })
 
-    try { 
       await user.save()
+
+      const token = generateToken(user, config.jwt.secret);
+
+      return { user, token };
     } catch (e) {
       if (!(e instanceof Error)) {
         throw new Error("unexpected error");
       }
       
       if (e.message.indexOf('duplicate key error') !== -1) {
-        throw new InvalidPayloadError("Username already registered");
+        return invalidPayload("Username already registered");
       }
 
-      throw new DatabaseError({ cause: e.message });
+      return databaseError({ cause: e.message });
     }
-
-    const token = generateToken(user, config.jwt.secret);
-
-    return { user, token };
   }
 });

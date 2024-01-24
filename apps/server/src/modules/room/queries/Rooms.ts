@@ -4,8 +4,8 @@ import { RoomConnection } from "../RoomType";
 import { RoomModel } from "../RoomModel";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import DataLoader from "dataloader";
-import { UnauthorizedError } from "../../../routes/error";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
+import { unauthorized } from "../../../routes/error";
 
 export const Rooms: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments> = {
   type: new GraphQLNonNull(RoomConnection.connectionType),
@@ -15,7 +15,7 @@ export const Rooms: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments>
     const user = context.user;
 
     if (!user) {
-      throw new UnauthorizedError
+      return unauthorized();
     };
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {

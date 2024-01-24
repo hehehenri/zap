@@ -1,7 +1,7 @@
 """Query Root"""
 type Query {
   """Get the authenticated user"""
-  me: User
+  me: Response
 
   """List users"""
   users(
@@ -51,6 +51,14 @@ type Query {
     last: Int
   ): RoomConnection!
   room(roomId: ID!): Room
+}
+
+union Response = Error | User
+
+type Error {
+  message: String!
+  cause: String
+  errorKind: String
 }
 
 type User {

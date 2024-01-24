@@ -4,8 +4,8 @@ import { UserConnection } from "../UserType";
 import DataLoader from "dataloader";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import { UserModel } from "../UserModel";
-import { UnauthorizedError } from "../../../routes/error";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
+import { unauthorized } from "../../../routes/error";
 
 export const Users: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments> = {
   type: new GraphQLNonNull(UserConnection.connectionType),
@@ -14,7 +14,9 @@ export const Users: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments>
   resolve: async (_source, args, context) => {
     const user = context.user;
 
-    if (!user) new UnauthorizedError();
+    if (!user) {
+      return unauthorized();
+    }
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {
       return mongooseLoader(UserModel, ids); 

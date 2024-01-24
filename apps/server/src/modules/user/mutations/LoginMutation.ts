@@ -6,7 +6,7 @@ import { UserType } from "../UserType";
 import { generateToken }  from "../../../authentication";
 import config from "../../../config";
 import { UserModel } from "../UserModel";
-import { InvalidPayloadError } from "../../../routes/error";
+import { invalidPayload } from "../../../routes/error";
 
 export const LoginMutation = mutationWithClientMutationId({
   name: "LoginMutation",
@@ -30,17 +30,18 @@ export const LoginMutation = mutationWithClientMutationId({
     }
   },
   mutateAndGetPayload: async ({ username, password: plainTextPassword }) => {
+    // TODO: +password?
     const user = await UserModel.findOne({ username }).select('+password').exec();
 
-    if (!user) throw new InvalidPayloadError(
-      "Invalid password or user not found"
-    );
+    if (!user) {
+      return invalidPayload("Invalid password or user not found");
+    }
     
     const isValidPassword = bcrypt.compareSync(plainTextPassword, user.password);
 
-    if (!isValidPassword) throw new InvalidPayloadError(
-      "Invalid password or user not found"
-    );
+    if (!isValidPassword) {
+      return invalidPayload("Invalid password or user not found");
+    }
 
     const token = generateToken(user, config.jwt.secret);
 
