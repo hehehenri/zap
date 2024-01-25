@@ -51,7 +51,7 @@ export const RegisterMutation = mutationWithClientMutationId({
       throw new DatabaseError({ cause: e.message });
     }
 
-    const token = generateToken(user, config.jwt.secret);
+    const token = generateToken(user);
 
     return { user, token };
   }

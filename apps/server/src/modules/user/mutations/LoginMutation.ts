@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 
 import { UserType } from "../UserType";
 import { generateToken }  from "../../../authentication";
-import config from "../../../config";
 import { UserModel } from "../UserModel";
 import { InvalidPayloadError } from "../../../routes/error";
 
@@ -42,7 +41,7 @@ export const LoginMutation = mutationWithClientMutationId({
       "Invalid password or user not found"
     );
 
-    const token = generateToken(user, config.jwt.secret);
+    const token = generateToken(user);
 
     return {
       token,
