@@ -1,4 +1,6 @@
+import config from "../../config";
 import { UserModel } from "./UserModel"
+import bcrypt from "bcryptjs";
 
 let counter = 0;
 
@@ -9,9 +11,10 @@ const getCounter = () => {
 }
 
 export const createUser = () => {
-  const index = getCounter();
-  
+  const index = getCounter();  
+
   return new UserModel({
-    username: `user#${index}`
+    username: `user#${index}`,
+    password: bcrypt.hashSync("password", config.jwt.saltRounds)
   }).save();
 }

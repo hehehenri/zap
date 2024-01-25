@@ -4,12 +4,18 @@ import request from "supertest";
 import { createApp } from "../../../../app";
 import { createUser } from "../../fixture";
 import { database } from "../../../../test";
-
-beforeAll(database.connect);
-afterEach(database.clear);
-afterAll(database.disconnect);
+import { MongoMemoryServer } from "mongodb-memory-server";
 
 describe('user/me', () => {
+  let db: MongoMemoryServer;
+  
+  beforeAll(async () => {
+    db = await MongoMemoryServer.create();
+    database.connect(db) 
+  });
+  afterAll(async () => database.disconnect(db));
+  afterEach(database.clear);
+  
   it("should return logged user", async () => {
     const user: UserDefinition = await createUser(); 
 
