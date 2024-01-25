@@ -35,7 +35,7 @@ const logger = () => {
   return koaBunyan(logger);
 }
 
-const createApp = () => {
+export const createApp = () => {
   const app = new Koa<Koa.DefaultState, KoaContext>();
 
   app.use(cors({ credentials: true }));
