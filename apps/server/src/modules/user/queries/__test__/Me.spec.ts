@@ -41,5 +41,30 @@ describe('user/me', () => {
 
     expect(response.status).toBe(200);
     expect(response.body.data.me.username).toMatch("user#1");
-  });  
-});
+  });
+
+  it(
+    "should return unauthorized error when token is not provided",
+    async () => {
+      const payload = {
+        query: `
+          query Me {
+            me { username }
+          }
+        `,
+        variables: {}
+      };
+
+      const response = await request(createApp().callback())
+        .post("/graphql")
+        .set({
+          Accept: "application/json",
+          'Content-Type': "application/json",
+        })
+        .send(JSON.stringify(payload));
+
+      expect(response.status).toBe(401);
+      expect(response.body.errors[0].message).toBe("User not authorized")
+    });
+  }
+);
