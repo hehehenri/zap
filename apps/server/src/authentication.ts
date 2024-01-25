@@ -22,11 +22,11 @@ export const getToken = (ctx: KoaContext) => {
   return null
 }
 
-export const getAuth = async (token: string | null, secret: string) => {
+export const getAuth = async (token: string | null) => {
   if (!token) return { user: null };
 
   try {
-    const decoded = jwt.verify(token, secret) as TokenPayload;
+    const decoded = jwt.verify(token, config.jwt.secret) as TokenPayload;
 
     const user = await UserModel.findById(decoded.id);
     return { user };

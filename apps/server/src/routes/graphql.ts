@@ -19,7 +19,7 @@ const graphqlRoute = () => {
     ctx: KoaContext,
   ): Promise<OptionsData> => {    
     const token = getToken(ctx);
-    const { user } = await getAuth(token, config.jwt.secret);
+    const { user } = await getAuth(token);
 
     return ({
       schema,

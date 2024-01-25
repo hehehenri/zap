@@ -6,7 +6,7 @@ import { createUser } from "../../fixture";
 import { database } from "../../../../test";
 import { MongoMemoryServer } from "mongodb-memory-server";
 
-describe('user/me', () => {
+describe('user/queries/me', () => {
   let db: MongoMemoryServer;
   
   beforeAll(async () => {
