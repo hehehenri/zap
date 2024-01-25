@@ -14,7 +14,7 @@ export const Users: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments>
   resolve: async (_source, args, context) => {
     const user = context.user;
 
-    if (!user) new UnauthorizedError();
+    if (!user) throw new UnauthorizedError();
 
     const loader = new DataLoader<string, Promise<any[]>>(ids => {
       return mongooseLoader(UserModel, ids); 
