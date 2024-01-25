@@ -24,6 +24,9 @@ const graphqlRoute = () => {
     return ({
       schema,
       pretty: true,
+      graphiql: {
+        headerEditorEnabled: true
+      },
       context: { user },
       customFormatErrorFn: (error) => {
         // TODO: this workaround doesn't seems right.

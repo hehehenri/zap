@@ -24,7 +24,7 @@ describe('user/me', () => {
     const payload = {
       query: `
         query Me {
-          me { id }
+          me { username }
         }
       `,
       variables: {}
@@ -40,5 +40,6 @@ describe('user/me', () => {
       .send(JSON.stringify(payload));
 
     expect(response.status).toBe(200);
+    expect(response.body.data.me.username).toMatch("user#1");
   });  
 });
