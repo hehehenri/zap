@@ -4,7 +4,6 @@ import Router from "koa-router";
 
 import schema from "../schemas";
 import { getAuth, getToken } from "../authentication";
-import config from "../config";
 import { UserDefinition } from "../modules/user/UserModel";
 import { RouteError } from "./error";
 

@@ -3,9 +3,8 @@ import { GraphQLNonNull, GraphQLString } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
 import { Context } from "../../../routes/graphql";
-import mongoose from "mongoose";
 import { UserModel } from "../../user/UserModel";
-import { InvalidPayloadError } from "../../../routes/error";
+import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 
 export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   name: "GetOrCreateRoom",
@@ -21,7 +20,7 @@ export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   },
   mutateAndGetPayload: async ({ userId }: { userId: string }, ctx: Context) => {
     const authUser = ctx.user;
-    if (!authUser) throw new Error("new authenticated");
+    if (!authUser) throw new UnauthorizedError();
 
     const user = await UserModel.findById(userId);
     if (!user) throw new InvalidPayloadError("user not found");
