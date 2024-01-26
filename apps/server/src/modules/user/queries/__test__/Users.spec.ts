@@ -1,10 +1,6 @@
 import { UserDefinition } from "../../UserModel";
 import { generateToken } from "../../../../authentication";
-import request from "supertest";
-import { createApp } from "../../../../app";
 import { createUser } from "../../fixture";
-import { database } from "../../../../test";
-import { MongoMemoryServer } from "mongodb-memory-server";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
 
 const query = {
