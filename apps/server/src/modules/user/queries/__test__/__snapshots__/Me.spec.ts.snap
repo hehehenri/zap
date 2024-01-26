@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`user/queries/me should return logged user 1`] = `
+{
+  "me": {
+    "username": "user#1",
+  },
+}
+`;
+
+exports[`user/queries/me should return unauthorized error when token is not provided 1`] = `
+[
+  {
+    "locations": [
+      {
+        "column": 7,
+        "line": 3,
+      },
+    ],
+    "message": "User not authorized",
+    "path": [
+      "me",
+    ],
+  },
+]
+`;
