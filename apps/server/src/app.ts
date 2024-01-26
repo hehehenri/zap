@@ -12,10 +12,7 @@ import { errorHandlerMiddleware } from "./routes/middlewares";
 import { useServer } from "graphql-ws/lib/use/ws";
 import config from "./config";
 
-const logger = () => {  
-  const src = require.main?.path;
-  const file = 'logs.json';
-  
+const logger = () => {
   const options: LoggerOptions = {
     name: 'zap',
     serializers: bunyan.stdSerializers,
@@ -26,12 +23,17 @@ const logger = () => {
       },
       {
         level: 'info',
-        path: src ? `${src}/../${file}` : `/var/tmp/${file}`
+        path: '/var/tmp/logs.json'
       }
     ]
   };
   
   const logger = bunyan.createLogger(options);
+
+  if (config.app.env === "test") {
+    logger.level(bunyan.FATAL + 1);
+  }
+  
   return koaBunyan(logger);
 }
 

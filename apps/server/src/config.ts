@@ -8,7 +8,9 @@ const schema = z.object({
   API_PORT: z.string(),
   TOKEN_SECRET: z.string(),
   TOKEN_SALT_ROUNDS: z.coerce.number(),
-  ENV: z.literal("prod").or(z.literal("local")),
+  ENV: z.literal("prod")
+    .or(z.literal("local"))
+    .or(z.literal("test")),
 })
 
 const env = schema.parse(process.env);
