@@ -1,0 +1,42 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`room/queries/rooms should not list room if user is not a member 1`] = `
+{
+  "rooms": {
+    "edges": [],
+  },
+}
+`;
+
+exports[`room/queries/rooms should return paginated room connections 1`] = `
+{
+  "rooms": {
+    "edges": [
+      {
+        "node": {
+          "participants": [
+            {
+              "username": "roomsusera",
+            },
+            {
+              "username": "roomsuserb",
+            },
+          ],
+        },
+      },
+      {
+        "node": {
+          "participants": [
+            {
+              "username": "roomsusera",
+            },
+            {
+              "username": "roomsuserc",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
+`;
