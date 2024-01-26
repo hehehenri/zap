@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`user/queries/users should return a collection of all users 1`] = `
+{
+  "users": {
+    "edges": [
+      {
+        "node": {
+          "username": "user#1",
+        },
+      },
+    ],
+  },
+}
+`;
+
+exports[`user/queries/users should return unauthorized error when token is not provided 1`] = `
+[
+  {
+    "locations": [
+      {
+        "column": 7,
+        "line": 3,
+      },
+    ],
+    "message": "User not authorized",
+    "path": [
+      "users",
+    ],
+  },
+]
+`;
