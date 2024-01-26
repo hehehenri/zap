@@ -1,0 +1,16 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`room/queries/room should return room 1`] = `
+{
+  "room": {
+    "participants": [
+      {
+        "username": "roomusera",
+      },
+      {
+        "username": "roomuserb",
+      },
+    ],
+  },
+}
+`;
