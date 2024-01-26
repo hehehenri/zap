@@ -1,0 +1,28 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`message/mutations/storeMessage can't add message to room when not a member 1`] = `
+[
+  {
+    "locations": [
+      {
+        "column": 7,
+        "line": 3,
+      },
+    ],
+    "message": "you can't send messages on this room",
+    "path": [
+      "storeMessage",
+    ],
+  },
+]
+`;
+
+exports[`message/mutations/storeMessage should add message to room 1`] = `
+{
+  "storeMessage": {
+    "message": {
+      "content": "message content",
+    },
+  },
+}
+`;

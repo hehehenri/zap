@@ -1,5 +1,4 @@
 
-import mongoose from "mongoose";
 import { generateToken } from "../../../../authentication";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
 import { createUser } from "../../../user/fixture";

@@ -5,9 +5,9 @@ import { MessageType } from "../MessageType";
 import { Context } from "../../../routes/graphql";
 import { MessageModel } from "../MessageModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
-import mongoose from "mongoose";
 import { events, pubsub } from "../../../pubsub";
 import { RoomModel } from "../../room/RoomModel";
+import { isRoomMember } from "../../room/helpers";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
@@ -31,11 +31,9 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     if (!room) throw new InvalidPayloadError("room not found");
 
-    const isRoomMember = room.participants
-      .map(u => u._id.toString())
-      .includes(user._id.toString());
-
-    if (!isRoomMember) throw new InvalidPayloadError("you can't send messages on this room");
+    if (!isRoomMember(room, user)) {
+      throw new InvalidPayloadError("you can't send messages on this room");
+    }
 
     const message = new MessageModel({
       content,

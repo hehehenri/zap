@@ -3,7 +3,7 @@ import { GraphQLContext } from "../../../schemas/context";
 import { RoomType } from "../RoomType";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import { RoomModel } from "../RoomModel";
-import { isParticipant } from "../utils";
+import { isRoomMember } from "../helpers";
 
 type Args = {
   roomId: string
@@ -23,7 +23,7 @@ export const Room: GraphQLFieldConfig<any, GraphQLContext, Args> = {
     if (!room)
       throw new InvalidPayloadError("room doesn't exists")
 
-    if (!isParticipant(room, user))
+    if (!isRoomMember(room, user))
       throw new InvalidPayloadError("you can't access this room information");
 
     return room;
