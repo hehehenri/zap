@@ -1,79 +1,44 @@
-import request from "supertest";
-import { createApp } from "../../../../app";
 import { createUser } from "../../fixture";
-import { database } from "../../../../test";
-import { MongoMemoryServer } from "mongodb-memory-server";
+import { describeWithDb, testQuery } from "../../../../test/helpers";
 import { getAuth } from "../../../../authentication";
 
-describe('user/mutations/login', () => {
-  let db: MongoMemoryServer;
-  
-  beforeAll(async () => {
-    db = await MongoMemoryServer.create();
-    database.connect(db) 
-  });
-  afterAll(async () => database.disconnect(db));
-  afterEach(database.clear);
-  
-  it("should return user token", async () => {
-    const username = "loginusername";
-    await createUser({ username, password: "password" });
-    
-    const payload = {
-      query: `
-        mutation Login($username: String! $password: String!) {
-          login(input: { username: $username, password: $password}) { token }
-        }
-      `,
-      variables: {
-        username,
-        password: "password"
-      }
-    };
-  
-    const response = await request(createApp().callback())
-      .post("/graphql")
-      .set({
-        Accept: "application/json",
-        'Content-Type': "application/json",
-      })
-      .send(JSON.stringify(payload));
+const query = ({ username, password }: { username?: string, password?: string }) => ({
+  query: `
+    mutation Login($username: String! $password: String!) {
+      login(input: { username: $username, password: $password}) { token }
+    }
+  `,
+  variables: {
+    username: username ?? "username",
+    password: password ?? "password",
+  }
+})
 
-    const token = response.body.data.login.token;
-    const { user } = await getAuth(token);
+describeWithDb('user/mutations/login', () => {
+  it("should return user token", async () => {
+    const data = { username: "username", password: "password"};
+    const user = await createUser(data);
+      
+    const response = await testQuery({ query: query(data) });
 
     expect(response.status).toBe(200);
-    expect(user?.username).toBe(username);
+
+    const token = response.body.data.login.token;
+    const { user: u } = await getAuth(token); 
+
+    expect(u?.username).toBe(user.username);
   });
 
   it(
     "should return invalid payload when username or password is invalid",
     async () => {
-      const username = "loginivnalidusername";
-      await createUser({ username, password: "password" });
+      const data = { username: "username", password: "password" };
+      await createUser(data);
       
-      const payload = {
-        query: `
-          mutation Login($username: String! $password: String!) {
-            login(input: { username: $username, password: $password}) { token }
-          }
-        `,
-        variables: {
-          username,
-          password: "invalidpassword"
-        }
-      };
-
-      const response = await request(createApp().callback())
-        .post("/graphql")
-        .set({
-          Accept: "application/json",
-          'Content-Type': "application/json",
-        })
-        .send(JSON.stringify(payload));
+      const response = await testQuery({ query: query({ ...data, password: "invalidPassword" }) })
 
       expect(response.status).toBe(422);
-      expect(response.body.errors[0].message).toBe("Invalid password or user not found")
+      expect(response.body.errors).toMatchSnapshot();
     });
   }
 );

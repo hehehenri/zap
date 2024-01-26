@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`user/mutations/register should return invalid payload when username already exists 1`] = `
+[
+  {
+    "locations": [
+      {
+        "column": 7,
+        "line": 3,
+      },
+    ],
+    "message": "Username already registered",
+    "path": [
+      "register",
+    ],
+  },
+]
+`;
