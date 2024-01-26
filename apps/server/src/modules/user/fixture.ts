@@ -12,7 +12,7 @@ const getCounter = () => {
 
 type Fields = Pick<UserDefinition, Exclude<keyof UserDefinition, "_id">>
 
-export const createUser = (fields?: DeepPartial<Fields>) => {
+export const createUser = async (fields?: DeepPartial<Fields>) => {
   const index = getCounter();
 
   const plainTextPassword = fields?.password ?? "password";
@@ -20,5 +20,8 @@ export const createUser = (fields?: DeepPartial<Fields>) => {
   const password = bcrypt.hashSync(plainTextPassword, config.jwt.saltRounds);
   const username = fields?.username ?? `user#${index}`;
 
-  return new UserModel({ password, username }).save();
+  const user = new UserModel({ password, username });
+  await user.save();
+
+  return user;
 }
