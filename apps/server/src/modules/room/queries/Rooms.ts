@@ -1,13 +1,13 @@
 import { GraphQLFieldConfig, GraphQLNonNull } from "graphql";
-import { GraphQLContext } from "../../../schemas/context";
 import { RoomConnection } from "../RoomType";
 import { RoomModel } from "../RoomModel";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import DataLoader from "dataloader";
 import { UnauthorizedError } from "../../../routes/error";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
+import { Context } from "@/context";
 
-export const Rooms: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments> = {
+export const Rooms: GraphQLFieldConfig<any, Context, ConnectionArguments> = {
   type: new GraphQLNonNull(RoomConnection.connectionType),
   description: "List user's rooms",
   args: connectionArgs,

@@ -4,13 +4,13 @@ import cors from "koa-cors";
 import bunyan, { LoggerOptions } from "bunyan";
 import koaBunyan from "koa-bunyan-logger";
 import routes from "./routes";
-import { KoaContext } from "./schemas/context";
 import { execute, subscribe } from "graphql";
 import { WebSocketServer } from "ws";
 import schema from "./schemas";
 import { errorHandlerMiddleware } from "./routes/middlewares";
 import { useServer } from "graphql-ws/lib/use/ws";
 import config from "./config";
+import { KoaContext } from "./context";
 
 const logger = () => {
   const options: LoggerOptions = {

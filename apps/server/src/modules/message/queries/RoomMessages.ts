@@ -1,13 +1,13 @@
 import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
-import { GraphQLContext } from "../../../schemas/context";
 import { MessageConnection } from "../MessageType";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
 import DataLoader from "dataloader";
 import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
 import { MessageModel } from "../MessageModel";
 import { UnauthorizedError } from "../../../routes/error";
+import { Context } from "@/context";
 
-export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments & {
+export const RoomMessages: GraphQLFieldConfig<any, Context, ConnectionArguments & {
   roomId: string
 }> = {
   type: new GraphQLNonNull(MessageConnection.connectionType),

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { UserModel, UserDefinition } from "./modules/user/UserModel";
-import { KoaContext } from "./schemas/context";
 import config from "./config";
+import { KoaContext } from "./context";
 
 export type Config = {
   secret: string

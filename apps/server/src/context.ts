@@ -1,8 +1,8 @@
-import { Context } from "koa";
+import { Context as KoaDefaultContext } from "koa";
 import WebSocket, { WebSocketServer } from "ws";
-import { UserDefinition } from "../modules/user/UserModel";
+import { UserDefinition } from "./modules/user/UserModel";
 
-export type GraphQLContext = {
+export type Context = {
   user: UserDefinition | null,
 }
 
@@ -11,4 +11,4 @@ export type KoaContext = {
     server: WebSocketServer;
     ws: () => Promise<WebSocket>;
   }  
-} & Context;
+} & KoaDefaultContext ;
