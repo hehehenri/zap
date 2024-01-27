@@ -1,4 +1,4 @@
-import { UserDefinition } from "../../UserModel";
+import { UserDocument } from "../../UserModel";
 import { generateToken } from "../../../../authentication";
 import { createUser } from "../../fixture";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
@@ -20,7 +20,7 @@ const query = {
 
 describeWithDb('user/queries/users', () => {  
   it("should return a collection of all users", async () => {
-    const firstUser: UserDefinition = await createUser(); 
+    const firstUser: UserDocument = await createUser(); 
     await createUser(); 
 
     const token = generateToken(firstUser);

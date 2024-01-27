@@ -2,12 +2,12 @@ import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLString } from "graphql/type";
 
 import { MessageType } from "../MessageType";
-import { Context } from "../../../routes/graphql";
 import { MessageModel } from "../MessageModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
 import { events, pubsub } from "../../../pubsub";
 import { RoomModel } from "../../room/RoomModel";
 import { isRoomMember } from "../../room/helpers";
+import { Context } from "@/context";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",

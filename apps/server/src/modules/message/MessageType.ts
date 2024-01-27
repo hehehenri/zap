@@ -4,7 +4,7 @@ import { connectionDefinitions } from "graphql-relay";
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
 import { RoomDefinition } from "../room/RoomModel";
-import { UserDefinition } from "../user/UserModel";
+import { UserDocument } from "../user/UserModel";
 
 export const MessageType = new GraphQLObjectType<MessageDefinition>({
   name: 'Message',
@@ -22,7 +22,7 @@ export const MessageType = new GraphQLObjectType<MessageDefinition>({
       resolve: async (message) => {
         const messageModel = await MessageModel
           .findById(message._id)
-          .populate<{ sender: UserDefinition }>('sender')
+          .populate<{ sender: UserDocument }>('sender')
           .exec();
 
         return messageModel?.sender;

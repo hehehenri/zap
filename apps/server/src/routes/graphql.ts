@@ -1,17 +1,9 @@
-import { Context as KoaContext, Request, Response } from "koa"
+import { Request, Response } from "koa"
 import { OptionsData, graphqlHTTP } from "koa-graphql"
 import Router from "koa-router";
-
 import schema from "../schemas";
-import { getAuth, getToken } from "../authentication";
-import { UserDefinition } from "../modules/user/UserModel";
 import { RouteError } from "./error";
-import { buildContext } from "@/context";
-
-export type Context = {
-  user: UserDefinition | null
-}
-
+import { KoaContext, buildContext } from "@/context";
 
 const options = async (
   _req: Request,

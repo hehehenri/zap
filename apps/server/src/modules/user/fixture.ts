@@ -1,5 +1,5 @@
 import config from "../../config";
-import { UserDefinition, UserModel } from "./UserModel"
+import { UserDocument, UserModel } from "./UserModel"
 import bcrypt from "bcryptjs";
 
 let counter = 0;
@@ -10,7 +10,7 @@ const getCounter = () => {
   return counter;
 }
 
-type Fields = Pick<UserDefinition, Exclude<keyof UserDefinition, "_id">>
+type Fields = Pick<UserDocument, Exclude<keyof UserDocument, "_id">>
 
 export const createUser = async (fields?: DeepPartial<Fields>) => {
   const index = getCounter();

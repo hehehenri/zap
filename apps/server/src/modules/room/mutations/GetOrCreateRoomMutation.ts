@@ -2,9 +2,9 @@ import { mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLNonNull, GraphQLString } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
-import { Context } from "../../../routes/graphql";
 import { UserModel } from "../../user/UserModel";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
+import { Context } from "@/context";
 
 export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   name: "GetOrCreateRoom",

@@ -5,7 +5,7 @@ import { RoomDefinition, RoomModel } from "./RoomModel";
 import { UserType } from "../user/UserType";
 import MessageType from "../message/MessageType";
 import { MessageDefinition } from "../message/MessageModel";
-import { UserDefinition } from "../user/UserModel";
+import { UserDocument } from "../user/UserModel";
 
 const list = <T extends GraphQLNullableType>(type: T) => {
   return new GraphQLNonNull(new GraphQLList( new GraphQLNonNull(type)))
@@ -24,7 +24,7 @@ export const RoomType: GraphQLObjectType<RoomDefinition, any> = new GraphQLObjec
       resolve: async (room) => {
         const roomModel = await RoomModel
           .findById(room._id)
-          .populate<{ participants: UserDefinition[] }>('participants')
+          .populate<{ participants: UserDocument[] }>('participants')
           .exec();
 
         return roomModel?.participants
