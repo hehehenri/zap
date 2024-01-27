@@ -6,42 +6,39 @@ import schema from "../schemas";
 import { getAuth, getToken } from "../authentication";
 import { UserDefinition } from "../modules/user/UserModel";
 import { RouteError } from "./error";
+import { buildContext } from "@/context";
 
 export type Context = {
   user: UserDefinition | null
 }
 
+
+const options = async (
+  _req: Request,
+  _res: Response,
+  ctx: KoaContext,
+): Promise<OptionsData> => ({
+  schema,
+  pretty: true,
+  graphiql: {
+    headerEditorEnabled: true
+  },
+  context: await buildContext(ctx),
+  customFormatErrorFn: (error) => {
+    // TODO: this workaround doesn't seems right.
+    // find a way to do the same using 
+    ctx.log.error(error);
+
+    const err = error.originalError;
+    if (err && err instanceof RouteError) {
+      ctx.status = err.status
+    }
+
+    return error;
+  }
+});
+
 const graphqlRoute = () => {
-  const options = async (
-    _req: Request,
-    _res: Response,
-    ctx: KoaContext,
-  ): Promise<OptionsData> => {    
-    const token = getToken(ctx);
-    const { user } = await getAuth(token);
-
-    return ({
-      schema,
-      pretty: true,
-      graphiql: {
-        headerEditorEnabled: true
-      },
-      context: { user },
-      customFormatErrorFn: (error) => {
-        // TODO: this workaround doesn't seems right.
-        // find a way to do the same using 
-        ctx.log.error(error);
-
-        const err = error.originalError;
-        if (err && err instanceof RouteError) {
-          ctx.status = err.status
-        }
-
-        return error;
-      }
-    });
-  };
-
   const router = new Router();
 
   router.all('/graphql', graphqlHTTP(options));

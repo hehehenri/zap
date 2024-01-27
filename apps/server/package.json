@@ -38,6 +38,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@entria/graphql-mongo-helpers": "^1.1.2",
     "@entria/graphql-mongoose-loader": "^4.4.0",
     "bcryptjs": "^2.4.3",
     "bunyan": "^1.8.15",
