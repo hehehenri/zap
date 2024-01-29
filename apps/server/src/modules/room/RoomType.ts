@@ -4,7 +4,7 @@ import { connectionDefinitions } from "graphql-relay";
 import { RoomDocument, RoomModel } from "./RoomModel";
 import { UserType } from "../user/UserType";
 import MessageType from "../message/MessageType";
-import { MessageDefinition } from "../message/MessageModel";
+import { MessageDocument } from "../message/MessageModel";
 import { UserDocument } from "../user/UserModel";
 
 const list = <T extends GraphQLNullableType>(type: T) => {
@@ -39,7 +39,7 @@ export const RoomType: GraphQLObjectType<RoomDocument, any> = new GraphQLObjectT
       resolve: async (room) => {        
         const roomModel = await RoomModel
           .findById(room._id)
-          .populate<{ lastMessage: MessageDefinition}>('lastMessage')
+          .populate<{ lastMessage: MessageDocument}>('lastMessage')
           .exec();
 
         return roomModel?.lastMessage

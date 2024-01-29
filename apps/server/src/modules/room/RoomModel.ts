@@ -1,10 +1,10 @@
 import { Document, Schema, Types, model } from "mongoose";
-import { MessageDefinition} from "../message/MessageModel";
+import { MessageDocument } from "../message/MessageModel";
 
 export interface RoomDocument extends Document {
   participants: Types.ObjectId[];
   createdAt: Date,
-  lastMessage: MessageDefinition | null,
+  lastMessage: MessageDocument | null,
   updatedAt: Date,
 }
 

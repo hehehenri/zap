@@ -1,12 +1,12 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { MessageDefinition, MessageModel } from "./MessageModel";
+import { MessageDocument, MessageModel } from "./MessageModel";
 import { connectionDefinitions } from "graphql-relay";
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
 import { RoomDocument } from "../room/RoomModel";
 import { UserDocument } from "../user/UserModel";
 
-export const MessageType = new GraphQLObjectType<MessageDefinition>({
+export const MessageType = new GraphQLObjectType<MessageDocument>({
   name: 'Message',
   fields: () => ({
     id: {
