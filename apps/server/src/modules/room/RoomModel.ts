@@ -1,18 +1,17 @@
-import mongoose from "mongoose";
+import { Document, Schema, Types, model } from "mongoose";
 import { MessageDefinition} from "../message/MessageModel";
 
-export type RoomDefinition = {
-  readonly _id: mongoose.Types.ObjectId;
-  readonly participants: mongoose.Types.ObjectId[];
-  readonly createdAt: Date,
+export interface RoomDocument extends Document {
+  participants: Types.ObjectId[];
+  createdAt: Date,
   lastMessage: MessageDefinition | null,
   updatedAt: Date,
 }
 
-const roomSchema = new mongoose.Schema<RoomDefinition>(
+const roomSchema = new Schema<RoomDocument>(
   {
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }],
-    lastMessage: { type: mongoose.Schema.Types.ObjectId, ref: "Message", required: false, default: null }
+    participants: [{ type: Schema.Types.ObjectId, ref: "User", required: true }],
+    lastMessage: { type: Schema.Types.ObjectId, ref: "Message", required: false, default: null }
   },
   {
     collection: "Room",
@@ -21,4 +20,4 @@ const roomSchema = new mongoose.Schema<RoomDefinition>(
 )
 
 
-export const RoomModel = mongoose.model<RoomDefinition>("Room", roomSchema);
+export const RoomModel = model<RoomDocument>("Room", roomSchema);

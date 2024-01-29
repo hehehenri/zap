@@ -3,7 +3,7 @@ import { MessageDefinition, MessageModel } from "./MessageModel";
 import { connectionDefinitions } from "graphql-relay";
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
-import { RoomDefinition } from "../room/RoomModel";
+import { RoomDocument } from "../room/RoomModel";
 import { UserDocument } from "../user/UserModel";
 
 export const MessageType = new GraphQLObjectType<MessageDefinition>({
@@ -33,7 +33,7 @@ export const MessageType = new GraphQLObjectType<MessageDefinition>({
       resolve: async message => {
         const messageModel = await MessageModel
           .findById(message._id)
-          .populate<{ room: RoomDefinition }>('room')
+          .populate<{ room: RoomDocument }>('room')
           .exec();
 
         return messageModel?.room;

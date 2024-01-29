@@ -1,7 +1,7 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString, GraphQLList, GraphQLNullableType } from "graphql/type";
 import { connectionDefinitions } from "graphql-relay";
 
-import { RoomDefinition, RoomModel } from "./RoomModel";
+import { RoomDocument, RoomModel } from "./RoomModel";
 import { UserType } from "../user/UserType";
 import MessageType from "../message/MessageType";
 import { MessageDefinition } from "../message/MessageModel";
@@ -11,7 +11,7 @@ const list = <T extends GraphQLNullableType>(type: T) => {
   return new GraphQLNonNull(new GraphQLList( new GraphQLNonNull(type)))
 }
 
-export const RoomType: GraphQLObjectType<RoomDefinition, any> = new GraphQLObjectType<RoomDefinition>({
+export const RoomType: GraphQLObjectType<RoomDocument, any> = new GraphQLObjectType<RoomDocument>({
   name: "Room",
   description: "Room Type",
   fields: () => ({

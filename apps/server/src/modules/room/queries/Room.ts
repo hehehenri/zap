@@ -1,9 +1,9 @@
-import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull, GraphQLString } from "graphql";
+import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
 import { RoomType } from "../RoomType";
 import { InvalidPayloadError, UnauthorizedError } from "../../../routes/error";
-import { RoomModel } from "../RoomModel";
 import { isRoomMember } from "../helpers";
 import { Context } from "@/context";
+import { RoomLoader } from "../RoomLoader";
 
 type Args = {
   roomId: string
@@ -18,7 +18,7 @@ export const Room: GraphQLFieldConfig<any, Context, Args> = {
     const user = context.user;
     if (!user) throw new UnauthorizedError(); 
 
-    const room = await RoomModel.findById(args.roomId);
+    const room = await RoomLoader.load(context, args.roomId);
 
     if (!room)
       throw new InvalidPayloadError("room doesn't exists")
