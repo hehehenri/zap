@@ -16,12 +16,21 @@ export type Context = {
   dataloaders: DataLoaders
 }
 
+export const initialContext = () => {
+  return {
+    user: null,
+    dataloaders: buildLoaders(),
+  }
+}
+
 export const buildContext = async (ctx: KoaContext): Promise<Context> => {
-  const token = getToken(ctx);
-  const { user } = await getAuth(token);
+  const context = initialContext();
+  
+  const token = getToken(ctx);  
+  const { user } = await getAuth(token, context);
 
   return {
+    ...context,
     user,
-    dataloaders: buildLoaders()
   };
 }
