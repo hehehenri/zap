@@ -1,4 +1,4 @@
-import { KoaContext } from "../../schemas/context";
+import { KoaContext } from "@/context";
 import { RouteError } from "../error";
 
 export const errorHandlerMiddleware = () => async (ctx: KoaContext, next: () => Promise<any>) => {      

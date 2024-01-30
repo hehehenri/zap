@@ -3,9 +3,9 @@ import { generateToken } from "../../../../authentication";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
 import { createUser } from "../../../user/fixture";
 import { createRoom } from "../../fixture";
-import { RoomDefinition } from "../../RoomModel";
+import { RoomDocument } from "../../RoomModel";
 
-const query = (room: RoomDefinition) => ({
+const query = (room: RoomDocument) => ({
   query: `
     query Room($roomId: ID!) {
       room(roomId: $roomId) {

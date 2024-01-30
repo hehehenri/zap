@@ -1,8 +1,8 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { UserDefinition } from "./UserModel";
+import { UserDocument } from "./UserModel";
 import { connectionDefinitions } from "graphql-relay";
 
-export const UserType = new GraphQLObjectType<UserDefinition>({
+export const UserType = new GraphQLObjectType<UserDocument>({
   name: "User",
   fields: () => ({
     id: {

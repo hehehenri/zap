@@ -22,7 +22,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             autoComplete="off"
             spellCheck={false}
             className={cn(
-              "dark:bg-zinc-800 dark:ring-zinc-700 text-zinc-700",
+              "text-zinc-700",
               "px-2.5 py-1 outline-none",
               className,
             )}

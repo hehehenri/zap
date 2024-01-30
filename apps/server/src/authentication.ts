@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
-import { UserModel, UserDefinition } from "./modules/user/UserModel";
-import { KoaContext } from "./schemas/context";
+import { UserDocument } from "./modules/user/UserModel";
 import config from "./config";
+import { Context, KoaContext } from "./context";
+import { UserLoader } from "./modules/user/UserLoader";
 
 export type Config = {
   secret: string
@@ -22,19 +23,19 @@ export const getToken = (ctx: KoaContext) => {
   return null
 }
 
-export const getAuth = async (token: string | null) => {
+export const getAuth = async (token: string | null, context: Context) => {
   if (!token) return { user: null };
 
   try {
     const decoded = jwt.verify(token, config.jwt.secret) as TokenPayload;
+    const user = await UserLoader.load(context, decoded.id);
 
-    const user = await UserModel.findById(decoded.id);
     return { user };
   } catch (_) {
     return { user: null };
   }
 }
 
-export const generateToken = (user: UserDefinition) => {
+export const generateToken = (user: UserDocument) => {
   return jwt.sign({ id: user._id }, config.jwt.secret);
 }

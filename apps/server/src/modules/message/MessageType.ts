@@ -1,12 +1,12 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { MessageDefinition, MessageModel } from "./MessageModel";
+import { MessageDocument, MessageModel } from "./MessageModel";
 import { connectionDefinitions } from "graphql-relay";
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
-import { RoomDefinition } from "../room/RoomModel";
-import { UserDefinition } from "../user/UserModel";
+import { RoomDocument } from "../room/RoomModel";
+import { UserDocument } from "../user/UserModel";
 
-export const MessageType = new GraphQLObjectType<MessageDefinition>({
+export const MessageType = new GraphQLObjectType<MessageDocument>({
   name: 'Message',
   fields: () => ({
     id: {
@@ -22,7 +22,7 @@ export const MessageType = new GraphQLObjectType<MessageDefinition>({
       resolve: async (message) => {
         const messageModel = await MessageModel
           .findById(message._id)
-          .populate<{ sender: UserDefinition }>('sender')
+          .populate<{ sender: UserDocument }>('sender')
           .exec();
 
         return messageModel?.sender;
@@ -33,7 +33,7 @@ export const MessageType = new GraphQLObjectType<MessageDefinition>({
       resolve: async message => {
         const messageModel = await MessageModel
           .findById(message._id)
-          .populate<{ room: RoomDefinition }>('room')
+          .populate<{ room: RoomDocument }>('room')
           .exec();
 
         return messageModel?.room;

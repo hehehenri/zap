@@ -1,13 +1,12 @@
 import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
-import { GraphQLContext } from "../../../schemas/context";
 import { MessageConnection } from "../MessageType";
 import { ConnectionArguments, connectionArgs } from "graphql-relay";
-import DataLoader from "dataloader";
-import { connectionFromMongoCursor, mongooseLoader } from "@entria/graphql-mongoose-loader";
-import { MessageModel } from "../MessageModel";
 import { UnauthorizedError } from "../../../routes/error";
+import { Context } from "@/context";
+import { MessageLoader } from "../MessageLoader";
+import { withFilter } from "@entria/graphql-mongo-helpers";
 
-export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArguments & {
+export const RoomMessages: GraphQLFieldConfig<any, Context, ConnectionArguments & {
   roomId: string
 }> = {
   type: new GraphQLNonNull(MessageConnection.connectionType),
@@ -23,16 +22,9 @@ export const RoomMessages: GraphQLFieldConfig<any, GraphQLContext, ConnectionArg
     const user = context.user;
 
     if (!user) throw new UnauthorizedError();
-    
-    const loader = new DataLoader<string, Promise<any>>(ids => {
-      return mongooseLoader(MessageModel, ids);
-    });
 
-    return connectionFromMongoCursor({
-      cursor: MessageModel.find({ room: args.roomId }).sort({ createdAt: -1}),
-      context,
-      args,
-      loader: (_ctx, id) => loader.load(id.toString()),
-    })
+    return await MessageLoader.loadAll(context, withFilter(args, {
+      room: args.roomId
+    }));
   }
 }

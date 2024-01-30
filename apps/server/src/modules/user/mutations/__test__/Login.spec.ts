@@ -1,6 +1,7 @@
 import { createUser } from "../../fixture";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
 import { getAuth } from "../../../../authentication";
+import { initialContext } from "@/context";
 
 const query = ({ username, password }: { username?: string, password?: string }) => ({
   query: `
@@ -15,6 +16,8 @@ const query = ({ username, password }: { username?: string, password?: string })
 })
 
 describeWithDb('user/mutations/login', () => {
+  const context = initialContext();
+  
   it("should return user token", async () => {
     const data = { username: "username", password: "password"};
     const user = await createUser(data);
@@ -24,7 +27,7 @@ describeWithDb('user/mutations/login', () => {
     expect(response.status).toBe(200);
 
     const token = response.body.data.login.token;
-    const { user: u } = await getAuth(token); 
+    const { user: u } = await getAuth(token, context); 
 
     expect(u?.username).toBe(user.username);
   });

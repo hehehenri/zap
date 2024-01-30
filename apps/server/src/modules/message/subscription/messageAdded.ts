@@ -2,8 +2,9 @@ import { subscriptionWithClientId } from "graphql-relay-subscription";
 import { MessageType } from "../MessageType";
 import { events, pubsub } from "../../../pubsub";
 import { MessageModel } from "../MessageModel";
-import { GraphQLContext } from "../../../schemas/context";
 import { GraphQLID, GraphQLNonNull } from "graphql";
+import { Context } from "@/context";
+import { MessageLoader } from "../MessageLoader";
 
 type NewMessage = {
   id: string,
@@ -14,7 +15,7 @@ type Input = {
   roomId: string
 };
 
-export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, GraphQLContext, Input>({
+export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Context, Input>({
   name: 'MessageAdded',
   inputFields: {
     roomId: { type: new GraphQLNonNull(GraphQLID) },
@@ -22,7 +23,7 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Gra
   outputFields: {
     message: {
       type: MessageType,
-      resolve: async ({ id }: NewMessage) => await MessageModel.findById(id)
+      resolve: async ({ id }: NewMessage, _, ctx) => await MessageLoader.load(ctx, id)
     }
   },
   subscribe: ({ roomId }) => {
@@ -30,5 +31,5 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Gra
   },
   getPayload: (obj) => {
     return { id: obj.messageId };
-  } 
+  }
 });

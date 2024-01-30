@@ -1,12 +1,11 @@
-import mongoose from "mongoose";
+import { Document, Schema, model } from "mongoose";
 
-export type UserDefinition = {
-  readonly _id: mongoose.Types.ObjectId;
-  readonly username: string
-  readonly password: string
-}
+export interface UserDocument extends Document {
+  username: string
+  password: string
+};
 
-export const userSchema = new mongoose.Schema<UserDefinition>(
+const UserSchema = new Schema(
   {
     username: { type: String, required: true, index: { unique: true } },
     password: { type: String, required: true, select: false },
@@ -14,4 +13,4 @@ export const userSchema = new mongoose.Schema<UserDefinition>(
   { collection: 'User' }
 );
 
-export const UserModel = mongoose.model<UserDefinition>('User', userSchema);
+export const UserModel = model<UserDocument>('User', UserSchema);

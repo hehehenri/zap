@@ -1,5 +1,5 @@
+import { KoaContext } from "@/context";
 import WebSocket, { WebSocketServer } from "ws";
-import { KoaContext } from "../../schemas/context";
 
 const servers: Map<string, WebSocketServer>  = new Map();
 

@@ -1,9 +1,9 @@
 import { GraphQLFieldConfig } from "graphql/type";
-import { GraphQLContext } from "../../../schemas/context";
 import { UserType } from "../UserType";
 import { UnauthorizedError } from "../../../routes/error";
+import { Context } from "../../../context";
 
-export const Me: GraphQLFieldConfig<any, GraphQLContext> = {
+export const Me: GraphQLFieldConfig<any, Context> = {
   type: UserType,
   description: "Get the authenticated user",
   resolve: (_root, _args, context) => {
