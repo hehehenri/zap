@@ -4,6 +4,7 @@ import { events, pubsub } from "../../../pubsub";
 import { MessageModel } from "../MessageModel";
 import { GraphQLID, GraphQLNonNull } from "graphql";
 import { Context } from "@/context";
+import { MessageLoader } from "../MessageLoader";
 
 type NewMessage = {
   id: string,
@@ -22,7 +23,7 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Con
   outputFields: {
     message: {
       type: MessageType,
-      resolve: async ({ id }: NewMessage) => await MessageModel.findById(id)
+      resolve: async ({ id }: NewMessage, _, ctx) => await MessageLoader.load(ctx, id)
     }
   },
   subscribe: ({ roomId }) => {
@@ -30,5 +31,5 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Con
   },
   getPayload: (obj) => {
     return { id: obj.messageId };
-  } 
+  }
 });

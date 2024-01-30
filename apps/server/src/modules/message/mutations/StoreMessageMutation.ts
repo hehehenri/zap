@@ -1,5 +1,5 @@
 import { mutationWithClientMutationId } from "graphql-relay";
-import { GraphQLString } from "graphql/type";
+import { GraphQLID, GraphQLNonNull, GraphQLString } from "graphql/type";
 
 import { MessageType } from "../MessageType";
 import { MessageModel } from "../MessageModel";
@@ -13,8 +13,8 @@ export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
   description: "Store user's message",
   inputFields: {
-    content: { type: GraphQLString },
-    roomId: { type: GraphQLString }
+    content: { type: new GraphQLNonNull(GraphQLString) },
+    roomId: { type: new GraphQLNonNull(GraphQLID) }
   },
   outputFields: {
     message: {

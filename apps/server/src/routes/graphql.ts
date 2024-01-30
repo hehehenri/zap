@@ -13,12 +13,13 @@ const options = async (
   schema,
   pretty: true,
   graphiql: {
-    headerEditorEnabled: true
+    headerEditorEnabled: true,
+    shouldPersistHeaders: true
   },
   context: await buildContext(ctx),
   customFormatErrorFn: (error) => {
     // TODO: this workaround doesn't seems right.
-    // find a way to do the same using 
+    // find a way to do the same using
     ctx.log.error(error);
 
     const err = error.originalError;

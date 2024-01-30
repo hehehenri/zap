@@ -1,8 +1,7 @@
 import { createUser } from "../../fixture";
 import { describeWithDb, testQuery } from "../../../../test/helpers";
 import { getAuth } from "../../../../authentication";
-import { buildContext, initialContext } from "@/context";
-import { buildLoaders } from "@/dataloaders";
+import { initialContext } from "@/context";
 
 const query = ({ username, password }: { username?: string, password?: string }) => ({
   query: `

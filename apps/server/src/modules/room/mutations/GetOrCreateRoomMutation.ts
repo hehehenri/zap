@@ -1,5 +1,5 @@
 import { mutationWithClientMutationId } from "graphql-relay";
-import { GraphQLNonNull, GraphQLString } from "graphql/type";
+import { GraphQLID, GraphQLNonNull } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
 import { UserModel } from "../../user/UserModel";
@@ -10,7 +10,7 @@ export const GetOrCreateRoomMutation = mutationWithClientMutationId({
   name: "GetOrCreateRoom",
   description: "Get the room based on it participants ids or create it if it doesn't exists yet.",
   inputFields: {
-    userId: { type: new GraphQLNonNull(GraphQLString) }
+    userId: { type: new GraphQLNonNull(GraphQLID) }
   },
   outputFields: {
     room: {
