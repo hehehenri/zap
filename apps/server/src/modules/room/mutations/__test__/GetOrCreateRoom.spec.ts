@@ -10,7 +10,7 @@ import { createRoom } from "../../fixture";
 const query = (userId: mongoose.Types.ObjectId) => {
   return {
     query: `
-      mutation GetCreateRoom($userId: String!) {
+      mutation GetCreateRoom($userId: ID!) {
         getOrCreateRoom(input: { userId: $userId}) {
           room { participants { username } }
         }
