@@ -1,12 +1,14 @@
-import { MessageAddedSubscription } from "@/__generated__/MessageAddedSubscription.graphql";
+import { MessageAddedSubscription, MessageAddedSubscription$variables } from "@/__generated__/MessageAddedSubscription.graphql";
 import { useMemo } from "react";
 import { useSubscription } from "react-relay";
 import { GraphQLSubscriptionConfig, graphql } from "relay-runtime";
 
 const messageAddedSubscription = graphql`
-  subscription MessageAddedSubscription($input: MessageAddedInput!) {
+  subscription MessageAddedSubscription($input: MessageAddedInput!, $connections: [ID!]!) {
     messageAddedSubscribe(input: $input) {
-      message {
+      message @prependEdge(connections: $connections) {
+        cursor
+        node {
           id
           content
           sender {
@@ -14,45 +16,22 @@ const messageAddedSubscription = graphql`
             username
           }
           sentAt
+        }
       }
     }
   }
 `
 
-export type MessageResponse = {
-  id: string,
-  content: string,
-}
-
-// TODO: cannot useFragment inside onMessage because of rule-of-hooks :(
-type MessagePayload = {
-  id: string,
-  content: string,
-  sender: {
-    id: string,
-    username: string,
-  },
-  sentAt: string,
-}
-
-type SubscriptionConfig = {
-  roomId: string,
-  onMessage: (message: MessagePayload) => void
-};
-
-export const useMessageAddedSubscription = ({roomId, onMessage}: SubscriptionConfig) => {
+export const useMessageAddedSubscription = (variables: MessageAddedSubscription$variables) => {
   const config = useMemo<GraphQLSubscriptionConfig<MessageAddedSubscription>>(
     () => ({
       subscription: messageAddedSubscription,
-      variables: { input: { roomId } },
-      onNext: (res) => {
-        const message = res?.messageAddedSubscribe?.message;
-        if (!message) return;
-
-        onMessage(message);
-      }
+      onNext: res => {
+        console.log(res);
+      },
+      variables,
     }),
-    [roomId, onMessage]
+    [variables],
   );
 
   useSubscription(config);

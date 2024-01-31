@@ -5,7 +5,7 @@ import { graphql, Disposable } from "relay-runtime";
 import z from "zod";
 
 const storeMessageSchema = z.object({
-  roomId: z.string().max(24).min(24),
+  roomId: z.string(),
   content: z.string().max(1024, "Message exceeds the limit of 1024 characters")
 });
 
@@ -24,8 +24,10 @@ export const storeMessageMutation = graphql`
   mutation StoreMessageMutation($input: StoreMessageInput!) {
     storeMessage(input: $input) {
       message {
-        id
-        content
+        node {
+          id
+          content
+        }
       }
     }
   }

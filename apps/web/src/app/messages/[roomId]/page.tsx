@@ -6,6 +6,7 @@ import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.gra
 import { RoomPreviewList } from "@/components/room/RoomList";
 import { MessagesHeader } from "@/components/messages/Header";
 import { RoomMessages } from "@/components/RoomMessages";
+import { decode } from "punycode";
 
 const RoomMessagesQuery = graphql`
   query pageRoomMessagesQuery($roomId: ID!) {
@@ -17,7 +18,8 @@ const RoomMessagesQuery = graphql`
 `;
 
 const RoomMessagesPage = () => {
-  const { roomId } = useParams<{ roomId: string }>();
+  const { roomId: roomIdParam } = useParams<{ roomId: string }>();
+  const roomId = decodeURIComponent(roomIdParam);
 
   const queryRef = useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
     roomId,
@@ -33,7 +35,7 @@ const RoomMessagesPage = () => {
           flex flex-col h-screen relative col-span-full lg:col-span-1
         "
       >
-        <MessagesHeader queryRef={queryRef} />
+        {/* <MessagesHeader queryRef={queryRef} /> */}
         <RoomMessages queryRef={queryRef} roomId={roomId} />
       </div>
     </main>

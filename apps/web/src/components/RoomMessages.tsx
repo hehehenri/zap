@@ -212,48 +212,55 @@ const MessageGroups = ({
   );
 };
 
-const LoadedMessages = ({ queryRef }: { queryRef: RoomMessagesQuery$key }) => {
+const RoomMessagesQueryFragment = graphql`
+  fragment RoomMessagesQuery on Query
+  @argumentDefinitions(
+    roomId: { type: "ID!" }
+    first: { type: "Int", defaultValue: 25 }
+    after: { type: "String" }
+  )
+  @refetchable(queryName: "RoomMessagesPaginationQuery") {
+    roomMessages(roomId: $roomId, first: $first, after: $after)
+      @connection(key: "messages_roomMessages") {
+      __id
+      edges {
+        node {
+          id
+          content
+          sender {
+            id
+            username
+          }
+          sentAt
+        }
+      }
+      pageInfo {
+        hasNextPage
+      }
+    }
+    me {
+      id
+      username
+    }
+    ...RoomMessagesMessagesQuery
+  }
+`;
+
+const LoadedMessages = ({ queryRef, roomId }: { queryRef: RoomMessagesQuery$key, roomId: string }) => {
   const { data, loadNext, hasNext, isLoadingNext } = usePaginationFragment<
     RoomMessagesPaginationQuery,
     RoomMessagesQuery$key
   >(
-    graphql`
-      fragment RoomMessagesQuery on Query
-      @argumentDefinitions(
-        roomId: { type: "ID!" }
-        first: { type: "Int", defaultValue: 25 }
-        after: { type: "String" }
-      )
-      @refetchable(queryName: "RoomMessagesPaginationQuery") {
-        roomMessages(roomId: $roomId, first: $first, after: $after)
-          @connection(key: "messages_roomMessages", filters: []) {
-          __id
-          edges {
-            node {
-              id
-              content
-              sender {
-                id
-                username
-              }
-              sentAt
-            }
-          }
-          pageInfo {
-            hasNextPage
-          }
-        }
-        me {
-          id
-          username
-        }
-        ...RoomMessagesMessagesQuery
-      }
-    `,
+    RoomMessagesQueryFragment,
     queryRef,
   );
 
-  const { roomMessages, me: user } = data;
+  useMessageAddedSubscription({
+    input: { roomId },
+    connections: [data.roomMessages?.__id ?? '']
+  })
+
+ const { roomMessages, me: user } = data;
 
   const loadMore = () => {
     if (isLoadingNext || !hasNext) return;
@@ -303,21 +310,6 @@ const Messages = ({
     scrollToBottom(messagesRef);
   }, [messages, messagesRef]);
 
-  useMessageAddedSubscription({
-    roomId,
-    onMessage: (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-
-      if (message.sender.id == user.id) {
-        setPendingMessages((pendingMessages) =>
-          pendingMessages.filter(
-            (pendingMessage) => pendingMessage !== message.content,
-          ),
-        );
-      }
-    }
-  })
-
   if (!user) return;
 
   return (
@@ -356,7 +348,6 @@ export const RoomMessages = ({
   const messagesRef = useRef<HTMLDivElement>(null);
 
   const onSent = (message: string) => {
-    console.log({ message });
     setPendingMessages((messages) => [...messages, message]);
     setValue("content", "")
   };
@@ -396,7 +387,7 @@ export const RoomMessages = ({
           "
         >
           <div className="max-h-full overflow-y-auto" ref={messagesRef}>
-            <LoadedMessages queryRef={queryRef} />
+            <LoadedMessages queryRef={queryRef} roomId={roomId} />
             {user && (
               <Messages
                 roomId={roomId}
