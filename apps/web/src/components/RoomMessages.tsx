@@ -1,7 +1,7 @@
 "use client";
 
 import { SendHorizonal } from "lucide-react";
-import { graphql, useFragment, useMutation } from "react-relay";
+import { useMutation } from "react-relay";
 import { RefObject, useEffect, useRef, useState } from "react";
 import {
   sendMessageHandler,

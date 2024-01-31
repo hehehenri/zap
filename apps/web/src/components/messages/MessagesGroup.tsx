@@ -1,3 +1,5 @@
+"use client";
+
 import { cn } from "@/utils";
 import { MessagesList } from "./MessagesList";
 import { User } from "@/auth";
@@ -15,15 +17,16 @@ type Message = {
   sentAt: string;
 };
 
-const getSentAt = (message: Message) => {
-  const date = new Date(message.sentAt);
+// TODO: disabled due to hydration errors
+// const getSentAt = (message: Message) => {
+//   const date = new Date(message.sentAt);
 
-  return new Intl.DateTimeFormat("pt-BR", {
-    hour: "numeric",
-    minute: "numeric",
-    hour12: true,
-  }).format(date);
-};
+//   return new Intl.DateTimeFormat("pt-BR", {
+//     hour: "numeric",
+//     minute: "numeric",
+//     hour12: true,
+//   }).format(date);
+// };
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -96,7 +99,12 @@ export const MessageGroup = ({
                 <span className="text-sm mt-1">Sent</span>
               )}
               {lastMessage?.sentAt && (
-                <span className="text-sm mt-1">{getSentAt(lastMessage)}</span>
+                <span className="text-sm mt-1">
+                  16:45
+                  {/** TODO: disabled due to hydration errors
+                  {getSentAt(lastMessage)}
+                  **/}
+                </span>
               )}
             </div>
           </div>

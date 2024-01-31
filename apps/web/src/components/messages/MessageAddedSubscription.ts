@@ -26,9 +26,6 @@ export const useMessageAddedSubscription = (variables: MessageAddedSubscription$
   const config = useMemo<GraphQLSubscriptionConfig<MessageAddedSubscription>>(
     () => ({
       subscription: messageAddedSubscription,
-      onNext: res => {
-        console.log(res);
-      },
       updater: (store) => store.invalidateStore(),
       variables,
     }),
