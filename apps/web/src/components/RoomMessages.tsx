@@ -6,7 +6,6 @@ import {
   useFragment,
   useMutation,
   usePaginationFragment,
-  useSubscription,
 } from "react-relay";
 import { cn, extractNodes } from "@/utils";
 import {
@@ -14,18 +13,16 @@ import {
   RefObject,
   SetStateAction,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
-import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscription.graphql";
 import { sendMessageHandler, storeMessageMutation, useStoreMessageForm } from "./messages/StoreMessage";
 import { InvalidMessageDialog } from "./messages/InvalidMessageDialog";
 import { StoreMessageMutation } from "@/__generated__/StoreMessageMutation.graphql";
+import { useMessageAddedSubscription } from "./messages/MessageAddedSubscription";
 
 const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
   const div = divRef.current;
@@ -306,43 +303,20 @@ const Messages = ({
     scrollToBottom(messagesRef);
   }, [messages, messagesRef]);
 
-  const config = useMemo<GraphQLSubscriptionConfig<RoomMessagesSubscription>>(
-    () => ({
-      subscription: graphql`
-        subscription RoomMessagesSubscription($input: MessageAddedInput!) {
-          messageAddedSubscribe(input: $input) {
-            message {
-              id
-              content
-              sender {
-                id
-                username
-              }
-              sentAt
-            }
-          }
-        }
-      `,
-      variables: { input: { roomId } },
-      onNext: (res) => {
-        const message = res?.messageAddedSubscribe?.message;
-        if (!message) return;
+  useMessageAddedSubscription({
+    roomId,
+    onMessage: (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
 
-        setMessages((prevMessages) => [...prevMessages, message]);
-
-        if (message.sender.id == user.id) {
-          setPendingMessages((pendingMessages) =>
-            pendingMessages.filter(
-              (pendingMessage) => pendingMessage !== message.content,
-            ),
-          );
-        }
-      },
-    }),
-    [user, setPendingMessages, roomId],
-  );
-
-  useSubscription(config);
+      if (message.sender.id == user.id) {
+        setPendingMessages((pendingMessages) =>
+          pendingMessages.filter(
+            (pendingMessage) => pendingMessage !== message.content,
+          ),
+        );
+      }
+    }
+  })
 
   if (!user) return;
 
