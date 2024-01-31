@@ -5,7 +5,7 @@ import { createUser } from "../../../user/fixture";
 
 const query = ({ content, roomId }: { content?: string, roomId: string }) => ({
   query: `
-    mutation StoreMessage($content: String $roomId: String) {
+    mutation StoreMessage($content: String! $roomId: ID!) {
       storeMessage(input: { content: $content roomId: $roomId}) {
         message { content }
       }

@@ -22,6 +22,7 @@ export const RoomType: GraphQLObjectType<RoomDocument, any> = new GraphQLObjectT
     participants: {
       type: list(UserType),
       resolve: async (room) => {
+        // TODO: find a way to populate using loaders
         const roomModel = await RoomModel
           .findById(room._id)
           .populate<{ participants: UserDocument[] }>('participants')
@@ -37,6 +38,7 @@ export const RoomType: GraphQLObjectType<RoomDocument, any> = new GraphQLObjectT
     lastMessage: {
       type: MessageType,
       resolve: async (room) => {        
+        // TODO: find a way to populate using loaders
         const roomModel = await RoomModel
           .findById(room._id)
           .populate<{ lastMessage: MessageDocument}>('lastMessage')

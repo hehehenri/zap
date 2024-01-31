@@ -20,6 +20,7 @@ export const MessageType = new GraphQLObjectType<MessageDocument>({
     sender: {
       type: new GraphQLNonNull(UserType),
       resolve: async (message) => {
+        // TODO: find a way to populate using loaders
         const messageModel = await MessageModel
           .findById(message._id)
           .populate<{ sender: UserDocument }>('sender')
@@ -31,6 +32,7 @@ export const MessageType = new GraphQLObjectType<MessageDocument>({
     room: {
       type: new GraphQLNonNull(RoomType),
       resolve: async message => {
+        // TODO: find a way to populate using loaders
         const messageModel = await MessageModel
           .findById(message._id)
           .populate<{ room: RoomDocument }>('room')
