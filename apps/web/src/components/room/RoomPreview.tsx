@@ -1,8 +1,8 @@
 import { RoomPreviewFragment$key } from "@/__generated__/RoomPreviewFragment.graphql";
-import { Avatar } from "@/components";
 import { useUser } from "@/hooks/useUser";
 import { getOtherParticipant } from "@/utils";
 import { graphql, useFragment } from "react-relay";
+import { Avatar } from "../Avatar";
 
 const roomPreviewFragment = graphql`
   fragment RoomPreviewFragment on Room {

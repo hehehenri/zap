@@ -5,12 +5,12 @@ import { useFragment, useMutation } from "react-relay";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { graphql } from "react-relay";
-import { Avatar } from "..";
 import { SearchIcon } from "lucide-react";
 import { NewRoomMutation } from "@/__generated__/NewRoomMutation.graphql";
 import { extractNodes } from "@/utils";
 import { NewRoomQuery$key } from "@/__generated__/NewRoomQuery.graphql";
 import { User } from "@/auth";
+import { Avatar } from "../Avatar";
 
 const Header = () => {
   return (

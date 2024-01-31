@@ -1,18 +1,13 @@
 "use client";
 
-import { Button, Input } from "@/components";
 import { Logo } from "@/components/Logo";
-import { graphql, useMutation } from "react-relay";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
 import { useState } from "react";
-import {
-  pageLoginMutation,
-  pageLoginMutation$data,
-  pageLoginMutation$variables,
-} from "@/__generated__/pageLoginMutation.graphql";
 import { login } from "@/auth";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
+import { loginHandler, useLoginForm, useLoginMutation } from "@/components/auth/Login";
 
 const Error = ({ error }: { error: string | null }) => {
   return (
@@ -25,37 +20,19 @@ const Error = ({ error }: { error: string | null }) => {
 const LoginPage = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
-  const [commitMutation, inFlight] = useMutation<pageLoginMutation>(graphql`
-    mutation pageLoginMutation($username: String!, $password: String!) {
-      login(input: { username: $username, password: $password }) {
-        token
-        user {
-          id
-          username
-        }
-      }
-    }
-  `);
 
-  const { register, handleSubmit } = useForm<pageLoginMutation$variables>();
+  const { register, handleSubmit } = useLoginForm();
+  const [commitMutation, inFlight] = useLoginMutation();
 
-  const onSubmit = (variables: pageLoginMutation$variables) => {
-    commitMutation({
-      variables,
-      onCompleted: ({ login: response }: pageLoginMutation$data) => {
-        if (!response?.token || !response.user) {
-          return;
-        }
-
-        login(response.token);
-        router.push("/messages");
-        router.refresh();
-      },
-      onError: (error) => {
-        setError(error.message);
-      },
-    });
-  };
+  const onSubmit = loginHandler({
+    commitMutation,
+    onSent: (token) => {
+      login(token);
+      router.push("/messages");
+      router.refresh();
+    },
+    onError: (error) => setError(error)
+  })
 
   return (
     <main className="w-full h-full flex flex-col gap-y-6 items-center justify-center">

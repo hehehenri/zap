@@ -1,17 +1,18 @@
 "use client";
 
-import { MessagesHeader, RoomMessages } from "@/components";
-import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
 import { graphql, useLazyLoadQuery } from "react-relay";
 import { useParams } from "next/navigation";
 import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.graphql";
+import { RoomPreviewList } from "@/components/room/RoomList";
+import { MessagesHeader } from "@/components/messages/Header";
+import { RoomMessages } from "@/components/RoomMessages";
 
 const RoomMessagesQuery = graphql`
   query pageRoomMessagesQuery($roomId: ID!) {
-    ...RoomPreviewListQuery
+    ...RoomListQuery
     ...RoomMessagesMessagesQuery
     ...RoomMessagesQuery @arguments(roomId: $roomId)
-    ...RoomMessagesHeaderQuery @arguments(roomId: $roomId)
+    ...HeaderQuery @arguments(roomId: $roomId)
   }
 `;
 

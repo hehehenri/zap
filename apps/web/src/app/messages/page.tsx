@@ -1,12 +1,12 @@
 "use client";
 
-import { RoomPreviewList } from "@/components/Room/RoomPreviewList";
 import { graphql, useLazyLoadQuery } from "react-relay";
-import { NewRoom } from "@/components";
 import {
   pageMessagesQuery,
   pageMessagesQuery$data,
 } from "@/__generated__/pageMessagesQuery.graphql";
+import { NewRoom } from "@/components/room/NewRoom";
+import { RoomPreviewList } from "@/components/room/RoomList";
 
 const ChatEmptyState = ({ queryRef }: { queryRef: pageMessagesQuery$data }) => {
   return (
@@ -35,7 +35,7 @@ const Messages = () => {
   const data = useLazyLoadQuery<pageMessagesQuery>(
     graphql`
       query pageMessagesQuery {
-        ...RoomPreviewListQuery
+        ...RoomListQuery
         ...NewRoomQuery
       }
     `,

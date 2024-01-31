@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowLeft, MoreHorizontal, SendHorizonal } from "lucide-react";
-import { Avatar } from "..";
+import { MoreHorizontal, SendHorizonal } from "lucide-react";
 import {
   graphql,
   useFragment,
@@ -9,7 +8,7 @@ import {
   usePaginationFragment,
   useSubscription,
 } from "react-relay";
-import { cn, extractNodes, getOtherParticipant } from "@/utils";
+import { cn, extractNodes } from "@/utils";
 import {
   Dispatch,
   RefObject,
@@ -23,12 +22,10 @@ import { GraphQLSubscriptionConfig } from "relay-runtime";
 import { RoomMessagesQuery$key } from "@/__generated__/RoomMessagesQuery.graphql";
 import { RoomMessagesPaginationQuery } from "@/__generated__/RoomMessagesPaginationQuery.graphql";
 import { User } from "@/auth";
-import { RoomMessagesHeaderQuery$key } from "@/__generated__/RoomMessagesHeaderQuery.graphql";
 import { RoomMessagesSubscription } from "@/__generated__/RoomMessagesSubscription.graphql";
-import { sendMessageHandler, storeMessageMutation, useStoreMessageForm } from "../Messages/StoreMessage";
+import { sendMessageHandler, storeMessageMutation, useStoreMessageForm } from "./messages/StoreMessage";
+import { InvalidMessageDialog } from "./messages/InvalidMessageDialog";
 import { StoreMessageMutation } from "@/__generated__/StoreMessageMutation.graphql";
-import { InvalidMessageDialog } from "../Messages/InvalidMessageDialog";
-import Link from "next/link";
 
 const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
   const div = divRef.current;
@@ -38,51 +35,6 @@ const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
     top: div.scrollHeight,
     behavior: "smooth",
   });
-};
-
-export const MessagesHeader = ({
-  queryRef,
-}: {
-  queryRef: RoomMessagesHeaderQuery$key;
-}) => {
-  const { room, me } = useFragment(
-    graphql`
-      fragment RoomMessagesHeaderQuery on Query
-      @argumentDefinitions(roomId: { type: "ID!" }) {
-        room(roomId: $roomId) {
-          participants {
-            id
-            username
-          }
-        }
-        me {
-          id
-          username
-        }
-      }
-    `,
-    queryRef,
-  );
-
-  if (!room?.participants || !me) return;
-
-  const otherParticipant = getOtherParticipant(room.participants, me);
-
-  if (!otherParticipant) return;
-
-  return (
-    <div className="flex items-center bg-white shadow px-6 py-2 gap-2">
-      <Link href={"/messages"} className="p-2 lg:hidden">
-        <ArrowLeft className="text-stone-600" />
-      </Link>
-      <Avatar />
-      <div className="flex flex-col">
-        <span className="text-lg font-semibold leading-tight">
-          {otherParticipant.username}
-        </span>
-      </div>
-    </div>
-  );
 };
 
 const getLastMessage = (messages: Message[]) => {
@@ -443,7 +395,7 @@ export const RoomMessages = ({
     onValidationError,
     onSent,
   });
-    
+
   useEffect(() => {
     scrollToBottom(messagesRef);
   }, [pendingMessages, messagesRef]);

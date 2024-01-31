@@ -1,6 +1,5 @@
 "use client";
 
-import { Button, Input } from "@/components";
 import { Logo } from "@/components/Logo";
 import { graphql, useMutation } from "react-relay";
 import { useForm } from "react-hook-form";
@@ -13,6 +12,8 @@ import {
 } from "@/__generated__/pageRegisterMutation.graphql";
 import { useState } from "react";
 import { login } from "@/auth";
+import { Input } from "@/components/Input";
+import { Button } from "@/components/Button";
 
 const Error = ({ error }: { error: string | null }) => {
   return (

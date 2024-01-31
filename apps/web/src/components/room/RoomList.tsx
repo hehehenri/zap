@@ -1,16 +1,17 @@
-import { NewRoom, Search } from "@/components";
 import { graphql, useFragment } from "react-relay";
 import { RoomPreview } from "./RoomPreview";
-import { RoomPreviewListFragment$key } from "@/__generated__/RoomPreviewListFragment.graphql";
-import NoMessages from "../EmptyState/NoMessages";
-import { RoomPreviewListQuery$key } from "@/__generated__/RoomPreviewListQuery.graphql";
+import NoMessages from "../emptyState/NoMessages";
 import { extractNodes } from "@/utils";
 import { Pen } from "lucide-react";
 import { useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
+import { Search } from "../Search";
+import { NewRoom } from "./NewRoom";
+import { RoomListQuery$key } from "@/__generated__/RoomListQuery.graphql";
+import { RoomListFragment$key } from "@/__generated__/RoomListFragment.graphql";
 
-const roomPreviewListFragment = graphql`
-  fragment RoomPreviewListFragment on RoomConnection {
+const roomListFragment = graphql`
+  fragment RoomListFragment on RoomConnection {
     edges {
       node {
         id
@@ -20,10 +21,10 @@ const roomPreviewListFragment = graphql`
   }
 `;
 
-const roomPreviewListQuery = graphql`
-  fragment RoomPreviewListQuery on Query {
+const roomListQuery = graphql`
+  fragment RoomListQuery on Query {
     rooms {
-      ...RoomPreviewListFragment
+      ...RoomListFragment
     }
     ...NewRoomQuery
   }
@@ -42,15 +43,15 @@ const EmptyState = () => {
 export const RoomPreviewList = ({
   fragmentRef,
 }: {
-  fragmentRef: RoomPreviewListQuery$key;
+  fragmentRef: RoomListQuery$key;
 }) => {
   const { rooms: roomsKey, ...users } = useFragment(
-    roomPreviewListQuery,
+    roomListQuery,
     fragmentRef,
   );
 
-  const roomsFragment: RoomPreviewListFragment$key = roomsKey;
-  const data = useFragment(roomPreviewListFragment, roomsFragment);
+  const roomsFragment: RoomListFragment$key = roomsKey;
+  const data = useFragment(roomListFragment, roomsFragment);
   const rooms = extractNodes(data);
 
   const [showNewRoom, setShowNewRoom] = useState(false);

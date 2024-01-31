@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from "react"
-import Dialog from "../Dialog"
+import Dialog from "../Dialog";
 
 type Error = string | null;
 
@@ -8,14 +8,14 @@ type Props = {
   setError: Dispatch<SetStateAction<Error>>,
 }
 
-export const InvalidMessageDialog = ({ error, setError }: Props) => {    
+export const InvalidMessageDialog = ({ error, setError }: Props) => {
   const open = Boolean(error);
   const onOpenChange = (open: boolean) => {
     if (!open) {
       setError(null);
     }
   }
-  
+
   return (
     <Dialog className="max-w-sm lg:max-w-sm" title="Something went wrong" open={open} onOpenChange={onOpenChange}>
       <section className="flex flex-col items-center gap-3">

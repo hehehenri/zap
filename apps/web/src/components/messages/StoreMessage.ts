@@ -11,7 +11,7 @@ const storeMessageSchema = z.object({
 
 export type StoreMessageFormData = z.infer<typeof storeMessageSchema>;
 
-export const useStoreMessageForm = ({ roomId }: {roomId: string}) => ( 
+export const useStoreMessageForm = ({ roomId }: {roomId: string}) => (
   useForm<StoreMessageFormData>({
     defaultValues: {
       roomId,
@@ -32,7 +32,7 @@ export const storeMessageMutation = graphql`
 `;
 
 type HandlerConfig = {
-  commitMutation: (config: UseMutationConfig<StoreMessageMutation>) => Disposable, 
+  commitMutation: (config: UseMutationConfig<StoreMessageMutation>) => Disposable,
   onSent: (message: string) => void,
   onValidationError: (error: string) => void,
 };
