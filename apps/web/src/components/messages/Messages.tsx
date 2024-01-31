@@ -6,6 +6,8 @@ import { graphql } from "relay-runtime";
 import { MessageGroup } from "./MessagesGroup";
 import { usePaginationFragment } from "react-relay";
 import { useMessageAddedSubscription } from "./MessageAddedSubscription";
+import useInfiniteScroll from "react-infinite-scroll-hook";
+import { useEffect, useRef, useState } from "react";
 
 const MessagesQuery = graphql`
   fragment MessagesQuery on Query
@@ -51,6 +53,7 @@ export const Messages = ({
     MessagesPaginationQuery,
     MessagesQuery$key
   >(MessagesQuery, queryRef);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   useMessageAddedSubscription({
     input: { roomId },
@@ -70,6 +73,24 @@ export const Messages = ({
 
   if (!user) return;
 
+  const [sentryRef] = useInfiniteScroll({
+    hasNextPage: hasNext,
+    loading: isLoadingNext,
+    onLoadMore: loadMore,
+    disabled: !hasLoaded,
+  });
+
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+
+    ref.current.scrollIntoView({
+      behavior: "smooth",
+    });
+    setHasLoaded(true);
+  }, [data.roomMessages, ref]);
+
   return (
     <div className="pt-3">
       {hasNext && (
@@ -85,7 +106,9 @@ export const Messages = ({
           </button>
         </div>
       )}
+      <div ref={sentryRef} />
       <MessageGroup messages={messages} user={user} />
+      <div ref={ref} />
     </div>
   );
 };

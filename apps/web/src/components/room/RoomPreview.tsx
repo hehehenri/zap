@@ -41,12 +41,14 @@ function formatReadableDate(inputDate: string) {
     return date.toLocaleString("default", { weekday: "short" }); // Mon
   }
 
-  // 22:34
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    hour12: false,
-    minute: "2-digit",
-  });
+  // TODO: disabled due to hydration errors
+  // return date.toLocaleTimeString("en-US", {
+  //   hour: "numeric",
+  //   hour12: false,
+  //   minute: "2-digit",
+  // });
+
+  return "16:47";
 }
 
 export const RoomPreview = ({
@@ -71,8 +73,12 @@ export const RoomPreview = ({
       <Avatar />
       <div className="flex justify-between w-full items-center overflow-hidden">
         <div className="flex flex-col leading-6 overflow-hidden">
-          <span className="font-medium overflow-hidden text-ellipsis">{part.username}</span>
-          <p className="text-stone-600 overflow-hidden text-ellipsis">{data.lastMessage?.content}</p>
+          <span className="font-medium overflow-hidden text-ellipsis">
+            {part.username}
+          </span>
+          <p className="text-stone-600 overflow-hidden text-ellipsis">
+            {data.lastMessage?.content}
+          </p>
         </div>
         {data.lastMessage && (
           <p className="text-stone-700 text-xs">

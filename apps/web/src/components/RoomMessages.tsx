@@ -2,7 +2,7 @@
 
 import { SendHorizonal } from "lucide-react";
 import { useMutation } from "react-relay";
-import { RefObject, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import {
   sendMessageHandler,
   storeMessageMutation,
@@ -13,16 +13,6 @@ import { StoreMessageMutation } from "@/__generated__/StoreMessageMutation.graph
 import { MessagesQuery$key } from "@/__generated__/MessagesQuery.graphql";
 import { Messages } from "./messages/Messages";
 
-const scrollToBottom = (divRef: RefObject<HTMLDivElement>) => {
-  const div = divRef.current;
-  if (!div) return;
-
-  div.scrollTo({
-    top: div.scrollHeight,
-    behavior: "smooth",
-  });
-};
-
 export const RoomMessages = ({
   roomId,
   queryRef,
@@ -30,19 +20,16 @@ export const RoomMessages = ({
   roomId: string;
   queryRef: MessagesQuery$key;
 }) => {
-  const [pendingMessages, setPendingMessages] = useState<string[]>([]);
-
   const [commitMutation] =
     useMutation<StoreMessageMutation>(storeMessageMutation);
   const [validationError, setValidationError] = useState<string | null>(null);
 
-  const { register, handleSubmit, setValue } = useStoreMessageForm({ roomId });
-  const messagesRef = useRef<HTMLDivElement>(null);
+  const {
+    register,
+    handleSubmit,
+    setValue: setInputValue,
+  } = useStoreMessageForm({ roomId });
 
-  const onSent = (message: string) => {
-    setPendingMessages((messages) => [...messages, message]);
-    setValue("content", "");
-  };
   const onValidationError = (error: string) => {
     setValidationError(error);
   };
@@ -50,12 +37,8 @@ export const RoomMessages = ({
   const sendMessage = sendMessageHandler({
     commitMutation,
     onValidationError,
-    onSent,
+    onSent: () => setInputValue("content", ""),
   });
-
-  useEffect(() => {
-    scrollToBottom(messagesRef);
-  }, [pendingMessages, messagesRef]);
 
   return (
     <>
@@ -66,7 +49,7 @@ export const RoomMessages = ({
             container flex justify-end flex-col gap-y-1.5
           "
         >
-          <div className="max-h-full overflow-y-auto" ref={messagesRef}>
+          <div className="max-h-full overflow-y-auto">
             <Messages queryRef={queryRef} roomId={roomId} />
           </div>
 

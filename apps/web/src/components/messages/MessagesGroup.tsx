@@ -17,16 +17,18 @@ type Message = {
   sentAt: string;
 };
 
-// TODO: disabled due to hydration errors
-// const getSentAt = (message: Message) => {
-//   const date = new Date(message.sentAt);
+const getSentAt = (message: Message) => {
+  // TODO: disabled due to hydration errors
+  // const date = new Date(message.sentAt);
 
-//   return new Intl.DateTimeFormat("pt-BR", {
-//     hour: "numeric",
-//     minute: "numeric",
-//     hour12: true,
-//   }).format(date);
-// };
+  // return new Intl.DateTimeFormat("pt-BR", {
+  //   hour: "numeric",
+  //   minute: "numeric",
+  //   hour12: true,
+  // }).format(date);
+
+  return "16:47";
+};
 
 const getLastMessage = (messages: Message[]) => {
   const lastMessages = messages.slice(-1);
@@ -99,12 +101,7 @@ export const MessageGroup = ({
                 <span className="text-sm mt-1">Sent</span>
               )}
               {lastMessage?.sentAt && (
-                <span className="text-sm mt-1">
-                  16:45
-                  {/** TODO: disabled due to hydration errors
-                  {getSentAt(lastMessage)}
-                  **/}
-                </span>
+                <span className="text-sm mt-1">{getSentAt(lastMessage)}</span>
               )}
             </div>
           </div>
