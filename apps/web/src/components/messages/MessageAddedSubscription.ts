@@ -29,6 +29,7 @@ export const useMessageAddedSubscription = (variables: MessageAddedSubscription$
       onNext: res => {
         console.log(res);
       },
+      updater: (store) => store.invalidateStore(),
       variables,
     }),
     [variables],

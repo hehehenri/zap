@@ -7,7 +7,11 @@ import { useState } from "react";
 import { login } from "@/auth";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
-import { registerHandler, useRegisterForm, useRegisterMutation } from "@/components/auth/Register";
+import {
+  registerHandler,
+  useRegisterForm,
+  useRegisterMutation,
+} from "@/components/auth/Register";
 
 const Error = ({ error }: { error: string | null }) => {
   return (
@@ -31,8 +35,8 @@ const RegisterPage = () => {
       router.push("/messages");
       router.refresh();
     },
-    onError: setError
-  })
+    onError: setError,
+  });
 
   return (
     <main className="w-full h-full flex flex-col gap-y-6 items-center justify-center">
