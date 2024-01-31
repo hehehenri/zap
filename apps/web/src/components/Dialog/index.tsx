@@ -36,7 +36,7 @@ const Dialog = ({
               <D.Overlay
                 forceMount
                 asChild
-                className="bg-zinc-500 dark:bg-zinc-700 dark:bg-opacity-10 bg-opacity-40 animate-in fade-in fixed inset-0 z-50 backdrop-blur-sm transition-opacity"
+                className="bg-zinc-500 bg-opacity-40 animate-in fade-in fixed inset-0 z-50 backdrop-blur-sm transition-opacity"
               >
                 <animated.div style={style} />
               </D.Overlay>
@@ -46,7 +46,7 @@ const Dialog = ({
                 className={cn(
                   "px-8 py-6 fixed top-[50%] left-[50%] -translate-x-[50%] -translate-y-[50%]",
                   "z-50 grid w-full max-w-lg rounded-t-xl sm:rounded-3xl lg:max-w-screen-sm",
-                  "scale-100 overflow-y-auto opacity-100 bg-white dark:bg-black md:w-full",
+                  "scale-100 overflow-y-auto opacity-100 bg-white md:w-full",
                   className,
                 )}
               >

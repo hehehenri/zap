@@ -72,7 +72,7 @@ const LoginPage = () => {
           <div className="flex flex-col gap-y-3">
             <div>
               <label
-                className="block  leading-6 text-zinc-800 dark:text-zinc-400"
+                className="block  leading-6 text-zinc-800"
                 htmlFor="username"
               >
                 Username
@@ -86,7 +86,7 @@ const LoginPage = () => {
 
             <div>
               <label
-                className="block  leading-6 text-zinc-800 dark:text-zinc-400"
+                className="block  leading-6 text-zinc-800"
                 htmlFor="username"
               >
                 Password

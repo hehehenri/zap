@@ -190,8 +190,8 @@ type StoreMessagePayload {
 }
 
 input StoreMessageInput {
-  content: String
-  roomId: String
+  content: String!
+  roomId: ID!
   clientMutationId: String
 }
 
@@ -201,7 +201,7 @@ type GetOrCreateRoomPayload {
 }
 
 input GetOrCreateRoomInput {
-  userId: String!
+  userId: ID!
   clientMutationId: String
 }
 
