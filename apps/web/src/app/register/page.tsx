@@ -1,19 +1,13 @@
 "use client";
 
 import { Logo } from "@/components/Logo";
-import { graphql, useMutation } from "react-relay";
-import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { LogIn } from "lucide-react";
-import {
-  pageRegisterMutation,
-  pageRegisterMutation$data,
-  pageRegisterMutation$variables,
-} from "@/__generated__/pageRegisterMutation.graphql";
 import { useState } from "react";
 import { login } from "@/auth";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
+import { registerHandler, useRegisterForm, useRegisterMutation } from "@/components/auth/Register";
 
 const Error = ({ error }: { error: string | null }) => {
   return (
@@ -23,45 +17,22 @@ const Error = ({ error }: { error: string | null }) => {
   );
 };
 
-const RegisterMutation = graphql`
-  mutation pageRegisterMutation($username: String!, $password: String!) {
-    register(input: { username: $username, password: $password }) {
-      token
-      user {
-        id
-        username
-      }
-    }
-  }
-`;
-
 const RegisterPage = () => {
-  const [commitMutation, inFlight] =
-    useMutation<pageRegisterMutation>(RegisterMutation);
+  const [commitMutation, inFlight] = useRegisterMutation();
   const [error, setError] = useState<string | null>(null);
 
-  const { register, handleSubmit } = useForm<pageRegisterMutation$variables>();
+  const { register, handleSubmit } = useRegisterForm();
   const router = useRouter();
 
-  // TODO: validate with zod before commiting
-  const onSubmit = (variables: pageRegisterMutation$variables) => {
-    commitMutation({
-      variables,
-      onCompleted: ({ register: response }: pageRegisterMutation$data) => {
-        if (!response?.token || !response.user) {
-          return;
-        }
-
-        login(response.token);
-
-        router.push("/messages");
-        router.refresh();
-      },
-      onError: (error) => {
-        setError(error.message);
-      },
-    });
-  };
+  const onSubmit = registerHandler({
+    commitMutation,
+    onSent: (token) => {
+      login(token);
+      router.push("/messages");
+      router.refresh();
+    },
+    onError: setError
+  })
 
   return (
     <main className="w-full h-full flex flex-col gap-y-6 items-center justify-center">

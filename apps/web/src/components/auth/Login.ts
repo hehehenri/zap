@@ -5,8 +5,13 @@ import { graphql, Disposable } from "relay-runtime";
 import { z } from "zod";
 
 const loginSchema = z.object({
-    username: z.string().min(4).max(24),
-    password: z.string().min(6)
+    username: z
+      .string()
+      .min(4, "Username must have at least 4 characters")
+      .max(24, "Username must have at most 24 characters"),
+    password: z
+      .string()
+      .min(6, "Password must have at least 6 characters")
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
