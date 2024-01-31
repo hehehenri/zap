@@ -10,7 +10,7 @@ import schema from "./schemas";
 import { errorHandlerMiddleware } from "./routes/middlewares";
 import { useServer } from "graphql-ws/lib/use/ws";
 import config from "./config";
-import { KoaContext } from "./context";
+import { KoaContext, initialContext } from "./context";
 
 const logger = () => {
   const options: LoggerOptions = {
@@ -57,10 +57,15 @@ const start = () => {
   server.listen(config.app.port, () => {
     const wsServer = new WebSocketServer({
       server,
-      path: "/graphql"
+      path: "/graphql",
     });
 
-    useServer({ schema, execute, subscribe }, wsServer)
+    useServer({
+      schema,
+      context: initialContext(),
+      execute,
+      subscribe
+    }, wsServer)
   });
 };
 

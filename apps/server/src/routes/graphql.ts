@@ -18,10 +18,10 @@ const options = async (
   },
   context: await buildContext(ctx),
   customFormatErrorFn: (error) => {
-    // TODO: this workaround doesn't seems right.
-    // find a way to do the same using
     ctx.log.error(error);
 
+    // TODO: this workaround doesn't seems right.
+    // find a way to do the same using
     const err = error.originalError;
     if (err && err instanceof RouteError) {
       ctx.status = err.status
