@@ -2,7 +2,7 @@ import { PubSub } from "graphql-subscriptions";
 
 export const events = {
   message: {
-    added: (roomId: string) => `MESSAGE:ADDED:${roomId}`
+    added: `MESSAGE:ADDED`
   }
 }
 

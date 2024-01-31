@@ -1,4 +1,4 @@
-import { mutationWithClientMutationId } from "graphql-relay";
+import { fromGlobalId, mutationWithClientMutationId } from "graphql-relay";
 import { GraphQLID, GraphQLNonNull } from "graphql/type";
 import { RoomType } from "../RoomType";
 import { RoomModel } from "../RoomModel";
@@ -18,11 +18,12 @@ export const GetOrCreateRoomMutation = mutationWithClientMutationId({
       resolve: ({ room }) => room
     }
   },
-  mutateAndGetPayload: async ({ userId }: { userId: string }, ctx: Context) => {
+  mutateAndGetPayload: async ({ userId: uId }: { userId: string }, ctx: Context) => {
     const authUser = ctx.user;
     if (!authUser) throw new UnauthorizedError();
 
-    const user = await UserModel.findById(userId);
+    const userId = fromGlobalId(uId);
+    const user = await UserModel.findById(userId.id);
     if (!user) throw new InvalidPayloadError("user not found");
 
     const existingRoom = await RoomModel.findOne({ $and: [

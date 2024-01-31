@@ -1,6 +1,6 @@
 import { GraphQLFieldConfig, GraphQLID, GraphQLNonNull } from "graphql";
 import { MessageConnection } from "../MessageType";
-import { ConnectionArguments, connectionArgs } from "graphql-relay";
+import { ConnectionArguments, connectionArgs, fromGlobalId } from "graphql-relay";
 import { UnauthorizedError } from "../../../routes/error";
 import { Context } from "@/context";
 import { MessageLoader } from "../MessageLoader";
@@ -18,13 +18,13 @@ export const RoomMessages: GraphQLFieldConfig<any, Context, ConnectionArguments 
       description: "The messages' room id"
     }
   },
-  resolve: async (_src, args, context) => {
-    const user = context.user;
+  resolve: async (_src, args, ctx) => {
+    if (!ctx.user) throw new UnauthorizedError();
 
-    if (!user) throw new UnauthorizedError();
+    const roomId = fromGlobalId(args.roomId);
 
-    return await MessageLoader.loadAll(context, withFilter(args, {
-      room: args.roomId
+    return MessageLoader.loadAll(ctx, withFilter(args, {
+      room: roomId.id
     }));
   }
 }
