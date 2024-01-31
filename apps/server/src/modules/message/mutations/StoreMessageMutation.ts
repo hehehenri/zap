@@ -8,6 +8,7 @@ import { events, pubsub } from "../../../pubsub";
 import { RoomModel } from "../../room/RoomModel";
 import { isRoomMember } from "../../room/helpers";
 import { Context } from "@/context";
+import { RoomLoader } from "@/modules/room/RoomLoader";
 
 export const StoreMessageMutation = mutationWithClientMutationId({
   name: "StoreMessage",
@@ -27,7 +28,7 @@ export const StoreMessageMutation = mutationWithClientMutationId({
 
     if (!user) throw new UnauthorizedError();
 
-    const room = await RoomModel.findById(roomId);
+    const room = await RoomLoader.load(ctx, roomId.toString());
 
     if (!room) throw new InvalidPayloadError("room not found");
 
@@ -40,10 +41,10 @@ export const StoreMessageMutation = mutationWithClientMutationId({
       sender: user._id,
       room: room._id,
     });
-
     await message.save();
+
     await RoomModel.updateOne({ _id: roomId }, { $set: { lastMessage: message._id }});
-    await pubsub.publish(events.message.added(roomId), { messageId: message._id.toString() })
+    await pubsub.publish(events.message.added(roomId), { messageId: message._id.toString() });
 
     return { message };
   }

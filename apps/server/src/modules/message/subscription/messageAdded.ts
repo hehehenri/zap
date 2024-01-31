@@ -1,7 +1,6 @@
 import { subscriptionWithClientId } from "graphql-relay-subscription";
 import { MessageType } from "../MessageType";
 import { events, pubsub } from "../../../pubsub";
-import { MessageModel } from "../MessageModel";
 import { GraphQLID, GraphQLNonNull } from "graphql";
 import { Context } from "@/context";
 import { MessageLoader } from "../MessageLoader";
@@ -23,10 +22,15 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Con
   outputFields: {
     message: {
       type: MessageType,
-      resolve: async ({ id }: NewMessage, _, ctx) => await MessageLoader.load(ctx, id)
+      resolve: async ({ id }: NewMessage, _, ctx) => {
+        return await MessageLoader.load(ctx, id);
+      }
     }
   },
-  subscribe: ({ roomId }) => {
+  subscribe: ({ roomId }, ctx, info) => {
+    const values = info.variableValues.input;
+    console.log({ values });
+
     return pubsub.asyncIterator(events.message.added(roomId));
   },
   getPayload: (obj) => {

@@ -1,17 +1,23 @@
 import { GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
-import { MessageDocument, MessageModel } from "./MessageModel";
-import { connectionDefinitions } from "graphql-relay";
+import { MessageDocument } from "./MessageModel";
+import { globalIdField } from "graphql-relay";
+import { connectionDefinitions } from '@entria/graphql-mongo-helpers';
 import { UserType } from "../user/UserType";
 import { RoomType } from "../room/RoomType";
-import { RoomDocument } from "../room/RoomModel";
-import { UserDocument } from "../user/UserModel";
+import { MessageLoader } from "./MessageLoader";
+import { UserLoader } from "../user/UserLoader";
+import { RoomLoader } from "../room/RoomLoader";
+import { nodeInterface, registerTypeLoader } from "../node/typeRegister";
+import { Context } from "@/context";
 
-export const MessageType = new GraphQLObjectType<MessageDocument>({
+export const MessageType = new GraphQLObjectType<MessageDocument, Context>({
   name: 'Message',
   fields: () => ({
-    id: {
+    id: globalIdField('Message'),
+    _id: {
       type: new GraphQLNonNull(GraphQLString),
-      resolve: (message) => message._id,
+      description: "mongoose _id",
+      resolve: (user) => user._id.toString(),
     },
     content: {
       type: new GraphQLNonNull(GraphQLString),
@@ -19,38 +25,29 @@ export const MessageType = new GraphQLObjectType<MessageDocument>({
     },
     sender: {
       type: new GraphQLNonNull(UserType),
-      resolve: async (message) => {
-        // TODO: find a way to populate using loaders
-        const messageModel = await MessageModel
-          .findById(message._id)
-          .populate<{ sender: UserDocument }>('sender')
-          .exec();
-
-        return messageModel?.sender;
+      resolve: async (message, _args, ctx) => {
+        return UserLoader.load(ctx, message.sender);
       }
     },
     room: {
       type: new GraphQLNonNull(RoomType),
-      resolve: async message => {
-        // TODO: find a way to populate using loaders
-        const messageModel = await MessageModel
-          .findById(message._id)
-          .populate<{ room: RoomDocument }>('room')
-          .exec();
-
-        return messageModel?.room;
+      resolve: async (message, _args, ctx) => {
+        return RoomLoader.load(ctx, message.room);
       }
     },
     sentAt: {
       type: new GraphQLNonNull(GraphQLString),
       resolve: (message) => message.createdAt.toString(),
-    }
-  })
+    },    
+  }),
+  interfaces: () => [nodeInterface]
 })
 
 export const MessageConnection = connectionDefinitions({
   name: 'Message',
   nodeType: MessageType
 })
+
+registerTypeLoader(MessageType, MessageLoader.load);
 
 export default MessageType;
