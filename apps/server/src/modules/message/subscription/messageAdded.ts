@@ -24,6 +24,8 @@ export const MessageAddedSubscription = subscriptionWithClientId<NewMessage, Con
         const node = await MessageLoader.load(ctx, id);
         if (!node) return null;
 
+        console.log({ "new messsage": node.content });
+        
         return {
           node,
           cursor: toGlobalId('Message', node._id)

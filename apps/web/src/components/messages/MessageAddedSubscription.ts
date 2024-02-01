@@ -1,5 +1,5 @@
 import { MessageAddedSubscription, MessageAddedSubscription$variables } from "@/__generated__/MessageAddedSubscription.graphql";
-import { useMemo } from "react";
+import { createContext, useContext, useMemo } from "react";
 import { useSubscription } from "react-relay";
 import { GraphQLSubscriptionConfig, graphql } from "relay-runtime";
 
@@ -22,11 +22,20 @@ const messageAddedSubscription = graphql`
   }
 `
 
+export const OnMessageContext = createContext<(() => void) | null>(null);
+
 export const useMessageAddedSubscription = (variables: MessageAddedSubscription$variables) => {
+  const onMessage = useContext(OnMessageContext);
+  
   const config = useMemo<GraphQLSubscriptionConfig<MessageAddedSubscription>>(
     () => ({
       subscription: messageAddedSubscription,
-      updater: (store) => store.invalidateStore(),
+      updater: (store) => {
+        store.invalidateStore()
+        if (onMessage) {
+          onMessage();
+        }        
+      },
       variables,
     }),
     [variables],

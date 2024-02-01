@@ -1,11 +1,13 @@
 "use client";
 
-import { graphql, useLazyLoadQuery } from "react-relay";
+import { FetchPolicy, graphql, useLazyLoadQuery } from "react-relay";
 import { useParams } from "next/navigation";
 import { pageRoomMessagesQuery } from "@/__generated__/pageRoomMessagesQuery.graphql";
 import { RoomPreviewList } from "@/components/room/RoomList";
 import { MessagesHeader } from "@/components/messages/Header";
 import { RoomMessages } from "@/components/RoomMessages";
+import { useCallback, useState } from "react";
+import { OnMessageContext } from "@/components/messages/MessageAddedSubscription";
 
 const RoomMessagesQuery = graphql`
   query pageRoomMessagesQuery($roomId: ID!) {
@@ -18,10 +20,25 @@ const RoomMessagesQuery = graphql`
 const RoomMessagesPage = () => {
   const { roomId: roomIdParam } = useParams<{ roomId: string }>();
   const roomId = decodeURIComponent(roomIdParam);
+  const [queryOptions, setQueryOptions] = useState<{
+    fetchKey: number;
+    fetchPolicy: FetchPolicy;
+  } | null>(null);
 
-  const queryRef = useLazyLoadQuery<pageRoomMessagesQuery>(RoomMessagesQuery, {
-    roomId,
-  });
+  const refresh = useCallback(() => {
+    setQueryOptions((prev) => ({
+      fetchKey: (prev?.fetchKey ?? 0) + 1,
+      fetchPolicy: "network-only",
+    }));
+  }, []);
+
+  const queryRef = useLazyLoadQuery<pageRoomMessagesQuery>(
+    RoomMessagesQuery,
+    {
+      roomId,
+    },
+    queryOptions ?? {},
+  );
 
   return (
     <main className="grid grid-cols-[auto_1fr]">
@@ -33,8 +50,10 @@ const RoomMessagesPage = () => {
           flex flex-col h-screen relative col-span-full lg:col-span-1
         "
       >
-        <MessagesHeader queryRef={queryRef} />
-        <RoomMessages queryRef={queryRef} roomId={roomId} />
+        <OnMessageContext.Provider value={refresh}>
+          <MessagesHeader queryRef={queryRef} />
+          <RoomMessages queryRef={queryRef} roomId={roomId} />
+        </OnMessageContext.Provider>
       </div>
     </main>
   );
