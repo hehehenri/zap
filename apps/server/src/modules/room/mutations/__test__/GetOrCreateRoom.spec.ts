@@ -3,11 +3,11 @@ import request from "supertest";
 import { createApp } from "../../../../app";
 import { generateToken } from "../../../../authentication";
 import { createUser } from "../../../user/fixture";
-import mongoose from "mongoose";
 import { describeWithDb } from "../../../../test/helpers";
 import { createRoom } from "../../fixture";
+import { toGlobalId } from "graphql-relay";
 
-const query = (userId: mongoose.Types.ObjectId) => {
+const query = (userId: string) => {
   return {
     query: `
       mutation GetCreateRoom($userId: ID!) {
@@ -28,7 +28,7 @@ describeWithDb('room/mutations/getOrCreateRoom', () => {
 
     const peer = await createUser({ username: "createroompeerusername" });
 
-    const payload = query(peer._id);
+    const payload = query(toGlobalId("User", peer._id));
     const response = await request(createApp().callback())
       .post("/graphql")
       .set({
@@ -61,7 +61,7 @@ describeWithDb('room/mutations/getOrCreateRoom', () => {
 
     await createRoom({ participants: [authUser, peer] })
 
-    const payload = query(peer._id);
+    const payload = query(toGlobalId("User",  peer._id));
     const response = await request(createApp().callback())
       .post("/graphql")
       .set({
