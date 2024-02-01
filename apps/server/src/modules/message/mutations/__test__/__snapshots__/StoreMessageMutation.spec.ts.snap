@@ -21,7 +21,9 @@ exports[`message/mutations/storeMessage should add message to room 1`] = `
 {
   "storeMessage": {
     "message": {
-      "content": "message content",
+      "node": {
+        "content": "message content",
+      },
     },
   },
 }
