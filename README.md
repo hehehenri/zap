@@ -48,7 +48,3 @@ Then, navigate to `http://localhost:3000` in your web browser to access the appl
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
-
-## Contact
-
-Henri Borges - [@hnrbs_](https://twitter.com/hnrbs_) - henri@henr.in
